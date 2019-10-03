@@ -20,7 +20,7 @@ import com.qualcomm.robotcore.util.Range;
  *
  */
 
-@TeleOp(name="Team11288_Teleop", group="Teleop")
+@TeleOp(name="Holonomic Test", group="Teleop")
 public class Holonomic extends OpMode{
 
     /* Declare OpMode members. */
@@ -86,46 +86,46 @@ public class Holonomic extends OpMode{
 
             //initialize knocking arm
             //move it out of the way and turn off the sensor light
-            knockingArm = hardwareMap.servo.get("knock arm");
-            knockingArm.setPosition(INIT_KNOCKINGARM);
-            colorSensor = hardwareMap.get(NormalizedColorSensor.class, "sensor_color");
-            if (colorSensor instanceof SwitchableLight) {
-                ((SwitchableLight) colorSensor).enableLight(false);
-            }
-
-            //initialize touch sensor
-            touchSensor = hardwareMap.get(DigitalChannel.class, "sensor_touch");
-            // set the digital channel to input.
-            touchSensor.setMode(DigitalChannel.Mode.INPUT);
-
-            //initialize shoulder motor
-            shoulder = hardwareMap.dcMotor.get("shoulder");
-            shoulder.setDirection(DcMotorSimple.Direction.REVERSE);
-            shoulder.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            shoulder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            /*
-            TODO:Here use the touch sensor to detect that the arm has moved to zero
-            TODO  While not pressed, move arm back, should ensure the knocking arm out of way
-            */
-            while(touchSensor.getState() == false){
-                targetPosition = shoulder.getCurrentPosition() - (int) (INCREMENT_MOTOR_MOVE);
-                shoulder.setTargetPosition(targetPosition);
-                shoulder.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                shoulder.setPower(SHOULDER_POWER);
-            }
-            //now set the minposition here
-            currentPosition = shoulder.getCurrentPosition(); //assume that we start with the shoulder down all the way - this is zero
-            minPosition = currentPosition;
-            //allow about 100deg of motion total
-            maxPosition = minPosition + INCREMENT_MOTOR_MOVE*17.0;
-            shoulder.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            shoulder.setPower(0);
-
-            //initialize claw and arm servos
-            leftClaw  = hardwareMap.servo.get("left claw");
-            rightClaw = hardwareMap.servo.get("right claw");
-            leftClaw.setPosition(MID_SERVO+0.4);
-            rightClaw.setPosition(MID_SERVO-0.4);
+//            knockingArm = hardwareMap.servo.get("knock arm");
+//            knockingArm.setPosition(INIT_KNOCKINGARM);
+//            colorSensor = hardwareMap.get(NormalizedColorSensor.class, "sensor_color");
+//            if (colorSensor instanceof SwitchableLight) {
+//                ((SwitchableLight) colorSensor).enableLight(false);
+//            }
+//
+//            //initialize touch sensor
+//            touchSensor = hardwareMap.get(DigitalChannel.class, "sensor_touch");
+//            // set the digital channel to input.
+//            touchSensor.setMode(DigitalChannel.Mode.INPUT);
+//
+//            //initialize shoulder motor
+//            shoulder = hardwareMap.dcMotor.get("shoulder");
+//            shoulder.setDirection(DcMotorSimple.Direction.REVERSE);
+//            shoulder.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//            shoulder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//            /*
+//            TODO:Here use the touch sensor to detect that the arm has moved to zero
+//            TODO  While not pressed, move arm back, should ensure the knocking arm out of way
+//            */
+//            while(touchSensor.getState() == false){
+//                targetPosition = shoulder.getCurrentPosition() - (int) (INCREMENT_MOTOR_MOVE);
+//                shoulder.setTargetPosition(targetPosition);
+//                shoulder.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                shoulder.setPower(SHOULDER_POWER);
+//            }
+//            //now set the minposition here
+//            currentPosition = shoulder.getCurrentPosition(); //assume that we start with the shoulder down all the way - this is zero
+//            minPosition = currentPosition;
+//            //allow about 100deg of motion total
+//            maxPosition = minPosition + INCREMENT_MOTOR_MOVE*17.0;
+//            shoulder.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//            shoulder.setPower(0);
+//
+//            //initialize claw and arm servos
+//            leftClaw  = hardwareMap.servo.get("left claw");
+//            rightClaw = hardwareMap.servo.get("right claw");
+//            leftClaw.setPosition(MID_SERVO+0.4);
+//            rightClaw.setPosition(MID_SERVO-0.4);
 
     }
     /*
@@ -168,58 +168,58 @@ public class Holonomic extends OpMode{
         motorBackRight.setPower(BackRight);
 
         // Use gamepad buttons to move the shoulder motor up (Y) and down (A)
-        if (gamepad2.y) {
-            telemetry.addData("Motor Position", targetPosition);
-            targetPosition = shoulder.getCurrentPosition() + (int) (INCREMENT_MOTOR_MOVE);
-          //  if (/*targetPosition >= minPosition && */targetPosition <= maxPosition) {
-                shoulder.setTargetPosition(targetPosition);
-                shoulder.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                shoulder.setPower(SHOULDER_POWER);
-          //  }
-        }
-        else {
-            if (gamepad2.a) {
-                targetPosition = shoulder.getCurrentPosition() - (int) (INCREMENT_MOTOR_MOVE);
-                //if (targetPosition >= minPosition && targetPosition <= maxPosition) {
-                    shoulder.setTargetPosition(targetPosition);
-                    shoulder.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    shoulder.setPower(SHOULDER_POWER);
-              //  }
-            } 
-                //else {
-               // if (shoulder.getCurrentPosition() > maxPosition) {
-               //    shoulder.setTargetPosition((int) maxPosition);
-               //    shoulder.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-               //    shoulder.setPower(SHOULDER_POWER);
-              //  } 
-                else {
-                   // shoulder.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                    shoulder.setPower(0.0);
-                }
-          //  }
-        }
-
-        telemetry.addData("ARM",  "= %d", shoulder.getCurrentPosition());
-
-        // Use gamepad2 dpad up and down to move elbow up and down
-        if (gamepad2.dpad_up)
-            elbowOffset += ELBOW_SPEED;
-        else if (gamepad2.dpad_down)
-            elbowOffset -= ELBOW_SPEED;
-        elbowOffset = Range.clip(elbowOffset, -0.5, 0.5);
-        knockingArm.setPosition(MID_SERVO + elbowOffset);
-       // telemetry.addData("knockingArm",  "= %.2f", MID_SERVO + elbowOffset);
-
-        // Use gamepad2 left & right Bumpers to open and close the claw
-        if (gamepad2.right_bumper)
-            clawOffset += CLAW_SPEED;
-        else if (gamepad2.left_bumper)
-            clawOffset -= CLAW_SPEED;
-        // Move both servos to new position.  Assume servos are mirror image of each other.
-        clawOffset = Range.clip(clawOffset, -0.5, 0.5);
-        leftClaw.setPosition(MID_SERVO + clawOffset);
-        rightClaw.setPosition(MID_SERVO - clawOffset);
-        telemetry.addData("clawOffset",  "= %.2f", clawOffset);
+//        if (gamepad2.y) {
+//            telemetry.addData("Motor Position", targetPosition);
+//            targetPosition = shoulder.getCurrentPosition() + (int) (INCREMENT_MOTOR_MOVE);
+//          //  if (/*targetPosition >= minPosition && */targetPosition <= maxPosition) {
+//                shoulder.setTargetPosition(targetPosition);
+//                shoulder.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                shoulder.setPower(SHOULDER_POWER);
+//          //  }
+//        }
+//        else {
+//            if (gamepad2.a) {
+//                targetPosition = shoulder.getCurrentPosition() - (int) (INCREMENT_MOTOR_MOVE);
+//                //if (targetPosition >= minPosition && targetPosition <= maxPosition) {
+//                    shoulder.setTargetPosition(targetPosition);
+//                    shoulder.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                    shoulder.setPower(SHOULDER_POWER);
+//              //  }
+//            }
+//                //else {
+//               // if (shoulder.getCurrentPosition() > maxPosition) {
+//               //    shoulder.setTargetPosition((int) maxPosition);
+//               //    shoulder.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//               //    shoulder.setPower(SHOULDER_POWER);
+//              //  }
+//                else {
+//                   // shoulder.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//                    shoulder.setPower(0.0);
+//                }
+//          //  }
+//        }
+//
+//        telemetry.addData("ARM",  "= %d", shoulder.getCurrentPosition());
+//
+//        // Use gamepad2 dpad up and down to move elbow up and down
+//        if (gamepad2.dpad_up)
+//            elbowOffset += ELBOW_SPEED;
+//        else if (gamepad2.dpad_down)
+//            elbowOffset -= ELBOW_SPEED;
+//        elbowOffset = Range.clip(elbowOffset, -0.5, 0.5);
+//        knockingArm.setPosition(MID_SERVO + elbowOffset);
+//       // telemetry.addData("knockingArm",  "= %.2f", MID_SERVO + elbowOffset);
+//
+//        // Use gamepad2 left & right Bumpers to open and close the claw
+//        if (gamepad2.right_bumper)
+//            clawOffset += CLAW_SPEED;
+//        else if (gamepad2.left_bumper)
+//            clawOffset -= CLAW_SPEED;
+//        // Move both servos to new position.  Assume servos are mirror image of each other.
+//        clawOffset = Range.clip(clawOffset, -0.5, 0.5);
+//        leftClaw.setPosition(MID_SERVO + clawOffset);
+//        rightClaw.setPosition(MID_SERVO - clawOffset);
+//        telemetry.addData("clawOffset",  "= %.2f", clawOffset);
     }
 
     /*
