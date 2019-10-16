@@ -175,7 +175,7 @@ public class Holonomic extends OpMode{
 //                shoulder.setTargetPosition(targetPosition);
 //                shoulder.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //                shoulder.setPower(SHOULDER_POWER);
-//          //  }
+//          //
 //        }
 //        else {
 //            if (gamepad2.a) {
