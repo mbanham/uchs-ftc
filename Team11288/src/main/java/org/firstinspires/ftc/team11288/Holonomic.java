@@ -176,9 +176,13 @@ public class Holonomic extends OpMode{
 
         if(gamepad2.x) {
             platform.setPosition(0);
+            Log.i("MyActivity", "ServoPosition=0");
         } else if(gamepad2.y) {
             platform.setPosition(1);
+            Log.i("MyActivity", "ServoPosition=1");
         }
+
+
 
         motorLift.setPower(gamepad2.left_stick_y);
 
