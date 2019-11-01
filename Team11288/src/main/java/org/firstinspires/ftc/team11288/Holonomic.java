@@ -29,6 +29,7 @@ public class Holonomic extends OpMode{
     private DcMotor motorFrontLeft;
     private DcMotor motorBackRight;
     private DcMotor motorBackLeft;
+    private DcMotor motorLift;
 
     //claw and arm
     static final double     COUNTS_PER_MOTOR_REV    = 1120 ;    // NeveRest Classic 40 Gearmotor (am-2964a)
@@ -39,19 +40,19 @@ public class Holonomic extends OpMode{
     private double minPosition; //minimum allowed position of shoulder motor
     private double maxPosition; //maximum allowed positon of shoulder motor
 
-//    private Servo elbow    = null;
-//    private Servo wrist    = null;
-    private Servo leftClaw    = null;
-    private Servo rightClaw   = null;
-    private static final double MID_SERVO       =  0.5 ;
-    private static final double INIT_ELBOW_SERVO       =  0.0 ;
-    private static final double SHOULDER_POWER =  1.0 ;
-    private static final double SHOULDER_UP_POWER =  0.5 ;
+//    private elbow             = null;
+//    private Servo wrist       = null;
+    private Servo claw        = null;
+    private Servo platform    = null;
+    private static final double MID_SERVO           =  0.5 ;
+    private static final double INIT_ELBOW_SERVO    =  0.0 ;
+    private static final double SHOULDER_POWER      =  1.0 ;
+    private static final double SHOULDER_UP_POWER   =  0.5 ;
     private static final double SHOULDER_DOWN_POWER = -0.5 ;
     private double          clawOffset  = 0.4 ;                  // Init to closed position
     private final double    CLAW_SPEED  = 0.02 ;                 // sets rate to move servo
     private double          elbowOffset  = 0.0 ;                  // Servo mid position
-    private final double    ELBOW_SPEED  = 0.02 ;                 // sets rate to move servo
+    private final double    ELBOW_SPEED  = 0.02 ;                  // sets rate to move servo
 //    private double          wristOffset  = 0.0 ;                  // Servo mid position
 //    private final double    WRIST_SPEED  = 0.02 ;                 // sets rate to move servo
     private static final double INIT_KNOCKINGARM = 0.3;   // Gets the knocking arm out of the way
@@ -78,11 +79,17 @@ public class Holonomic extends OpMode{
             motorFrontLeft = hardwareMap.dcMotor.get("motor front left");
             motorBackLeft = hardwareMap.dcMotor.get("motor back left");
             motorBackRight = hardwareMap.dcMotor.get("motor back right");
+            motorLift = hardwareMap.dcMotor.get("motor lift");
+            claw = hardwareMap.servo.get("claw servo");
+            platform = hardwareMap.servo.get("platform servo");
 
+            claw.setPosition(0);
+            platform.setPosition(0);
             motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
             motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
             motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
             motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+            motorLift.setDirection(DcMotorSimple.Direction.FORWARD);
 
             //initialize knocking arm
             //move it out of the way and turn off the sensor light
@@ -166,6 +173,14 @@ public class Holonomic extends OpMode{
         motorFrontLeft.setPower(FrontLeft);
         motorBackLeft.setPower(BackLeft);
         motorBackRight.setPower(BackRight);
+
+        if(gamepad2.x) {
+            platform.setPosition(0);
+        } else if(gamepad2.y) {
+            platform.setPosition(1);
+        }
+
+        motorLift.setPower(gamepad2.left_stick_y);
 
         // Use gamepad buttons to move the shoulder motor up (Y) and down (A)
 //        if (gamepad2.y) {
