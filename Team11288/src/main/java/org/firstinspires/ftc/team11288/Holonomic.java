@@ -182,8 +182,6 @@ public class Holonomic extends OpMode{
             Log.i("MyActivity", "ServoPosition=1");
         }
 
-
-
         motorLift.setPower(gamepad2.left_stick_y);
 
         // Use gamepad buttons to move the shoulder motor up (Y) and down (A)
@@ -268,10 +266,8 @@ public class Holonomic extends OpMode{
         // get the corresponding index for the scaleInput array.
         int index = (int) (dVal * 16.0);
         // index should be positive.
-        if (index < 0) {
-            index = -index;
-        }
-        // index cannot exceed size of array minus 1.
+        index = Math.abs(index);
+        //index cannot exceed size of array minus 1.
         if (index > 16) {
             index = 16;
         }
