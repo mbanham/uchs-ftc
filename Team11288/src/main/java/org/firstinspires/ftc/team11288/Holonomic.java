@@ -90,6 +90,8 @@ public class Holonomic extends OpMode{
             motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
             motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);
             motorLift.setDirection(DcMotorSimple.Direction.FORWARD);
+            motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            motorLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
             //initialize knocking arm
             //move it out of the way and turn off the sensor light
@@ -174,15 +176,26 @@ public class Holonomic extends OpMode{
         motorBackLeft.setPower(BackLeft);
         motorBackRight.setPower(BackRight);
 
-        if(gamepad2.x) {
+        if(gamepad2.a) {
             platform.setPosition(0);
-            Log.i("MyActivity", "ServoPosition=0");
+            telemetry.addData("MyActivity", "ServoPosition=0");
         } else if(gamepad2.y) {
             platform.setPosition(1);
-            Log.i("MyActivity", "ServoPosition=1");
+            telemetry.addData("MyActivity", "ServoPosition=1");
+        }
+        if(gamepad2.right_trigger != 0){
+            claw.setPosition(1);
+            telemetry.addData("MyActivity", "ClawPosition=1");
+        } if (gamepad2.left_trigger != 0){
+            claw.setPosition(0);
+            telemetry.addData("MyActivity", "ClawPosition=0");
         }
 
-        motorLift.setPower(gamepad2.left_stick_y);
+        telemetry.update();
+        if(gamepad2.left_stick_y > 4)
+        motorLift.setPower(gamepad2.left_stick_y * 0.01);//1%
+        else
+            motorLift.setPower(0);
 
         // Use gamepad buttons to move the shoulder motor up (Y) and down (A)
 //        if (gamepad2.y) {
