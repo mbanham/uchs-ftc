@@ -52,7 +52,7 @@ public class Holonomic extends OpMode{
     private double          clawOffset  = 0.4 ;                  // Init to closed position
     private final double    CLAW_SPEED  = 0.02 ;                 // sets rate to move servo
     private double          elbowOffset  = 0.0 ;                  // Servo mid position
-    private final double    ELBOW_SPEED  = 0.02 ;                  // sets rate to move servo
+    private fina double    ELBOW_SPEED  = 0.02 ;                  // sets rate to move servo
 //    private double          wristOffset  = 0.0 ;                  // Servo mid position
 //    private final double    WRIST_SPEED  = 0.02 ;                 // sets rate to move servo
     private static final double INIT_KNOCKINGARM = 0.3;   // Gets the knocking arm out of the way
@@ -61,7 +61,7 @@ public class Holonomic extends OpMode{
     //arm for knocking jewel - keep it out of the way in Driver Mode
     private Servo knockingArm = null;
     private static final double SAFE_ARM_POSITION       =  0.0 ;
-    //color sensor
+    //color sensorl
     NormalizedColorSensor colorSensor;
 
     //TODO touch sensor
@@ -264,9 +264,7 @@ public class Holonomic extends OpMode{
                 0.25, 0.36, 0.43, 0.6499, 0.84, 1.00, 1.00, 1.00, 1.00};
 
         // get the corresponding index for the scaleInput array.
-        int index = (int) (dVal * 16.0);
-        // index should be positive.
-        index = Math.abs(index);
+        int index = Math.abs((int) (dVal * 16.0));
         //index cannot exceed size of array minus 1.
         if (index > 16) {
             index = 16;
