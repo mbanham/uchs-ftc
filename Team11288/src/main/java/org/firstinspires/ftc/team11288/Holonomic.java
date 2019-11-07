@@ -52,7 +52,7 @@ public class Holonomic extends OpMode{
     private double          clawOffset  = 0.4 ;                  // Init to closed position
     private final double    CLAW_SPEED  = 0.02 ;                 // sets rate to move servo
     private double          elbowOffset  = 0.0 ;                  // Servo mid position
-    private fina double    ELBOW_SPEED  = 0.02 ;                  // sets rate to move servo
+    private final double    ELBOW_SPEED  = 0.02 ;                  // sets rate to move servo
 //    private double          wristOffset  = 0.0 ;                  // Servo mid position
 //    private final double    WRIST_SPEED  = 0.02 ;                 // sets rate to move servo
     private static final double INIT_KNOCKINGARM = 0.3;   // Gets the knocking arm out of the way
