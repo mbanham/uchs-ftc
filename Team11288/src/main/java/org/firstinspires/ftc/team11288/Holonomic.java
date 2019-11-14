@@ -12,6 +12,8 @@ import com.qualcomm.robotcore.hardware.SwitchableLight;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.Range;
 
+import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
+
 /*
  * This file provides Teleop driving for the Team11288 Holonomic drive robot.
  * The code is structured as an Iterative OpMode
@@ -32,8 +34,15 @@ public class Holonomic extends OpMode{
     private DcMotor motorLift;
 
     //claw and arm
-    static final double     COUNTS_PER_MOTOR_REV    = 1120 ;    // NeveRest Classic 40 Gearmotor (am-2964a)
-    static final double INCREMENT_MOTOR_MOVE = 30; // move about 10 degrees at a time
+ //  static final double     COUNTS_PER_MOTOR_REV    = 1120 ;    // NeveRest Classic 40 Gearmotor (am-2964a)
+    static final double INCREMENT_MOTOR_MOVE = 100; // move about 10 degrees at a time
+
+    private final double ARM_MOTOR_POWER = 0.5;
+    private final double DRIVE_MOTOR_POWER = 0.75;
+    static final double     COUNTS_PER_MOTOR_REV    = 1250.0; //HD Hex Motor (REV-41-1301) 40:1
+    static final double     COUNTS_PER_DRIVE_MOTOR_REV    = 300.0; // counts per reevaluation of the motor
+    static final double INCREMENT_DRIVE_MOTOR_MOVE = 30.0; // move set amount at a time
+
     private DcMotor shoulder; //bottom pivot of the new claw
     private int currentPosition; //used to track shoulder motor current position
     private int targetPosition; //used to track target shoulder position
@@ -67,6 +76,12 @@ public class Holonomic extends OpMode{
     //TODO touch sensor
     DigitalChannel touchSensor;  // Hardware Device Object
 
+
+    private int directionArm=1;
+    private int rotations=12;
+    private int initialPosition;
+
+
     /* Code to run ONCE when the driver hits INIT */
         @Override
     public void init() {
@@ -90,8 +105,19 @@ public class Holonomic extends OpMode{
             motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
             motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);
             motorLift.setDirection(DcMotorSimple.Direction.FORWARD);
+
+
             motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             motorLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            motorLift.setMode(STOP_AND_RESET_ENCODER);
+
+            motorLift.setDirection(DcMotorSimple.Direction.FORWARD);
+            initialPosition = (int) (motorLift.getCurrentPosition());
+            rotations=12;
+            directionArm = -1;
+            targetPosition = (int) (motorLift.getCurrentPosition() + (directionArm * rotations * COUNTS_PER_MOTOR_REV));
+           // motorLift.setTargetPosition(targetPosition);
+           // motorLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             //initialize knocking arm
             //move it out of the way and turn off the sensor light
@@ -176,26 +202,39 @@ public class Holonomic extends OpMode{
         motorBackLeft.setPower(BackLeft);
         motorBackRight.setPower(BackRight);
 
-        if(gamepad2.a) {
+        if(gamepad1.a) {
             platform.setPosition(0);
             telemetry.addData("MyActivity", "ServoPosition=0");
-        } else if(gamepad2.y) {
+            telemetry.update();
+        } else if(gamepad1.y) {
             platform.setPosition(1);
             telemetry.addData("MyActivity", "ServoPosition=1");
+            telemetry.update();
         }
-        if(gamepad2.right_trigger != 0){
+        if(gamepad2.right_bumper){
             claw.setPosition(1);
             telemetry.addData("MyActivity", "ClawPosition=1");
-        } if (gamepad2.left_trigger != 0){
+            telemetry.update();
+        } if (gamepad2.left_bumper){
             claw.setPosition(0);
             telemetry.addData("MyActivity", "ClawPosition=0");
+            telemetry.update();
         }
 
         telemetry.update();
-        if(gamepad2.left_stick_y > 4)
-        motorLift.setPower(gamepad2.left_stick_y * 0.01);//1%
-        else
-            motorLift.setPower(0);
+
+
+
+
+        motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        if(gamepad2.dpad_up) {
+            motorLift.setPower(0.5);
+        }
+        motorLift.setPower(0.0);
+        if(gamepad2.dpad_down) {
+            motorLift.setPower(-0.5);
+
+        }
 
         // Use gamepad buttons to move the shoulder motor up (Y) and down (A)
 //        if (gamepad2.y) {
