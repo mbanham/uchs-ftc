@@ -12,6 +12,8 @@ import com.qualcomm.robotcore.hardware.SwitchableLight;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.internal.files.RecursiveFileObserver;
+
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
 /*
@@ -181,6 +183,8 @@ public class Holonomic extends OpMode{
     /*
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
      */
+
+
     @Override
     public void loop() {
         double r = Math.hypot(scaleInput(gamepad1.left_stick_x), scaleInput(gamepad1.left_stick_y));
@@ -227,14 +231,22 @@ public class Holonomic extends OpMode{
 
 
         motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        if(gamepad2.dpad_up) {
-            motorLift.setPower(0.5);
+        if(gamepad2.dpad_up && !gamepad2.x) {
+            motorLift.setTargetPosition(Globals.max_claw_limit);
+            motorLift.setPower(100);
         }
         motorLift.setPower(0.0);
-        if(gamepad2.dpad_down) {
+        if(gamepad2.dpad_down && !gamepad2.x) {
             motorLift.setPower(-0.5);
 
         }
+        if(gamepad2.x && gamepad2.dpad_down){
+            Globals.min__claw_limit = motorLift.getCurrentPosition();
+        }
+        if(gamepad2.x && gamepad2.dpad_up){
+            Globals.max_claw_limit = motorLift.getCurrentPosition();
+        }
+
 
         // Use gamepad buttons to move the shoulder motor up (Y) and down (A)
 //        if (gamepad2.y) {
@@ -330,5 +342,26 @@ public class Holonomic extends OpMode{
         }
         // return scaled value.
         return dScale;
+    }
+
+    public static void drive(double lsx, double lsy, double rsx) {
+        double r = Math.hypot(scaleInput(lsx), scaleInput(lsy));
+        double robotAngle = Math.atan2(scaleInput(lsy), scaleInput(-lsx)) - Math.PI / 4;
+        double rightX = scaleInput(rsx);
+        final double v1 = r * Math.cos(robotAngle) - rightX;
+        final double v2 = -r * Math.sin(robotAngle) - rightX;
+        final double v3 = r * Math.sin(robotAngle) - rightX;
+        final double v4 = -r * Math.cos(robotAngle) - rightX;
+
+        double FrontRight = Range.clip(v2, -1, 1);
+        double FrontLeft = Range.clip(v1, -1, 1);
+        double BackLeft = Range.clip(v3, -1, 1);
+        double BackRight = Range.clip(v4, -1, 1);
+
+        // write the values to the motors
+        motorFrontRight.setPower(FrontRight);
+        motorFrontLeft.setPower(FrontLeft);
+        motorBackLeft.setPower(BackLeft);
+        motorBackRight.setPower(BackRight);
     }
 }
