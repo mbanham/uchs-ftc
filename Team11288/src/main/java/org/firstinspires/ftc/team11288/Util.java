@@ -1,14 +1,14 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.team11288;
 
 import android.graphics.Color;
+
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorControllerEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -28,6 +28,7 @@ public class Util {
     private DigitalChannel touchSensor;
     private DigitalChannel liftSensor;
 
+
     private final double LIFT_MOTOR_POWER = 0.65;
     private final double ARM_MOTOR_POWER = 0.15;
     private final double DRIVE_MOTOR_POWER = 0.75;
@@ -38,16 +39,85 @@ public class Util {
     static final double INCHES_PER_ROTATION = 11.137; //inches per rotation of 90mm traction wheel
     static final double DEG_PER_ROTATION = 100.0; //inches per rotation of 90mm traction wheel
 
-    public Util(DcMotor rightMotor, DcMotor leftMotor, DcMotor liftMotorIn, DcMotor armMotorIn,
-                Telemetry telemetryIn, DigitalChannel touchSensorIn) {
-        motorLeft = leftMotor;
-        motorRight = rightMotor;
-        liftMotor = liftMotorIn;
-        armMotor = armMotorIn;
-        telemetry = telemetryIn;
-        touchSensor = touchSensorIn;
-       // liftSensor = liftSensorIn;
+    //2019 Code changes
+    private DcMotor  motorBackLeft;
+    private DcMotor  motorBackRight;
+    private DcMotor  motorFrontLeft;
+    private DcMotor  motorFrontRight;
+    static final int COUNTS_PER_INCH= (int) ((1.4142 * (COUNTS_PER_DRIVE_MOTOR_REV)) / (4.0 * Math.PI)); //for 45deg wheels
+    ///
+
+    public Util(DcMotor frontRightMotor, DcMotor frontLeftMotor, DcMotor backRightMotor, DcMotor backLeftMotor
+            /*, DcMotor liftMotorIn, DcMotor armMotorIn,
+                Telemetry telemetryIn, DigitalChannel touchSensorIn*/) {
+
+        motorBackLeft=backLeftMotor;
+        motorBackRight=backRightMotor;
+        motorFrontLeft=frontLeftMotor;
+        motorFrontRight=frontRightMotor;
+
+
+//        motorLeft = leftMotor;
+//        motorRight = rightMotor;
+//        liftMotor = liftMotorIn;
+//        armMotor = armMotorIn;
+//        telemetry = telemetryIn;
+//        touchSensor = touchSensorIn;
+//       // liftSensor = liftSensorIn;
     }
+
+    //Routines for 2019-2020 - based on Holonomic code from 2017
+
+    public void drivebyDistance(double x, double y, double rotation, double distance) {//inches
+        double r = Math.hypot((x), (-y));
+        double robotAngle = Math.atan2((-y), (x)) - Math.PI / 4;
+        double rightX = (rotation);
+        final double v1 = r * Math.cos(robotAngle) - rightX;
+        final double v2 = -r * Math.sin(robotAngle) - rightX;
+        final double v3 = r * Math.sin(robotAngle) - rightX;
+        final double v4 = -r * Math.cos(robotAngle) - rightX;
+
+        double FrontRight = Range.clip(v2, -1, 1);
+        double FrontLeft = Range.clip(v1, -1, 1);
+        double BackLeft = Range.clip(v3, -1, 1);
+        double BackRight = Range.clip(v4, -1, 1);
+
+
+        int moveAmount = (int) (distance * COUNTS_PER_INCH);
+        int backLeftTargetPosition = (int) (motorBackLeft.getCurrentPosition() + Math.signum(BackLeft)* moveAmount);
+        int backRightTargetPosition = (int) (motorBackRight.getCurrentPosition() + Math.signum(BackRight)* moveAmount);
+        int frontLeftTargetPosition = (int) (motorFrontLeft.getCurrentPosition() + Math.signum(FrontLeft)* moveAmount);
+        int frontRightTargetPosition = (int) (motorFrontRight.getCurrentPosition() + Math.signum(FrontRight)* moveAmount);
+
+        motorBackLeft.setTargetPosition((int) backLeftTargetPosition);
+        motorBackRight.setTargetPosition((int) backRightTargetPosition);
+        motorFrontLeft.setTargetPosition((int) frontLeftTargetPosition);
+        motorFrontRight.setTargetPosition((int) frontRightTargetPosition);
+
+        motorBackLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorBackRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorFrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorFrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        motorFrontRight.setPower(FrontRight);
+        motorFrontLeft.setPower(FrontLeft);
+        motorBackLeft.setPower(BackLeft);
+        motorBackRight.setPower(BackRight);
+    }
+
+    public void setWheelsToEncoderMode(){
+            motorBackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            motorBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            motorFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            motorFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            motorFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            motorFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            motorBackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            motorBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
+    }
+    ///
 
     //Drive Routines
     public void twoWheelDrive(double leftInput, double rightInput,int mode) {

@@ -1,5 +1,5 @@
 // Team11288_Teleop
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.team11288;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;

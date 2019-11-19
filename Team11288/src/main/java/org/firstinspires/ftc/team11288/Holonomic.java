@@ -8,11 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.SwitchableLight;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.Range;
-
-import org.firstinspires.ftc.robotcore.internal.files.RecursiveFileObserver;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
@@ -34,6 +30,9 @@ public class Holonomic extends OpMode{
     private DcMotor motorBackRight;
     private DcMotor motorBackLeft;
     private DcMotor motorLift;
+
+    private Util teamUtils;
+
 
     //claw and arm
  //  static final double     COUNTS_PER_MOTOR_REV    = 1120 ;    // NeveRest Classic 40 Gearmotor (am-2964a)
@@ -118,51 +117,9 @@ public class Holonomic extends OpMode{
             rotations=12;
             directionArm = -1;
             targetPosition = (int) (motorLift.getCurrentPosition() + (directionArm * rotations * COUNTS_PER_MOTOR_REV));
-           // motorLift.setTargetPosition(targetPosition);
-           // motorLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            //initialize knocking arm
-            //move it out of the way and turn off the sensor light
-//            knockingArm = hardwareMap.servo.get("knock arm");
-//            knockingArm.setPosition(INIT_KNOCKINGARM);
-//            colorSensor = hardwareMap.get(NormalizedColorSensor.class, "sensor_color");
-//            if (colorSensor instanceof SwitchableLight) {
-//                ((SwitchableLight) colorSensor).enableLight(false);
-//            }
-//
-//            //initialize touch sensor
-//            touchSensor = hardwareMap.get(DigitalChannel.class, "sensor_touch");
-//            // set the digital channel to input.
-//            touchSensor.setMode(DigitalChannel.Mode.INPUT);
-//
-//            //initialize shoulder motor
-//            shoulder = hardwareMap.dcMotor.get("shoulder");
-//            shoulder.setDirection(DcMotorSimple.Direction.REVERSE);
-//            shoulder.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//            shoulder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//            /*
-//            TODO:Here use the touch sensor to detect that the arm has moved to zero
-//            TODO  While not pressed, move arm back, should ensure the knocking arm out of way
-//            */
-//            while(touchSensor.getState() == false){
-//                targetPosition = shoulder.getCurrentPosition() - (int) (INCREMENT_MOTOR_MOVE);
-//                shoulder.setTargetPosition(targetPosition);
-//                shoulder.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//                shoulder.setPower(SHOULDER_POWER);
-//            }
-//            //now set the minposition here
-//            currentPosition = shoulder.getCurrentPosition(); //assume that we start with the shoulder down all the way - this is zero
-//            minPosition = currentPosition;
-//            //allow about 100deg of motion total
-//            maxPosition = minPosition + INCREMENT_MOTOR_MOVE*17.0;
-//            shoulder.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//            shoulder.setPower(0);
-//
-//            //initialize claw and arm servos
-//            leftClaw  = hardwareMap.servo.get("left claw");
-//            rightClaw = hardwareMap.servo.get("right claw");
-//            leftClaw.setPosition(MID_SERVO+0.4);
-//            rightClaw.setPosition(MID_SERVO-0.4);
+            //utils class initializer
+            teamUtils = new Util(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft);
 
     }
     /*
@@ -206,6 +163,7 @@ public class Holonomic extends OpMode{
         motorBackLeft.setPower(BackLeft);
         motorBackRight.setPower(BackRight);
 
+        //platformArm
         if(gamepad1.a) {
             platform.setPosition(0);
             telemetry.addData("MyActivity", "ServoPosition=0");
@@ -215,6 +173,8 @@ public class Holonomic extends OpMode{
             telemetry.addData("MyActivity", "ServoPosition=1");
             telemetry.update();
         }
+
+        //claw
         if(gamepad2.right_bumper){
             claw.setPosition(1);
             telemetry.addData("MyActivity", "ClawPosition=1");
@@ -225,7 +185,43 @@ public class Holonomic extends OpMode{
             telemetry.update();
         }
 
+        ///Code from 2017 - this is how the holonomic drive can be
+        //set up to drive a fixed number of inches
+        //can test here in teleop and bring into autonomous
+        //drive fixed amount
+        double distanceToDrive=6.0;  //test parameter
+        teamUtils.setWheelsToEncoderMode();
+        //driveByDistance - speed in each direction and inches to travel
+        //ex: travel 12 inches in positive X direction at quarter speed
+        //drivebyDistance(0.25,0.0,0.0,12.0);
+        if (gamepad1.left_bumper) {
+            distanceToDrive=distanceToDrive+1.0<36?distanceToDrive+1:36;
+        }
+        if (gamepad1.right_bumper) {
+            distanceToDrive=distanceToDrive-1.0>0.0?distanceToDrive-1.0:0.0;
+        }
+        telemetry.addData("Distance To Drive",  "= %.2f", distanceToDrive);
         telemetry.update();
+        if (gamepad1.dpad_up) {
+            teamUtils.drivebyDistance(0.0, 0.25, 0.0, distanceToDrive);
+        }
+        if (gamepad1.dpad_down) {
+            teamUtils.drivebyDistance(0.0, -0.25, 0.0, distanceToDrive);
+        }
+        if (gamepad1.dpad_right) {
+            teamUtils.drivebyDistance(0.25, 0.0, 0.0, distanceToDrive);
+        }
+        if (gamepad1.dpad_left) {
+            teamUtils.drivebyDistance(-0.25, 0.0, 0.0, distanceToDrive);
+        }
+        if (gamepad1.dpad_right) {
+            teamUtils.drivebyDistance(0.0, 0.0, 0.25, distanceToDrive);
+        }
+        if (gamepad1.dpad_left) {
+            teamUtils. drivebyDistance(0.0, 0.0, -0.25, distanceToDrive);
+        }
+        telemetry.update();
+        /////
 
 
 
@@ -248,59 +244,6 @@ public class Holonomic extends OpMode{
         }
 
 
-        // Use gamepad buttons to move the shoulder motor up (Y) and down (A)
-//        if (gamepad2.y) {
-//            telemetry.addData("Motor Position", targetPosition);
-//            targetPosition = shoulder.getCurrentPosition() + (int) (INCREMENT_MOTOR_MOVE);
-//          //  if (/*targetPosition >= minPosition && */targetPosition <= maxPosition) {
-//                shoulder.setTargetPosition(targetPosition);
-//                shoulder.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//                shoulder.setPower(SHOULDER_POWER);
-//          //
-//        }
-//        else {
-//            if (gamepad2.a) {
-//                targetPosition = shoulder.getCurrentPosition() - (int) (INCREMENT_MOTOR_MOVE);
-//                //if (targetPosition >= minPosition && targetPosition <= maxPosition) {
-//                    shoulder.setTargetPosition(targetPosition);
-//                    shoulder.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//                    shoulder.setPower(SHOULDER_POWER);
-//              //  }
-//            }
-//                //else {
-//               // if (shoulder.getCurrentPosition() > maxPosition) {
-//               //    shoulder.setTargetPosition((int) maxPosition);
-//               //    shoulder.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//               //    shoulder.setPower(SHOULDER_POWER);
-//              //  }
-//                else {
-//                   // shoulder.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//                    shoulder.setPower(0.0);
-//                }
-//          //  }
-//        }
-//
-//        telemetry.addData("ARM",  "= %d", shoulder.getCurrentPosition());
-//
-//        // Use gamepad2 dpad up and down to move elbow up and down
-//        if (gamepad2.dpad_up)
-//            elbowOffset += ELBOW_SPEED;
-//        else if (gamepad2.dpad_down)
-//            elbowOffset -= ELBOW_SPEED;
-//        elbowOffset = Range.clip(elbowOffset, -0.5, 0.5);
-//        knockingArm.setPosition(MID_SERVO + elbowOffset);
-//       // telemetry.addData("knockingArm",  "= %.2f", MID_SERVO + elbowOffset);
-//
-//        // Use gamepad2 left & right Bumpers to open and close the claw
-//        if (gamepad2.right_bumper)
-//            clawOffset += CLAW_SPEED;
-//        else if (gamepad2.left_bumper)
-//            clawOffset -= CLAW_SPEED;
-//        // Move both servos to new position.  Assume servos are mirror image of each other.
-//        clawOffset = Range.clip(clawOffset, -0.5, 0.5);
-//        leftClaw.setPosition(MID_SERVO + clawOffset);
-//        rightClaw.setPosition(MID_SERVO - clawOffset);
-//        telemetry.addData("clawOffset",  "= %.2f", clawOffset);
     }
 
     /*
@@ -344,7 +287,7 @@ public class Holonomic extends OpMode{
         return dScale;
     }
 
-    public static void drive(double lsx, double lsy, double rsx) {
+    public void drive(double lsx, double lsy, double rsx) {
         double r = Math.hypot(scaleInput(lsx), scaleInput(lsy));
         double robotAngle = Math.atan2(scaleInput(lsy), scaleInput(-lsx)) - Math.PI / 4;
         double rightX = scaleInput(rsx);
