@@ -16,10 +16,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 
 
-@Autonomous(name = "Crater_No_Land", group = "Linear Opmode")
+@Autonomous(name = "LinearExample", group = "Linear Opmode")
 //@Disabled                            // Comment this out to add to the opmode list
 
-public class Crater_No_Land extends LinearOpMode {
+public class LinearExample extends LinearOpMode {
     //initialize these variables, override them in the constructor
     private int TEAM_COLOR = Color.BLUE;
     private static final int teleopType1 = 0, teleopType2 = 1, teleopType3 = 2, teleopTypeLinear = 3, teleopTypeRev = 4;
@@ -117,7 +117,7 @@ public class Crater_No_Land extends LinearOpMode {
         touchSensor = hardwareMap.get(DigitalChannel.class, "arm limit");
         touchSensor.setMode(DigitalChannel.Mode.INPUT);
         //utils class initializer
-        teamUtils = new Util(motorRight, motorLeft, liftMotor, armMotor, telemetry, touchSensor);
+   //     teamUtils = new Util(motorRight, motorLeft, liftMotor, armMotor, telemetry, touchSensor);
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         //Play started
@@ -126,10 +126,25 @@ public class Crater_No_Land extends LinearOpMode {
         boolean doneKnockingGold = false;
         boolean doneWithDrive = false;
 
+        //land system
+//        teamUtils.runliftFixedDistance(1.0, 2.0);
+//        try {
+//            Thread.sleep(1000);
+//        } catch (InterruptedException e) {
+//
+//        }
+        teamUtils.runliftFixedDistance(1.0, 4.5);
+        //back up
 
-          //ask camera where gold is
+       // teamUtils.runArmFixedDistance(1.0, 0.25);
+     //   teamUtils.armDrive(1);
+        teamUtils.driveAngledDistance(-1.0, 7.0, false);
+        teamUtils.runliftFixedDistance(-1.0, 4.5);
+        teamUtils.driveFixedDegrees(1, 40);
+        teamUtils.driveFixedDistance(1.0, 7.0, false);
+        //ask camera where gold is
         //read where gold marker located
-        FindGoldPosition findMineral = new FindGoldPosition(telemetry, hardwareMap);
+       // FindGoldPosition findMineral = new FindGoldPosition(telemetry, hardwareMap);
         int locationOfGold = 2; //unknown
 
         int error = 0;
@@ -141,7 +156,7 @@ public class Crater_No_Land extends LinearOpMode {
             // run this loop until the end of the match (driver presses stop)
             //find+knock off gold mineral
             if (runtime.milliseconds() < 20000 && locationOfGold > 1) {
-                locationOfGold = findMineral.getGoldPosition();
+              //  locationOfGold = findMineral.getGoldPosition();
                 if(locationOfGold == 3) {
                     //sees 2 minerals
                     if(madeError) {
@@ -152,7 +167,7 @@ public class Crater_No_Land extends LinearOpMode {
                     }
                     //take multiple readings after adjusting
                     for (int i = 0; i < iterations; i++) {
-                        locationOfGold = findMineral.getGoldPosition();
+                      //  locationOfGold = findMineral.getGoldPosition();
                         try {
                             Thread.sleep(100);
                         } catch (Exception E){
@@ -167,7 +182,7 @@ public class Crater_No_Land extends LinearOpMode {
                     }
                     //take multiple readings after adjusting
                     for (int i = 0; i < iterations; i++) {
-                        locationOfGold = findMineral.getGoldPosition();
+                 //       locationOfGold = findMineral.getGoldPosition();
                         try {
                             Thread.sleep(100);
                         } catch (Exception E){
@@ -177,8 +192,8 @@ public class Crater_No_Land extends LinearOpMode {
                     madeError = true;
                     //continue around in loop again
                 }
-            }else if(!doneWithCamera){
-                findMineral.close(); //done with camera;
+            } else if(!doneWithCamera){
+               // findMineral.close(); //done with camera;
                 doneWithCamera=true;
             }
             telemetry.addData("Gold Position:", locationOfGold);
@@ -223,7 +238,6 @@ public class Crater_No_Land extends LinearOpMode {
                     teamUtils.driveFixedDistance(1,12, false);
                     teamUtils.driveFixedDegrees (1, 10);
                     doneKnockingGold=true;
-
                     //telemetry.addData("Status","Peter's code has failed us");
                 //    teamUtils.driveFixedDegrees(1, 150);
                //     teamUtils.driveFixedDistance(1,24);
@@ -240,10 +254,10 @@ public class Crater_No_Land extends LinearOpMode {
             }
 
 
-          //  telemetry.update();
+        //    telemetry.update();
             }
-           //be sure to shutdown camera;
-           findMineral.close();
+        //   //be sure to shutdown camera;
+        //   findMineral.close();
         }
 
     }

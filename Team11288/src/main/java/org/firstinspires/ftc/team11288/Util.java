@@ -33,7 +33,7 @@ public class Util {
     private final double ARM_MOTOR_POWER = 0.15;
     private final double DRIVE_MOTOR_POWER = 0.75;
     static final double     COUNTS_PER_MOTOR_REV    = 1250.0; //HD Hex Motor (REV-41-1301) 40:1
-    static final double     COUNTS_PER_DRIVE_MOTOR_REV    = 300.0; // counts per reevaluation of the motor
+    static final double     COUNTS_PER_DRIVE_MOTOR_REV    = 300; // counts per reevaluation of the motor
     static final double INCREMENT_MOTOR_MOVE = 175.0; // move set amount at a time
     static final double INCREMENT_DRIVE_MOTOR_MOVE = 30.0; // move set amount at a time
     static final double INCHES_PER_ROTATION = 11.137; //inches per rotation of 90mm traction wheel
@@ -69,6 +69,7 @@ public class Util {
     //Routines for 2019-2020 - based on Holonomic code from 2017
 
     public void drivebyDistance(double x, double y, double rotation, double distance) {//inches
+        setWheelsToEncoderMode();
         double r = Math.hypot((x), (-y));
         double robotAngle = Math.atan2((-y), (x)) - Math.PI / 4;
         double rightX = (rotation);
@@ -116,7 +117,7 @@ public class Util {
             motorBackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             motorBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
-    }
+
     ///
 
     //Drive Routines

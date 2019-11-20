@@ -81,7 +81,7 @@ public class Holonomic extends OpMode{
     private int directionArm=1;
     private int rotations=12;
     private int initialPosition;
-
+    double distanceToDrive=6.0;  //test parameter
 
     /* Code to run ONCE when the driver hits INIT */
         @Override
@@ -158,10 +158,16 @@ public class Holonomic extends OpMode{
         double BackRight = Range.clip(v4, -1, 1);
 
         // write the values to the motors
-        motorFrontRight.setPower(FrontRight);
-        motorFrontLeft.setPower(FrontLeft);
-        motorBackLeft.setPower(BackLeft);
-        motorBackRight.setPower(BackRight);
+
+            motorBackLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            motorBackRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            motorFrontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            motorFrontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            motorFrontRight.setPower(FrontRight);
+            motorFrontLeft.setPower(FrontLeft);
+            motorBackLeft.setPower(BackLeft);
+            motorBackRight.setPower(BackRight);
+
 
         //platformArm
         if(gamepad1.a) {
@@ -189,12 +195,12 @@ public class Holonomic extends OpMode{
         //set up to drive a fixed number of inches
         //can test here in teleop and bring into autonomous
         //drive fixed amount
-        double distanceToDrive=6.0;  //test parameter
-        teamUtils.setWheelsToEncoderMode();
+
+       // teamUtils.setWheelsToEncoderMode();
         //driveByDistance - speed in each direction and inches to travel
         //ex: travel 12 inches in positive X direction at quarter speed
         //drivebyDistance(0.25,0.0,0.0,12.0);
-        if (gamepad1.left_bumper) {
+  /*      if (gamepad1.left_bumper) {
             distanceToDrive=distanceToDrive+1.0<36?distanceToDrive+1:36;
         }
         if (gamepad1.right_bumper) {
@@ -203,23 +209,20 @@ public class Holonomic extends OpMode{
         telemetry.addData("Distance To Drive",  "= %.2f", distanceToDrive);
         telemetry.update();
         if (gamepad1.dpad_up) {
-            teamUtils.drivebyDistance(0.0, 0.25, 0.0, distanceToDrive);
+            teamUtils.drivebyDistance(0.5, 0.5, 0.0, distanceToDrive);
         }
         if (gamepad1.dpad_down) {
-            teamUtils.drivebyDistance(0.0, -0.25, 0.0, distanceToDrive);
+            teamUtils.drivebyDistance(-0.5, -0.5, 0.0, distanceToDrive);
         }
         if (gamepad1.dpad_right) {
-            teamUtils.drivebyDistance(0.25, 0.0, 0.0, distanceToDrive);
+            teamUtils.drivebyDistance(-0.5, 0.0, 0.0, distanceToDrive);
         }
         if (gamepad1.dpad_left) {
-            teamUtils.drivebyDistance(-0.25, 0.0, 0.0, distanceToDrive);
-        }
-        if (gamepad1.dpad_right) {
-            teamUtils.drivebyDistance(0.0, 0.0, 0.25, distanceToDrive);
-        }
-        if (gamepad1.dpad_left) {
-            teamUtils. drivebyDistance(0.0, 0.0, -0.25, distanceToDrive);
-        }
+            teamUtils.drivebyDistance(0.5, 0.0, 0.0, 32);
+            teamUtils.drivebyDistance(0.5, 0.0, 0.0, 45);
+            teamUtils.drivebyDistance(0.0, 0.5, 0.0, 12);
+        }*/
+
         telemetry.update();
         /////
 
