@@ -104,6 +104,21 @@ public class Util {
         motorFrontLeft.setPower(FrontLeft);
         motorBackLeft.setPower(BackLeft);
         motorBackRight.setPower(BackRight);
+
+        //for those motors that should be busy (power!=0) wait until they are done
+        //reaching target position before returning from this function.
+        while ((FrontRight != 0 && motorFrontRight.isBusy()) ||
+                (FrontLeft != 0 && motorFrontLeft.isBusy()) ||
+                (BackLeft != 0 && motorBackLeft.isBusy()) ||
+                (BackRight != 0 && motorBackRight.isBusy())){
+            //wait and check again until done running
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     public void setWheelsToEncoderMode(){
