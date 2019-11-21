@@ -10,10 +10,12 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
+import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
 
 @Autonomous(name = "LinearExample", group = "Linear Opmode")
@@ -27,52 +29,66 @@ public class LinearExample extends LinearOpMode {
 
     /* Declare OpMode members. */
     //wheels
-    //  private DcMotor motorFrontRight;
-    // private DcMotor motorFrontLeft;
-    private DcMotor motorRight;
-    private DcMotor motorLeft;
-    private DcMotor liftMotor;
-    private DcMotor armMotor;
+    private DcMotor motorFrontRight;
+    private DcMotor motorFrontLeft;
+    private DcMotor motorBackRight;
+    private DcMotor motorBackLeft;
+    private DcMotor motorLift;
+
     private Util teamUtils;
 
+
     //claw and arm
+    //  static final double     COUNTS_PER_MOTOR_REV    = 1120 ;    // NeveRest Classic 40 Gearmotor (am-2964a)
+    static final double INCREMENT_MOTOR_MOVE = 100; // move about 10 degrees at a time
+
+    private final double ARM_MOTOR_POWER = 0.5;
+    private final double DRIVE_MOTOR_POWER = 0.75;
+    static final double COUNTS_PER_MOTOR_REV = 1250.0; //HD Hex Motor (REV-41-1301) 40:1
+    static final double COUNTS_PER_DRIVE_MOTOR_REV = 300.0; // counts per reevaluation of the motor
+    static final double INCREMENT_DRIVE_MOTOR_MOVE = 30.0; // move set amount at a time
+
     private DcMotor shoulder; //bottom pivot of the new claw
     private int currentPosition; //used to track shoulder motor current position
     private int targetPosition; //used to track target shoulder position
     private double minPosition; //minimum allowed position of shoulder motor
     private double maxPosition; //maximum allowed positon of shoulder motor
 
-    private Servo leftArm = null;
-    private Servo rightArm = null;
-    private static final double START_ARM_SERVO_L = 0.8;
-    private static final double START_ARM_SERVO_R = 0.1;
-    private Servo leftClaw = null;
-    private Servo rightClaw = null;
-    private static final double OPEN_CLAW_SERVO_L = 0.7;
-    private static final double OPEN_CLAW_SERVO_R = 0.3;
-    private static final double START_CLAW_SERVO_L = 0.86;
-    private static final double START_CLAW_SERVO_R = 0.14;
-    private double clawOffsetL = START_CLAW_SERVO_L;                  // Init to closed position
-    private double clawOffsetR = START_CLAW_SERVO_R;                  // Init to closed position
-
-    private double armOffsetL = START_ARM_SERVO_L;                  // Init to down position
-    private double armOffsetR = START_ARM_SERVO_R;                  // Init to down position
-    private final double CLAW_SPEED = 0.01;                 // sets rate to move servo
-    private final double ARM_SPEED = 0.01;                 // sets rate to move servo
-
-
-    private ColorSensor sensorColor;
-    private DistanceSensor sensorDistance;
-    private DigitalChannel touchSensor;
+    //    private elbow             = null;
+//    private Servo wrist       = null;
+    private Servo claw = null;
+    private Servo platform = null;
+    private static final double MID_SERVO = 0.5;
+    private static final double INIT_ELBOW_SERVO = 0.0;
+    private static final double SHOULDER_POWER = 1.0;
+    private static final double SHOULDER_UP_POWER = 0.5;
+    private static final double SHOULDER_DOWN_POWER = -0.5;
+    private double clawOffset = 0.4;                  // Init to closed position
+    private final double CLAW_SPEED = 0.02;                 // sets rate to move servo
+    private double elbowOffset = 0.0;                  // Servo mid position
+    private final double ELBOW_SPEED = 0.02;                  // sets rate to move servo
+    //    private double          wristOffset  = 0.0 ;                  // Servo mid position
+//    private final double    WRIST_SPEED  = 0.02 ;                 // sets rate to move servo
+    private static final double INIT_KNOCKINGARM = 0.3;   // Gets the knocking arm out of the way
 
 
+    //arm for knocking jewel - keep it out of the way in Driver Mode
+    private Servo knockingArm = null;
+    private static final double SAFE_ARM_POSITION = 0.0;
+    //color sensorl
+    NormalizedColorSensor colorSensor;
 
- //    DigitalChannel liftSensor = hardwareMap.get(DigitalChannel.class, "lift limit");
+    //TODO touch sensor
+    DigitalChannel touchSensor;  // Hardware Device Object
+
+
+    private int directionArm = 1;
+    private int rotations = 12;
+    private int initialPosition;
 
 
     private ElapsedTime runtime = new ElapsedTime();
 
-    int detectedColor = Color.WHITE;
 
     @Override
     public void runOpMode() {
@@ -80,184 +96,48 @@ public class LinearExample extends LinearOpMode {
         telemetry.update();
 
         //initialize wheels
-        motorLeft = hardwareMap.dcMotor.get("motor left");
-        motorRight = hardwareMap.dcMotor.get("motor right");
-        motorRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        motorLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-        motorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //lift dc motor for lift system
-        //liftMotor or "lift motor"
-        liftMotor = hardwareMap.dcMotor.get("lift motor");
-        liftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motorFrontRight = hardwareMap.dcMotor.get("motor front right");
+        motorFrontLeft = hardwareMap.dcMotor.get("motor front left");
+        motorBackLeft = hardwareMap.dcMotor.get("motor back left");
+        motorBackRight = hardwareMap.dcMotor.get("motor back right");
+        motorLift = hardwareMap.dcMotor.get("motor lift");
+        claw = hardwareMap.servo.get("claw servo");
+        platform = hardwareMap.servo.get("platform servo");
 
-        //servos for lift
-        leftArm = hardwareMap.servo.get("left arm");
-        rightArm = hardwareMap.servo.get("right arm");
-        leftArm.setPosition(START_ARM_SERVO_L);
-        rightArm.setPosition(START_ARM_SERVO_R);
+        claw.setPosition(0);
+        platform.setPosition(0);
+        motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+        motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+        motorLift.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        //motor for arm
-        armMotor = hardwareMap.dcMotor.get("arm motor");
-        armMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        armMotor.setMode(RUN_USING_ENCODER);
-        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        armMotor.setPower(0);
-        //initialize claw servos
-        leftClaw = hardwareMap.servo.get("left claw");
-        rightClaw = hardwareMap.servo.get("right claw");
-        leftClaw.setPosition(START_CLAW_SERVO_L);
-        rightClaw.setPosition(START_CLAW_SERVO_R);
+        motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motorLift.setMode(STOP_AND_RESET_ENCODER);
+        motorLift.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        //color sensor- needed?
-        //  sensorColor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
-        //  sensorDistance = hardwareMap.get(DistanceSensor.class, "sensor_color_distance");
-        //TODO touch sensor
-        touchSensor = hardwareMap.get(DigitalChannel.class, "arm limit");
-        touchSensor.setMode(DigitalChannel.Mode.INPUT);
+        initialPosition = (int) (motorLift.getCurrentPosition());
+        rotations = 12;
+        directionArm = -1;
+        targetPosition = (int) (motorLift.getCurrentPosition() + (directionArm * rotations * COUNTS_PER_MOTOR_REV));
+
         //utils class initializer
-   //     teamUtils = new Util(motorRight, motorLeft, liftMotor, armMotor, telemetry, touchSensor);
+        teamUtils = new Util(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft);
+
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         //Play started
         runtime.reset();
-        boolean doneWithCamera = false;
-        boolean doneKnockingGold = false;
-        boolean doneWithDrive = false;
-
-        //land system
-//        teamUtils.runliftFixedDistance(1.0, 2.0);
-//        try {
-//            Thread.sleep(1000);
-//        } catch (InterruptedException e) {
-//
-//        }
-        teamUtils.runliftFixedDistance(1.0, 4.5);
-        //back up
-
-       // teamUtils.runArmFixedDistance(1.0, 0.25);
-     //   teamUtils.armDrive(1);
-        teamUtils.driveAngledDistance(-1.0, 7.0, false);
-        teamUtils.runliftFixedDistance(-1.0, 4.5);
-        teamUtils.driveFixedDegrees(1, 40);
-        teamUtils.driveFixedDistance(1.0, 7.0, false);
-        //ask camera where gold is
-        //read where gold marker located
-       // FindGoldPosition findMineral = new FindGoldPosition(telemetry, hardwareMap);
-        int locationOfGold = 2; //unknown
-
-        int error = 0;
-        boolean madeError = false;
-        final int turn_degrees = 13;
-        final int iterations = 12;
 
         while (opModeIsActive()) {
             // run this loop until the end of the match (driver presses stop)
-            //find+knock off gold mineral
-            if (runtime.milliseconds() < 20000 && locationOfGold > 1) {
-              //  locationOfGold = findMineral.getGoldPosition();
-                if(locationOfGold == 3) {
-                    //sees 2 minerals
-                    if(madeError) {
-                        teamUtils.driveFixedDegrees(1, turn_degrees);
-                    } else {
-                        teamUtils.driveFixedDegrees(-1, turn_degrees);
-                        error += turn_degrees;
-                    }
-                    //take multiple readings after adjusting
-                    for (int i = 0; i < iterations; i++) {
-                      //  locationOfGold = findMineral.getGoldPosition();
-                        try {
-                            Thread.sleep(100);
-                        } catch (Exception E){
-                        }
-                    }
-                    //continue around in loop again
-                }
-                else if(locationOfGold == 4) {
-                    //sees 1 mineral
-                    if(!madeError) {
-                        teamUtils.driveFixedDegrees(1, error);
-                    }
-                    //take multiple readings after adjusting
-                    for (int i = 0; i < iterations; i++) {
-                 //       locationOfGold = findMineral.getGoldPosition();
-                        try {
-                            Thread.sleep(100);
-                        } catch (Exception E){
+            teamUtils.drivebyDistance(0.5, 0.0, 0.0, 32);
+            teamUtils.drivebyDistance(0.5, 0.0, 0.0, 45);
+            teamUtils.drivebyDistance(0.0, 0.5, 0.0, 12);
 
-                        }
-                    }
-                    madeError = true;
-                    //continue around in loop again
-                }
-            } else if(!doneWithCamera){
-               // findMineral.close(); //done with camera;
-                doneWithCamera=true;
-            }
-            telemetry.addData("Gold Position:", locationOfGold);
-
-                //now check where is the mineral
-                //locationOfGold=1 - LEFT
-                //locationOfGold=0 - CENTER
-                //locationOfGold=-1 - RIGHT
-
-            if(doneWithCamera && !doneKnockingGold) {
-                //depending on locationoOfGold
-                if(locationOfGold == 0) {  //center
-                    teamUtils.driveFixedDegrees(1,90);
-                    teamUtils.driveFixedDistance(1, 32, false);
-                    teamUtils.driveFixedDegrees(1, 0);
-                    teamUtils.driveFixedDistance(1,12, false);
-                    teamUtils.driveFixedDegrees (1, 10);
-                    doneKnockingGold=true;
-                    //drop Marker
-
-                } else if (locationOfGold == 1) {  //left
-                    teamUtils.driveFixedDegrees(1,120);
-                    teamUtils.driveFixedDistance(1, 32, false);
-                    teamUtils.driveFixedDegrees(-1,50);
-                    teamUtils.driveFixedDistance(1,13.4, false);
-                    doneKnockingGold=true;
-                    //drop Marker
-
-                } else if (locationOfGold == -1) {  //right
-                    teamUtils.driveFixedDegrees (1, 60);
-                    teamUtils.driveFixedDistance(1, 32, false);
-                    teamUtils.driveFixedDegrees(1,40);
-                    teamUtils.driveFixedDistance(1,13.4, false);
-                    doneKnockingGold=true;
-                    //drop Marker
-
-                } else { //not detected
-                    telemetry.addData("Status", "rarted");
-                    teamUtils.driveFixedDegrees(1,90);
-                    teamUtils.driveFixedDistance(1, 32, false);
-                    teamUtils.driveFixedDegrees(1, 0);
-                    teamUtils.driveFixedDistance(1,12, false);
-                    teamUtils.driveFixedDegrees (1, 10);
-                    doneKnockingGold=true;
-                    //telemetry.addData("Status","Peter's code has failed us");
-                //    teamUtils.driveFixedDegrees(1, 150);
-               //     teamUtils.driveFixedDistance(1,24);
-                //    teamUtils.driveFixedDegrees(1,-90);
-               //     teamUtils.driveFixedDistance(1,24);
-                }
-
-            }
-
-
-            if(doneWithCamera && doneKnockingGold && !doneWithDrive) {
-                teamUtils.driveFixedDistance(1,6, true);
-                doneWithDrive=true;
-            }
-
-
-        //    telemetry.update();
-            }
-        //   //be sure to shutdown camera;
-        //   findMineral.close();
         }
-
     }
+}
+
+
