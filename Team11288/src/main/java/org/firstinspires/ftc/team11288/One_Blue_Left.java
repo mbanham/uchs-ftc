@@ -18,10 +18,10 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
 
-@Autonomous(name = "LinearExample", group = "Linear Opmode")
+@Autonomous(name = "One_Blue_Left", group = "Linear Opmode")
 //@Disabled                            // Comment this out to add to the opmode list
 
-public class LinearExample extends LinearOpMode {
+public class One_Blue_Left extends LinearOpMode {
     //initialize these variables, override them in the constructor
     private int TEAM_COLOR = Color.BLUE;
     private static final int teleopType1 = 0, teleopType2 = 1, teleopType3 = 2, teleopTypeLinear = 3, teleopTypeRev = 4;
@@ -105,7 +105,7 @@ public class LinearExample extends LinearOpMode {
         platform = hardwareMap.servo.get("platform servo");
 
         claw.setPosition(0);
-        platform.setPosition(0);
+        platform.setPosition(1);
         motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
         motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -123,20 +123,22 @@ public class LinearExample extends LinearOpMode {
         targetPosition = (int) (motorLift.getCurrentPosition() + (directionArm * rotations * COUNTS_PER_MOTOR_REV));
 
         //utils class initializer
-        teamUtils = new Util(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft);
-
+        teamUtils = new Util(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
+        platform.setPosition(0);
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         //Play started
         runtime.reset();
 
-        while (opModeIsActive()) {
+        //while (opModeIsActive()) {
             // run this loop until the end of the match (driver presses stop)
-            teamUtils.drivebyDistance(0.5, 0.0, 0.0, 32);
-            teamUtils.drivebyDistance(0.5, 0.0, 0.0, 45);
-            teamUtils.drivebyDistance(0.0, 0.5, 0.0, 12);
-
-        }
+            teamUtils.drivebyDistance(0.5, 0.0, 0.0, 36);
+            teamUtils.drivebyDistance(0.0, 0.5, 0.0, 30);
+            platform.setPosition(0);
+            teamUtils.drivebyDistance(0.0, -0.5, 0.0, 30);
+            platform.setPosition(1);
+            teamUtils.drivebyDistance(-0.5, 0.0, 0.0, 36);
+        //}
     }
 }
 

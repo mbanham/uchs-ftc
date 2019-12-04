@@ -47,16 +47,16 @@ public class Util {
     static final int COUNTS_PER_INCH= (int) ((1.4142 * (COUNTS_PER_DRIVE_MOTOR_REV)) / (4.0 * Math.PI)); //for 45deg wheels
     ///
 
-    public Util(DcMotor frontRightMotor, DcMotor frontLeftMotor, DcMotor backRightMotor, DcMotor backLeftMotor
-            /*, DcMotor liftMotorIn, DcMotor armMotorIn,
-                Telemetry telemetryIn, DigitalChannel touchSensorIn*/) {
+    public Util(DcMotor frontRightMotor, DcMotor frontLeftMotor, DcMotor backRightMotor, DcMotor backLeftMotor,
+            /*, DcMotor liftMotorIn, DcMotor armMotorIn,*/
+                Telemetry telemetryIn/*, DigitalChannel touchSensorIn*/) {
 
         motorBackLeft=backLeftMotor;
         motorBackRight=backRightMotor;
         motorFrontLeft=frontLeftMotor;
         motorFrontRight=frontRightMotor;
 
-
+        telemetry=telemetryIn;
 //        motorLeft = leftMotor;
 //        motorRight = rightMotor;
 //        liftMotor = liftMotorIn;
@@ -107,17 +107,28 @@ public class Util {
 
         //for those motors that should be busy (power!=0) wait until they are done
         //reaching target position before returning from this function.
-        while ((FrontRight != 0 && motorFrontRight.isBusy()) ||
-                (FrontLeft != 0 && motorFrontLeft.isBusy()) ||
-                (BackLeft != 0 && motorBackLeft.isBusy()) ||
-                (BackRight != 0 && motorBackRight.isBusy())){
+
+        double tolerance = 10;
+        while ((((Math.abs(FrontRight)) > 0.01 && Math.abs(motorFrontRight.getCurrentPosition() - frontRightTargetPosition) > tolerance)) ||
+                (((Math.abs(FrontLeft)) > 0.01 && Math.abs(motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition) > tolerance)) ||
+                (((Math.abs(BackLeft)) > 0.01 && Math.abs(motorBackLeft.getCurrentPosition() - backLeftTargetPosition) > tolerance)) ||
+                (((Math.abs(BackRight)) > 0.01 && Math.abs(motorBackRight.getCurrentPosition() - backRightTargetPosition) > tolerance))){
             //wait and check again until done running
+            telemetry.addData("front right", "=%.2f  %d %b", FrontRight, motorFrontRight.getCurrentPosition() - frontRightTargetPosition,((Math.ceil(Math.abs(FrontRight)) > 0.0 && Math.abs(motorFrontRight.getCurrentPosition() - frontRightTargetPosition) > tolerance)));//, frontRightTargetPosition);
+            telemetry.addData("front left", "=%.2f %d %b", FrontLeft, motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition,((Math.ceil(Math.abs(FrontLeft)) > 0.0 && Math.abs(motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition) > tolerance)));//, frontLeftTargetPosition);
+            telemetry.addData("back left", "=%.2f %d %b",  BackLeft, motorBackLeft.getCurrentPosition() - backLeftTargetPosition, ((Math.ceil(Math.abs(BackLeft)) > 0.0 && Math.abs(motorBackLeft.getCurrentPosition() - backLeftTargetPosition) > tolerance)));//, backLeftTargetPosition);
+            telemetry.addData("back right", "=%.2f %d %b", BackRight, motorBackRight.getCurrentPosition() - backRightTargetPosition, ((Math.ceil(Math.abs(BackRight)) > 0.0 && Math.abs(motorBackRight.getCurrentPosition() - backRightTargetPosition) > tolerance)));
+            telemetry.update();
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+        motorFrontLeft.setPower(0);
+        motorBackRight.setPower(0);
+        motorFrontRight.setPower(0);
+        motorBackLeft.setPower(0);
 
     }
 
