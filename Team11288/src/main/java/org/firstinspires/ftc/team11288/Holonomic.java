@@ -54,18 +54,6 @@ public class Holonomic extends OpMode{
 //    private Servo wrist       = null;
     private Servo claw        = null;
     private Servo platform    = null;
-    private static final double MID_SERVO           =  0.5 ;
-    private static final double INIT_ELBOW_SERVO    =  0.0 ;
-    private static final double SHOULDER_POWER      =  1.0 ;
-    private static final double SHOULDER_UP_POWER   =  0.5 ;
-    private static final double SHOULDER_DOWN_POWER = -0.5 ;
-    private double          clawOffset  = 0.4 ;                  // Init to closed position
-    private final double    CLAW_SPEED  = 0.02 ;                 // sets rate to move servo
-    private double          elbowOffset  = 0.0 ;                  // Servo mid position
-    private final double    ELBOW_SPEED  = 0.02 ;                  // sets rate to move servo
-//    private double          wristOffset  = 0.0 ;                  // Servo mid position
-//    private final double    WRIST_SPEED  = 0.02 ;                 // sets rate to move servo
-    private static final double INIT_KNOCKINGARM = 0.3;   // Gets the knocking arm out of the way
 
 
     //arm for knocking jewel - keep it out of the way in Driver Mode
@@ -101,18 +89,18 @@ public class Holonomic extends OpMode{
 
             claw.setPosition(0);
             platform.setPosition(0);
+
             motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
             motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
             motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
             motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+
             motorLift.setDirection(DcMotorSimple.Direction.FORWARD);
-
-
             motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             motorLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             motorLift.setMode(STOP_AND_RESET_ENCODER);
-
             motorLift.setDirection(DcMotorSimple.Direction.FORWARD);
+
             initialPosition = (int) (motorLift.getCurrentPosition());
             rotations=12;
             directionArm = -1;
@@ -120,7 +108,6 @@ public class Holonomic extends OpMode{
 
             //utils class initializer
             teamUtils = new Util(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft,telemetry);
-
     }
     /*
       * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
@@ -140,8 +127,6 @@ public class Holonomic extends OpMode{
     /*
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
      */
-
-
     @Override
     public void loop() {
         double r = Math.hypot(scaleInput(gamepad1.left_stick_x), scaleInput(gamepad1.left_stick_y));
@@ -167,7 +152,6 @@ public class Holonomic extends OpMode{
         motorBackLeft.setPower(BackLeft);
         motorBackRight.setPower(BackRight);
 
-
         //platformArm
         if (gamepad1.a) {
             platform.setPosition(0);
@@ -190,61 +174,11 @@ public class Holonomic extends OpMode{
             telemetry.addData("MyActivity", "ClawPosition=0");
             telemetry.update();
         }
-
-        ///Code from 2017 - this is how the holonomic drive can be
-        //set up to drive a fixed number of inches
-        //can test here in teleop and bring into autonomous
-        //drive fixed amount
-
-        // teamUtils.setWheelsToEncoderMode();
-        //driveByDistance - speed in each direction and inches to travel
-        //ex: travel 12 inches in positive X direction at quarter speed
-        //drivebyDistance(0.25,0.0,0.0,12.0);
-        if (gamepad1.left_bumper) {
-            distanceToDrive=distanceToDrive+1.0<36?distanceToDrive+1:36;
-        }
-        if (gamepad1.right_bumper) {
-            distanceToDrive=distanceToDrive-1.0>0.0?distanceToDrive-1.0:0.0;
-        }
-        telemetry.addData("Distance To Drive",  "= %.2f", distanceToDrive);
-        telemetry.update();
-        if (gamepad1.dpad_up) {
-            teamUtils.drivebyDistance(0.5, 0.5, 0.0, distanceToDrive);
-        }
-        if (gamepad1.dpad_down) {
-            teamUtils.drivebyDistance(-0.5, -0.5, 0.0, distanceToDrive);
-        }
-        if (gamepad1.dpad_right) {
-            teamUtils.drivebyDistance(-0.5, 0.0, 0.0, distanceToDrive);
-        }
-        if (gamepad1.dpad_left) {
-            teamUtils.drivebyDistance(0.5, 0.0, 0.0, 32);
-            teamUtils.drivebyDistance(0.5, 0.0, 0.0, 45);
-            teamUtils.drivebyDistance(0.0, 0.5, 0.0, 12);
-        }
-
-        telemetry.update();
-        /////
-
-
         //lift
-//       if (gamepad2.dpad_up) {
-//            motorLift.setPower(0.5);
-//        }
-//
-//
-//       if (gamepad2.dpad_down) {
-//                motorLift.setPower(-0.5);
-//
-//            }
-
-
-
-
         motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         if(gamepad2.dpad_up && !gamepad2.x) {
             motorLift.setTargetPosition(Globals.max_claw_limit);
-            motorLift.setPower(100);
+            motorLift.setPower(1.0);
         }
         motorLift.setPower(0.0);
         if(gamepad2.dpad_down && !gamepad2.x) {
@@ -257,7 +191,6 @@ public class Holonomic extends OpMode{
         if(gamepad2.x && gamepad2.dpad_up){
             Globals.max_claw_limit = motorLift.getCurrentPosition();
         }
-
 
     }
 

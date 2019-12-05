@@ -114,11 +114,11 @@ public class Util {
                 (((Math.abs(BackLeft)) > 0.01 && Math.abs(motorBackLeft.getCurrentPosition() - backLeftTargetPosition) > tolerance)) ||
                 (((Math.abs(BackRight)) > 0.01 && Math.abs(motorBackRight.getCurrentPosition() - backRightTargetPosition) > tolerance))){
             //wait and check again until done running
-            telemetry.addData("front right", "=%.2f  %d %b", FrontRight, motorFrontRight.getCurrentPosition() - frontRightTargetPosition,((Math.ceil(Math.abs(FrontRight)) > 0.0 && Math.abs(motorFrontRight.getCurrentPosition() - frontRightTargetPosition) > tolerance)));//, frontRightTargetPosition);
-            telemetry.addData("front left", "=%.2f %d %b", FrontLeft, motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition,((Math.ceil(Math.abs(FrontLeft)) > 0.0 && Math.abs(motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition) > tolerance)));//, frontLeftTargetPosition);
-            telemetry.addData("back left", "=%.2f %d %b",  BackLeft, motorBackLeft.getCurrentPosition() - backLeftTargetPosition, ((Math.ceil(Math.abs(BackLeft)) > 0.0 && Math.abs(motorBackLeft.getCurrentPosition() - backLeftTargetPosition) > tolerance)));//, backLeftTargetPosition);
-            telemetry.addData("back right", "=%.2f %d %b", BackRight, motorBackRight.getCurrentPosition() - backRightTargetPosition, ((Math.ceil(Math.abs(BackRight)) > 0.0 && Math.abs(motorBackRight.getCurrentPosition() - backRightTargetPosition) > tolerance)));
-            telemetry.update();
+//            telemetry.addData("front right", "=%.2f  %d %b", FrontRight, motorFrontRight.getCurrentPosition() - frontRightTargetPosition,((Math.ceil(Math.abs(FrontRight)) > 0.0 && Math.abs(motorFrontRight.getCurrentPosition() - frontRightTargetPosition) > tolerance)));//, frontRightTargetPosition);
+//            telemetry.addData("front left", "=%.2f %d %b", FrontLeft, motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition,((Math.ceil(Math.abs(FrontLeft)) > 0.0 && Math.abs(motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition) > tolerance)));//, frontLeftTargetPosition);
+//            telemetry.addData("back left", "=%.2f %d %b",  BackLeft, motorBackLeft.getCurrentPosition() - backLeftTargetPosition, ((Math.ceil(Math.abs(BackLeft)) > 0.0 && Math.abs(motorBackLeft.getCurrentPosition() - backLeftTargetPosition) > tolerance)));//, backLeftTargetPosition);
+//            telemetry.addData("back right", "=%.2f %d %b", BackRight, motorBackRight.getCurrentPosition() - backRightTargetPosition, ((Math.ceil(Math.abs(BackRight)) > 0.0 && Math.abs(motorBackRight.getCurrentPosition() - backRightTargetPosition) > tolerance)));
+//            telemetry.update();
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
