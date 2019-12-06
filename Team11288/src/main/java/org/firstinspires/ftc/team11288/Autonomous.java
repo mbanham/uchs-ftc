@@ -9,7 +9,7 @@ import java.util.List;
 public class Autonomous extends OpMode {
 
     DcMotor mfl, mfr, mbl, mbr;
-    ArrayList<ArrayList<String>> programs = new ArrayList<ArrayList<String>>();
+
 
     @Override
     public void init() {
@@ -20,13 +20,18 @@ public class Autonomous extends OpMode {
         mfr = hardwareMap.dcMotor.get("motor front right");
         mbl = hardwareMap.dcMotor.get("motor back left");
         mbr = hardwareMap.dcMotor.get("motor back right");
+        /*teamUtils.drivebyDistance(-0.5, 0.0, 0.0, 3);
+        teamUtils.drivebyDistance(0.0, 0.5, 0.0, 60);
+        platform.setPosition(0);
+        teamUtils.drivebyDistance(0.5, 0, 0.0, 28);
+        platform.setPosition(1);
+        teamUtils.drivebyDistance(-0.5, 0.0, 0.0, 30);
+        platform.setPosition(0);
+        teamUtils.drivebyDistance(0.0, -0.5, 0.0, 60);*/
     }
 
     @Override
     public void loop() {
 
-    }
-    public void InitProgram(ArrayList<String> commands){
-        //programs.add()
     }
 }

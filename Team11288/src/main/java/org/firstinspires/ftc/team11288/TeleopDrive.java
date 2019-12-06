@@ -13,15 +13,15 @@ import com.qualcomm.robotcore.util.Range;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
 /*
- * This file provides Teleop driving for the Team11288 Holonomic drive robot.
+ * This file provides Teleop driving for the Team11288 TeleopDrive drive robot.
  * The code is structured as an Iterative OpMode
  *
  * Assumes claw with arm having shoulder motor, elbow servo and wrist servo - all having 180deg servos
  *
  */
 
-@TeleOp(name="Holonomic Test", group="Teleop")
-public class Holonomic extends OpMode{
+@TeleOp(name="TeleopDrive Test", group="Teleop")
+public class TeleopDrive extends OpMode{
 
     /* Declare OpMode members. */
   //wheels
@@ -29,6 +29,7 @@ public class Holonomic extends OpMode{
     private DcMotor motorFrontLeft;
     private DcMotor motorBackRight;
     private DcMotor motorBackLeft;
+    private DcMotor motorArm;
     private DcMotor motorLift;
 
     private Util teamUtils;
@@ -83,9 +84,10 @@ public class Holonomic extends OpMode{
             motorFrontLeft = hardwareMap.dcMotor.get("motor front left");
             motorBackLeft = hardwareMap.dcMotor.get("motor back left");
             motorBackRight = hardwareMap.dcMotor.get("motor back right");
-            motorLift = hardwareMap.dcMotor.get("motor lift");
+            motorArm = hardwareMap.dcMotor.get("motor arm");
             claw = hardwareMap.servo.get("claw servo");
             platform = hardwareMap.servo.get("platform servo");
+            motorLift = hardwareMap.dcMotor.get("motor lift");
 
             claw.setPosition(0);
             platform.setPosition(0);
@@ -95,16 +97,22 @@ public class Holonomic extends OpMode{
             motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
             motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);
 
+            motorArm.setDirection(DcMotorSimple.Direction.FORWARD);
+            motorArm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            motorArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            motorArm.setMode(STOP_AND_RESET_ENCODER);
+            motorArm.setDirection(DcMotorSimple.Direction.FORWARD);
+            
             motorLift.setDirection(DcMotorSimple.Direction.FORWARD);
             motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             motorLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             motorLift.setMode(STOP_AND_RESET_ENCODER);
             motorLift.setDirection(DcMotorSimple.Direction.FORWARD);
 
-            initialPosition = (int) (motorLift.getCurrentPosition());
+            initialPosition = (int) (motorArm.getCurrentPosition());
             rotations=12;
             directionArm = -1;
-            targetPosition = (int) (motorLift.getCurrentPosition() + (directionArm * rotations * COUNTS_PER_MOTOR_REV));
+            targetPosition = (int) (motorArm.getCurrentPosition() + (directionArm * rotations * COUNTS_PER_MOTOR_REV));
 
             //utils class initializer
             teamUtils = new Util(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft,telemetry);
@@ -163,6 +171,24 @@ public class Holonomic extends OpMode{
             telemetry.update();
         }
 
+
+
+            //dpad control 1 inch
+            double x_int = 0;
+            double y_int = 0;
+            if (gamepad1.dpad_up)
+                y_int = 0.5;
+            if(gamepad1.dpad_down)
+                y_int = -0.5;
+            if(gamepad1.dpad_left)
+                x_int = 0.5;
+            if(gamepad1.dpad_right)
+                x_int = -0.5;
+            if(x_int != 0 || y_int != 0) {
+                teamUtils.drivebyDistance(x_int, y_int, 0, 1);
+            }
+
+
         //claw
         if (gamepad2.right_bumper) {
             claw.setPosition(1);
@@ -174,26 +200,33 @@ public class Holonomic extends OpMode{
             telemetry.addData("MyActivity", "ClawPosition=0");
             telemetry.update();
         }
+        //arm
+        motorArm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        if (gamepad2.dpad_up) {
+            motorArm.setPower(0.7);
+        } else {
+            if (gamepad2.dpad_down) {
+                motorArm.setPower(-0.5);
+            } else {
+                motorArm.setPower(0.0);
+            }
+        }
+
+
         //lift
         motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        if(gamepad2.dpad_up && !gamepad2.x) {
-            motorLift.setTargetPosition(Globals.max_claw_limit);
-            motorLift.setPower(1.0);
-        }
-        motorLift.setPower(0.0);
-        if(gamepad2.dpad_down && !gamepad2.x) {
-            motorLift.setPower(-0.5);
+        if (gamepad2.left_trigger > 0.1) {
+            motorLift.setPower(-gamepad2.left_trigger);
+        } else {
+            if (gamepad2.right_trigger > 0.1) {
+                motorLift.setPower(gamepad2.right_trigger);
 
-        }
-        if(gamepad2.x && gamepad2.dpad_down){
-            Globals.min__claw_limit = motorLift.getCurrentPosition();
-        }
-        if(gamepad2.x && gamepad2.dpad_up){
-            Globals.max_claw_limit = motorLift.getCurrentPosition();
+            } else {
+                motorLift.setPower(0);
+            }
         }
 
     }
-
     /*
     * Code to run ONCE after the driver hits STOP
     */

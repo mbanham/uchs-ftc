@@ -2,6 +2,7 @@ package org.firstinspires.ftc.team11288;
 
 import android.graphics.Color;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -13,6 +14,7 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
@@ -66,7 +68,7 @@ public class Util {
 //       // liftSensor = liftSensorIn;
     }
 
-    //Routines for 2019-2020 - based on Holonomic code from 2017
+    //Routines for 2019-2020 - based on TeleopDrive code from 2017
 
     public void drivebyDistance(double x, double y, double rotation, double distance) {//inches
         setWheelsToEncoderMode();
