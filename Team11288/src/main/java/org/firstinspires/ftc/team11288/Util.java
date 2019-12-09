@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.team11288;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -8,14 +9,18 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
@@ -46,6 +51,7 @@ public class Util {
     private DcMotor  motorBackRight;
     private DcMotor  motorFrontLeft;
     private DcMotor  motorFrontRight;
+    private ColorSensor colorSensor;
     static final int COUNTS_PER_INCH= (int) ((1.4142 * (COUNTS_PER_DRIVE_MOTOR_REV)) / (4.0 * Math.PI)); //for 45deg wheels
     ///
 
@@ -68,6 +74,10 @@ public class Util {
 //       // liftSensor = liftSensorIn;
     }
 
+    public void InitExtraSensors(ColorSensor colorSensor){
+        if(colorSensor != null)
+            this.colorSensor = colorSensor;
+    }
     //Routines for 2019-2020 - based on TeleopDrive code from 2017
 
     public void drivebyDistance(double x, double y, double rotation, double distance) {//inches
@@ -132,6 +142,40 @@ public class Util {
         motorFrontRight.setPower(0);
         motorBackLeft.setPower(0);
 
+    }
+    @SuppressLint("NewApi")
+    public void driveUntilColor(double x, double y, Color color, int tolerance) {//inches
+
+        double r = Math.hypot((x), (-y));
+        double robotAngle = Math.atan2((-y), (x)) - Math.PI / 4;
+        final double v1 = r * Math.cos(robotAngle);
+        final double v2 = -r * Math.sin(robotAngle);
+        final double v3 = r * Math.sin(robotAngle);
+        final double v4 = -r * Math.cos(robotAngle);
+
+        double FrontRight = Range.clip(v2, -1, 1);
+        double FrontLeft = Range.clip(v1, -1, 1);
+        double BackLeft = Range.clip(v3, -1, 1);
+        double BackRight = Range.clip(v4, -1, 1);
+
+        motorBackLeft.setMode(RUN_WITHOUT_ENCODER);
+        motorBackRight.setMode(RUN_WITHOUT_ENCODER);
+        motorFrontLeft.setMode(RUN_WITHOUT_ENCODER);
+        motorFrontRight.setMode(RUN_WITHOUT_ENCODER);
+
+        motorFrontRight.setPower(FrontRight);
+        motorFrontLeft.setPower(FrontLeft);
+        motorBackLeft.setPower(BackLeft);
+        motorBackRight.setPower(BackRight);
+
+        colorSensor.enableLed(true);
+
+        while(  (colorSensor.red() > color.red() + (tolerance / 2) || colorSensor.red() < color.red() - (tolerance / 2)) ||
+                (colorSensor.blue() > color.blue() + (tolerance / 2) || colorSensor.blue() < color.blue() - (tolerance / 2)) ||
+                (colorSensor.green() > color.green() + (tolerance / 2) && colorSensor.green() < color.green() - (tolerance / 2)) ){
+            //get stuck
+        }
+        colorSensor.enableLed(false);
     }
 
     public void setWheelsToEncoderMode(){
