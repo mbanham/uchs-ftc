@@ -185,7 +185,7 @@ public class TeleopDrive extends OpMode{
             if(gamepad1.dpad_right)
                 x_int = -0.5;
             if(x_int != 0 || y_int != 0) {
-                teamUtils.drivebyDistance(x_int, y_int, 0, 1);
+                teamUtils.drivebyDistance(x_int, y_int, 0, 1, "inch");
             }
 
 

@@ -53,6 +53,7 @@ public class Util {
     private DcMotor  motorFrontRight;
     private ColorSensor colorSensor;
     static final int COUNTS_PER_INCH= (int) ((1.4142 * (COUNTS_PER_DRIVE_MOTOR_REV)) / (4.0 * Math.PI)); //for 45deg wheels
+    static final int COUNTS_PER_SQUARE = (int) (COUNTS_PER_INCH * 1); //for 45deg wheels
     ///
 
     public Util(DcMotor frontRightMotor, DcMotor frontLeftMotor, DcMotor backRightMotor, DcMotor backLeftMotor,
@@ -80,10 +81,10 @@ public class Util {
     }
     //Routines for 2019-2020 - based on TeleopDrive code from 2017
 
-    public void drivebyDistance(double x, double y, double rotation, double distance) {//inches
+    public void drivebyDistance(double x, double y, double rotation, double distance, String unit) {//inches
         setWheelsToEncoderMode();
-        double r = Math.hypot((x), (-y));
-        double robotAngle = Math.atan2((-y), (x)) - Math.PI / 4;
+        double r = Math.hypot((-x), (-y));
+        double robotAngle = Math.atan2((-y), (-x)) - Math.PI / 4;
         double rightX = (rotation);
         final double v1 = r * Math.cos(robotAngle) - rightX;
         final double v2 = -r * Math.sin(robotAngle) - rightX;
@@ -96,7 +97,11 @@ public class Util {
         double BackRight = Range.clip(v4, -1, 1);
 
 
-        int moveAmount = (int) (distance * COUNTS_PER_INCH);
+        double moveAmount = distance;
+        if(unit=="inch")
+        moveAmount = (int) (distance * COUNTS_PER_INCH);
+        if(unit=="square")
+        moveAmount = (int) (distance * COUNTS_PER_SQUARE);
         int backLeftTargetPosition = (int) (motorBackLeft.getCurrentPosition() + Math.signum(BackLeft)* moveAmount);
         int backRightTargetPosition = (int) (motorBackRight.getCurrentPosition() + Math.signum(BackRight)* moveAmount);
         int frontLeftTargetPosition = (int) (motorFrontLeft.getCurrentPosition() + Math.signum(FrontLeft)* moveAmount);
@@ -144,10 +149,10 @@ public class Util {
 
     }
     @SuppressLint("NewApi")
-    public void driveUntilColor(double x, double y, Color color, int tolerance) {//inches
+    public void driveUntilColor(double x, double y, int R, int G, int B, int tolerance) {//inches
 
-        double r = Math.hypot((x), (-y));
-        double robotAngle = Math.atan2((-y), (x)) - Math.PI / 4;
+        double r = Math.hypot((-x), (-y));
+        double robotAngle = Math.atan2((-y), (-x)) - Math.PI / 4;
         final double v1 = r * Math.cos(robotAngle);
         final double v2 = -r * Math.sin(robotAngle);
         final double v3 = r * Math.sin(robotAngle);
@@ -170,9 +175,9 @@ public class Util {
 
         colorSensor.enableLed(true);
 
-        while(  (colorSensor.red() > color.red() + (tolerance / 2) || colorSensor.red() < color.red() - (tolerance / 2)) ||
-                (colorSensor.blue() > color.blue() + (tolerance / 2) || colorSensor.blue() < color.blue() - (tolerance / 2)) ||
-                (colorSensor.green() > color.green() + (tolerance / 2) && colorSensor.green() < color.green() - (tolerance / 2)) ){
+        while ((colorSensor.red() > R + (tolerance / 2) || colorSensor.red() < R - (tolerance / 2)) ||
+                (colorSensor.blue() > B + (tolerance / 2) || colorSensor.blue() < B - (tolerance / 2)) ||
+                (colorSensor.green() > G + (tolerance / 2) && colorSensor.green() < G - (tolerance / 2))) {
             //get stuck
         }
         colorSensor.enableLed(false);

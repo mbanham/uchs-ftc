@@ -5,23 +5,20 @@ import android.graphics.Color;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
 
-@Autonomous(name = "One_Blue_Left", group = "Linear Opmode")
+@Autonomous(name = "One_Red_Left", group = "Linear Opmode")
 //@Disabled                            // Comment this out to add to the opmode list
 
-public class One_Blue_Left extends LinearOpMode {
+public class One_Red_Left extends LinearOpMode {
     //initialize these variables, override them in the constructor
     private int TEAM_COLOR = Color.BLUE;
     private static final int teleopType1 = 0, teleopType2 = 1, teleopType3 = 2, teleopTypeLinear = 3, teleopTypeRev = 4;
@@ -93,15 +90,15 @@ public class One_Blue_Left extends LinearOpMode {
         runtime.reset();
         //while (opModeIsActive()) {
             // run this loop until the end of the match (driver presses stop)
-            teamUtils.drivebyDistance(0.5, 0.0, 0.0, 3, "inch");
-            teamUtils.drivebyDistance(0.0, 0.5, 0.0, 30, "inch");
-            platform.setPosition(0);
-            teamUtils.drivebyDistance(0.5, 0, 0.0, 28, "inch");
-            platform.setPosition(1);
-            teamUtils.drivebyDistance(-0.5, 0.0, 0.0, 28, "inch");
-            platform.setPosition(0);
-            teamUtils.drivebyDistance(0.0, -0.5, 0.0, 60, "inch");
             teamUtils.drivebyDistance(-0.5, 0.0, 0.0, 3, "inch");
+            teamUtils.driveUntilColor(0.0, 0.5, 255, 0,0, 30);
+            platform.setPosition(0);
+            teamUtils.drivebyDistance(-0.5, 0, 0.0, 28, "inch");
+            platform.setPosition(1);
+            teamUtils.drivebyDistance(0.5, 0.0, 0.0, 28, "inch");
+            platform.setPosition(0);
+            teamUtils.drivebyDistance(0.0, 0.5, 0.0, 30, "inch");//down
+            teamUtils.drivebyDistance(0.5, 0.0, 0.0, 3, "inch");
         //}
     }
 }
