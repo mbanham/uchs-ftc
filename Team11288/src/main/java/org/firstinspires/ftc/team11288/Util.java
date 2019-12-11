@@ -66,10 +66,10 @@ public class Util {
     //initialize these in InitExtraSensors if using
     private ColorSensor colorSensor;
     float hsvValues[] = {0F, 0F, 0F};
-    final float values[];
+    float values[];
     final double SCALE_FACTOR = 255;
     int relativeLayoutId;
-    final View relativeLayout;
+    static View relativeLayout;
 
 
     ///
@@ -96,7 +96,7 @@ public class Util {
         // get a reference to the color sensor.
         colorSensor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
         // hsvValues is an array that will hold the hue, saturation, and value information.
-        hsvValues[] = {0F, 0F, 0F};
+        hsvValues = new float[] {0F, 0F, 0F};
         // values is a reference to the hsvValues array.
         float values[] = hsvValues;
         // get a reference to the RelativeLayout so we can change the background
@@ -212,12 +212,14 @@ public class Util {
         telemetry.addData("Blue ", colorSensor.blue());
         telemetry.addData("Hue", hsvValues[0]);
 
-        boolean foundBlue=false;
-        boolean foundRed=false;
+
         // change the background color to match the color detected by the RGB sensor.
         // pass a reference to the hue, saturation, and value array as an argument
         // to the HSVToColor method.
         relativeLayout.post(new Runnable() {
+            boolean foundBlue=false;
+            boolean foundRed=false;
+
             public void run() {
                 relativeLayout.setBackgroundColor(Color.HSVToColor(0xff, values));
                 //look for the hue in the blue range
