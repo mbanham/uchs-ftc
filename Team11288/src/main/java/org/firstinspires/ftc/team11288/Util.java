@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.team11288;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.View;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -12,6 +14,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
@@ -56,14 +59,23 @@ public class Util {
     private DcMotor  motorBackRight;
     private DcMotor  motorFrontLeft;
     private DcMotor  motorFrontRight;
-    private ColorSensor colorSensor;
+
     static final int COUNTS_PER_INCH= (int) ((1.4142 * (COUNTS_PER_DRIVE_MOTOR_REV)) / (4.0 * Math.PI)); //for 45deg wheels
     static final int COUNTS_PER_SQUARE = (int) (COUNTS_PER_INCH * 1); //for 45deg wheels
+
+    //initialize these in InitExtraSensors if using
+    private ColorSensor colorSensor;
+    float hsvValues[] = {0F, 0F, 0F};
+    final float values[];
+    final double SCALE_FACTOR = 255;
+    int relativeLayoutId;
+    final View relativeLayout;
+
+
     ///
 
     public Util(DcMotor frontRightMotor, DcMotor frontLeftMotor, DcMotor backRightMotor, DcMotor backLeftMotor,
-            /*, DcMotor liftMotorIn, DcMotor armMotorIn,*/
-                Telemetry telemetryIn/*, DigitalChannel touchSensorIn*/) {
+                Telemetry telemetryIn) {
 
         motorBackLeft=backLeftMotor;
         motorBackRight=backRightMotor;
@@ -80,10 +92,19 @@ public class Util {
 //       // liftSensor = liftSensorIn;
     }
 
-    public void InitExtraSensors(ColorSensor colorSensor){
-        if(colorSensor != null)
-            this.colorSensor = colorSensor;
+    public void InitExtraSensors(HardwareMap hardwareMap){
+        // get a reference to the color sensor.
+        colorSensor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
+        // hsvValues is an array that will hold the hue, saturation, and value information.
+        hsvValues[] = {0F, 0F, 0F};
+        // values is a reference to the hsvValues array.
+        float values[] = hsvValues;
+        // get a reference to the RelativeLayout so we can change the background
+        // color of the Robot Controller app to match the hue detected by the RGB sensor.
+        relativeLayoutId = hardwareMap.appContext.getResources().getIdentifier("RelativeLayout", "id", hardwareMap.appContext.getPackageName());
+        View relativeLayout = ((Activity) hardwareMap.appContext).findViewById(relativeLayoutId);
     }
+
     //Routines for 2019-2020 - based on TeleopDrive code from 2017
 
     public void drivebyDistance(double x, double y, double rotation, double distance, String unit) {//inches
@@ -155,7 +176,6 @@ public class Util {
     }
     @SuppressLint("NewApi")
     public void driveUntilColor(double x, double y, int R, int G, int B, int tolerance) {//inches
-
         double r = Math.hypot((-x), (-y));
         double robotAngle = Math.atan2((-y), (-x)) - Math.PI / 4;
         final double v1 = r * Math.cos(robotAngle);
@@ -179,6 +199,44 @@ public class Util {
         motorBackRight.setPower(BackRight);
 
         colorSensor.enableLed(true);
+
+
+        Color.RGBToHSV((int) (colorSensor.red() * SCALE_FACTOR),
+                (int) (colorSensor.green() * SCALE_FACTOR),
+                (int) (colorSensor.blue() * SCALE_FACTOR),
+                hsvValues);
+
+        // send the info back to driver station using telemetry function.
+        telemetry.addData("Red  ", colorSensor.red());
+        telemetry.addData("Green", colorSensor.green());
+        telemetry.addData("Blue ", colorSensor.blue());
+        telemetry.addData("Hue", hsvValues[0]);
+
+        boolean foundBlue=false;
+        boolean foundRed=false;
+        // change the background color to match the color detected by the RGB sensor.
+        // pass a reference to the hue, saturation, and value array as an argument
+        // to the HSVToColor method.
+        relativeLayout.post(new Runnable() {
+            public void run() {
+                relativeLayout.setBackgroundColor(Color.HSVToColor(0xff, values));
+                //look for the hue in the blue range
+                if(hsvValues[0]>200 && hsvValues[0]<250) {
+                    relativeLayout.setBackgroundColor(Color.BLUE);
+                    foundBlue=true;
+                }
+                else{
+                    //look for the hue in the red range
+                    if(hsvValues[0]<10 || hsvValues[0]>330) {
+                        relativeLayout.setBackgroundColor(Color.RED);
+                        foundRed=true;
+                    }
+                }
+            }
+        });
+
+
+    //updates needed here to drive until foundRed or foundBlue;
 
         while ((colorSensor.red() > R + (tolerance / 2) || colorSensor.red() < R - (tolerance / 2)) ||
                 (colorSensor.blue() > B + (tolerance / 2) || colorSensor.blue() < B - (tolerance / 2)) ||
