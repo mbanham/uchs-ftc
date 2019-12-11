@@ -151,7 +151,7 @@ public class Util {
         //for those motors that should be busy (power!=0) wait until they are done
         //reaching target position before returning from this function.
 
-        double tolerance = 10;
+        double tolerance = 20;
         while ((((Math.abs(FrontRight)) > 0.01 && Math.abs(motorFrontRight.getCurrentPosition() - frontRightTargetPosition) > tolerance)) ||
                 (((Math.abs(FrontLeft)) > 0.01 && Math.abs(motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition) > tolerance)) ||
                 (((Math.abs(BackLeft)) > 0.01 && Math.abs(motorBackLeft.getCurrentPosition() - backLeftTargetPosition) > tolerance)) ||
