@@ -2,6 +2,8 @@ package org.firstinspires.ftc.team11288;
 
 import android.annotation.SuppressLint;
 import android.graphics.Color;
+import android.os.Handler;
+import android.os.Looper;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -21,7 +23,9 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ThreadFactory;
 
+import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
@@ -45,6 +49,7 @@ public class Util {
     static final double INCREMENT_DRIVE_MOTOR_MOVE = 30.0; // move set amount at a time
     static final double INCHES_PER_ROTATION = 11.137; //inches per rotation of 90mm traction wheel
     static final double DEG_PER_ROTATION = 100.0; //inches per rotation of 90mm traction wheel
+    static final double claw_arm_max_distance = 200;
 
     //2019 Code changes
     private DcMotor  motorBackLeft;
@@ -195,6 +200,23 @@ public class Util {
             motorBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
 
+        public void moveClaw(final DcMotor motor, double position){
+
+        Thread thr = new Thread(new Runnable() {
+            @Override
+            public void run() {
+//                while() //while the motor is not at the position specified which would either be the top position or 0(Where it starts at the bottor)
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+
+                    }
+                });
+                }
+
+        });
+        thr.start();
+        }
     ///
 
     //Drive Routines
