@@ -18,11 +18,16 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -41,7 +46,13 @@ public class Util {
     private Telemetry telemetry;
     private DigitalChannel touchSensor;
     private DigitalChannel liftSensor;
-
+    //vuforia
+    private static final String TFOD_MODEL_ASSET = "Skystone.tflite";
+    public static final String STONE = "Stone";
+    public static final String SKYSTONE = "Skystone";
+    private static final String VUFORIA_KEY = "ASVozkX/////AAAAGX+Aimqfn0YRqafZGVaD2MIhBsmxiHLTd4r2XyoV4F/VEvRMnL1mLn7NDtl1onYGhHmJADQR8nt0aX4rZLIAb/7+XxI7LLZV4X0tMBDQyBL6IWcEdgMD63hTKncdP8NsIVJxJOY971/5pVdU50XisgiiAhq3b6D9twKLfGZ9EI2M4XXM0B7BxdA7x7YMD5QcMDf96myKGsPhVlkwz8XvBdbnOvZZg2FoxmhqExRp33AKii1GZRDwvfeco0hEOKusdwOkjbJ5RTJ+9T3fAysvqSovSG8iAWZ98qrG2xop2gK73UPJaY4vj5/1yVBKFMnWt42P931ybmEW1/c5dc8LR1CyD8jCxlgqypf9oCz/q89j";
+    private VuforiaLocalizer vuforia;
+    private TFObjectDetector tfod;
 
     private final double LIFT_MOTOR_POWER = 0.65;
     private final double ARM_MOTOR_POWER = 0.15;
@@ -104,14 +115,65 @@ public class Util {
         relativeLayoutId = hardwareMap.appContext.getResources().getIdentifier("RelativeLayout", "id", hardwareMap.appContext.getPackageName());
         View relativeLayout = ((Activity) hardwareMap.appContext).findViewById(relativeLayoutId);
     }
+    public void InitVuforia(HardwareMap hwm){
+        initVuforiaRaw();
 
-    //Routines for 2019-2020 - based on TeleopDrive code from 2017
+        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
+            initTfod(hwm);
+        } else {
+            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
+        }
+
+        /**
+         * Activate TensorFlow Object Detection before we wait for the start command.
+         * Do it here so that the Camera Stream window will have the TensorFlow annotations visible.
+         **/
+        if (tfod != null) {
+            tfod.activate();
+        }
+
+        /** Wait for the game to begin */
+        telemetry.addData(">", "Press Play to start op mode");
+        telemetry.update();
+
+    }
+
+    private void initVuforiaRaw() {
+        /*
+         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+         */
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+
+        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+
+        //  Instantiate the Vuforia engine
+        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+
+        // Loading trackables is not necessary for the TensorFlow Object Detection engine.
+    }
+    private void initTfod(HardwareMap hwm) {
+        int tfodMonitorViewId = hwm.appContext.getResources().getIdentifier(
+                "tfodMonitorViewId", "id", hwm.appContext.getPackageName());
+        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+        tfodParameters.minimumConfidence = 0.8;
+        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, STONE, SKYSTONE);
+    }
+
+    public List<Recognition> GetObjectsInFrame(){
+        List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+        return updatedRecognitions;
+    }
+
+    //Routines for 2019-2020 - based on TeleopDrive code from
+    // 2017
 
     public void drivebyDistance(double x, double y, double rotation, double distance, String unit) {//inches
         setWheelsToEncoderMode();
         double r = Math.hypot((-x), (-y));
         double robotAngle = Math.atan2((-y), (-x)) - Math.PI / 4;
-        double rightX = (rotation);
+        double rightX = rotation;
         final double v1 = r * Math.cos(robotAngle) - rightX;
         final double v2 = -r * Math.sin(robotAngle) - rightX;
         final double v3 = r * Math.sin(robotAngle) - rightX;
@@ -123,11 +185,13 @@ public class Util {
         double BackRight = Range.clip(v4, -1, 1);
 
 
-        double moveAmount = distance;
-        if(unit=="inch")
-        moveAmount = (int) (distance * COUNTS_PER_INCH);
-        if(unit=="square")
-        moveAmount = (int) (distance * COUNTS_PER_SQUARE);
+        int moveAmount = (int) (distance * COUNTS_PER_INCH);
+//        if(unit.equals("inch")) {
+//            moveAmount = (int) (distance * COUNTS_PER_INCH);
+//        }else
+//        if(unit.equals("square")) {
+//            moveAmount = (int) (distance * COUNTS_PER_SQUARE);
+//        }
         int backLeftTargetPosition = (int) (motorBackLeft.getCurrentPosition() + Math.signum(BackLeft)* moveAmount);
         int backRightTargetPosition = (int) (motorBackRight.getCurrentPosition() + Math.signum(BackRight)* moveAmount);
         int frontLeftTargetPosition = (int) (motorFrontLeft.getCurrentPosition() + Math.signum(FrontLeft)* moveAmount);
@@ -157,6 +221,115 @@ public class Util {
                 (((Math.abs(BackLeft)) > 0.01 && Math.abs(motorBackLeft.getCurrentPosition() - backLeftTargetPosition) > tolerance)) ||
                 (((Math.abs(BackRight)) > 0.01 && Math.abs(motorBackRight.getCurrentPosition() - backRightTargetPosition) > tolerance))){
             //wait and check again until done running
+            telemetry.addData("front right", "=%.2f  %d %b", FrontRight, motorFrontRight.getCurrentPosition() - frontRightTargetPosition,((Math.ceil(Math.abs(FrontRight)) > 0.0 && Math.abs(motorFrontRight.getCurrentPosition() - frontRightTargetPosition) > tolerance)));//, frontRightTargetPosition);
+            telemetry.addData("front left", "=%.2f %d %b", FrontLeft, motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition,((Math.ceil(Math.abs(FrontLeft)) > 0.0 && Math.abs(motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition) > tolerance)));//, frontLeftTargetPosition);
+            telemetry.addData("back left", "=%.2f %d %b",  BackLeft, motorBackLeft.getCurrentPosition() - backLeftTargetPosition, ((Math.ceil(Math.abs(BackLeft)) > 0.0 && Math.abs(motorBackLeft.getCurrentPosition() - backLeftTargetPosition) > tolerance)));//, backLeftTargetPosition);
+            telemetry.addData("back right", "=%.2f %d %b", BackRight, motorBackRight.getCurrentPosition() - backRightTargetPosition, ((Math.ceil(Math.abs(BackRight)) > 0.0 && Math.abs(motorBackRight.getCurrentPosition() - backRightTargetPosition) > tolerance)));
+            telemetry.update();
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        motorFrontLeft.setPower(0);
+        motorBackRight.setPower(0);
+        motorFrontRight.setPower(0);
+        motorBackLeft.setPower(0);
+
+    }
+    @SuppressLint("NewApi")
+    public void driveUntilColor(double x, double y, double rotation, double distance, String unit) {//inches
+        setWheelsToEncoderMode();
+        double r = Math.hypot((-x), (-y));
+        double robotAngle = Math.atan2((-y), (-x)) - Math.PI / 4;
+        double rightX = rotation;
+        final double v1 = r * Math.cos(robotAngle) - rightX;
+        final double v2 = -r * Math.sin(robotAngle) - rightX;
+        final double v3 = r * Math.sin(robotAngle) - rightX;
+        final double v4 = -r * Math.cos(robotAngle) - rightX;
+
+        double FrontRight = Range.clip(v2, -1, 1);
+        double FrontLeft = Range.clip(v1, -1, 1);
+        double BackLeft = Range.clip(v3, -1, 1);
+        double BackRight = Range.clip(v4, -1, 1);
+
+
+
+
+        double moveAmount = distance;
+        if(unit.equals("inch")) {
+            moveAmount = (int) (distance * COUNTS_PER_INCH);
+        }else
+        if(unit.equals("square")) {
+            moveAmount = (int) (distance * COUNTS_PER_SQUARE);
+        }
+        int backLeftTargetPosition = (int) (motorBackLeft.getCurrentPosition() + Math.signum(BackLeft)* moveAmount);
+        int backRightTargetPosition = (int) (motorBackRight.getCurrentPosition() + Math.signum(BackRight)* moveAmount);
+        int frontLeftTargetPosition = (int) (motorFrontLeft.getCurrentPosition() + Math.signum(FrontLeft)* moveAmount);
+        int frontRightTargetPosition = (int) (motorFrontRight.getCurrentPosition() + Math.signum(FrontRight)* moveAmount);
+
+        motorBackLeft.setTargetPosition((int) backLeftTargetPosition);
+        motorBackRight.setTargetPosition((int) backRightTargetPosition);
+        motorFrontLeft.setTargetPosition((int) frontLeftTargetPosition);
+        motorFrontRight.setTargetPosition((int) frontRightTargetPosition);
+
+        motorBackLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorBackRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorFrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorFrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        motorFrontRight.setPower(FrontRight);
+        motorFrontLeft.setPower(FrontLeft);
+        motorBackLeft.setPower(BackLeft);
+        motorBackRight.setPower(BackRight);
+
+
+
+        colorSensor.enableLed(true);
+        //for those motors that should be busy (power!=0) wait until they are done
+        //reaching target position before returning from this function.
+
+        Color.RGBToHSV((int) (colorSensor.red() * SCALE_FACTOR),
+                (int) (colorSensor.green() * SCALE_FACTOR),
+                (int) (colorSensor.blue() * SCALE_FACTOR),
+                hsvValues);
+
+        // send the info back to driver station using telemetry function.
+        telemetry.addData("Red  ", colorSensor.red());
+        telemetry.addData("Green", colorSensor.green());
+        telemetry.addData("Blue ", colorSensor.blue());
+        telemetry.addData("Hue", hsvValues[0]);
+        telemetry.update();
+        // change the background color to match the color detected by the RGB sensor.
+        // pass a reference to the hue, saturation, and value array as an argument
+        // to the HSVToColor method.
+        boolean foundBlue=false;
+        boolean foundRed=false;
+
+        if(hsvValues[0]>200 && hsvValues[0]<250) {
+            relativeLayout.setBackgroundColor(Color.BLUE);
+            foundBlue=true;
+        }
+        else{
+            //look for the hue in the red range
+            if(hsvValues[0]<10 || hsvValues[0]>330) {
+                relativeLayout.setBackgroundColor(Color.RED);
+                foundRed=true;
+            }
+        }
+
+
+
+    //updates needed here to drive until foundRed or foundBlue;
+
+        double tolerance = 10;
+        while ((((Math.abs(FrontRight)) > 0.01 && Math.abs(motorFrontRight.getCurrentPosition() - frontRightTargetPosition) > tolerance)) ||
+                (((Math.abs(FrontLeft)) > 0.01 && Math.abs(motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition) > tolerance)) ||
+                (((Math.abs(BackLeft)) > 0.01 && Math.abs(motorBackLeft.getCurrentPosition() - backLeftTargetPosition) > tolerance)) ||
+                (((Math.abs(BackRight)) > 0.01 && Math.abs(motorBackRight.getCurrentPosition() - backRightTargetPosition) > tolerance)) ||
+                (!foundBlue || !foundRed)){
+            //wait and check again until done running
 //            telemetry.addData("front right", "=%.2f  %d %b", FrontRight, motorFrontRight.getCurrentPosition() - frontRightTargetPosition,((Math.ceil(Math.abs(FrontRight)) > 0.0 && Math.abs(motorFrontRight.getCurrentPosition() - frontRightTargetPosition) > tolerance)));//, frontRightTargetPosition);
 //            telemetry.addData("front left", "=%.2f %d %b", FrontLeft, motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition,((Math.ceil(Math.abs(FrontLeft)) > 0.0 && Math.abs(motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition) > tolerance)));//, frontLeftTargetPosition);
 //            telemetry.addData("back left", "=%.2f %d %b",  BackLeft, motorBackLeft.getCurrentPosition() - backLeftTargetPosition, ((Math.ceil(Math.abs(BackLeft)) > 0.0 && Math.abs(motorBackLeft.getCurrentPosition() - backLeftTargetPosition) > tolerance)));//, backLeftTargetPosition);
@@ -173,78 +346,11 @@ public class Util {
         motorFrontRight.setPower(0);
         motorBackLeft.setPower(0);
 
-    }
-    @SuppressLint("NewApi")
-    public void driveUntilColor(double x, double y, int R, int G, int B, int tolerance) {//inches
-        double r = Math.hypot((-x), (-y));
-        double robotAngle = Math.atan2((-y), (-x)) - Math.PI / 4;
-        final double v1 = r * Math.cos(robotAngle);
-        final double v2 = -r * Math.sin(robotAngle);
-        final double v3 = r * Math.sin(robotAngle);
-        final double v4 = -r * Math.cos(robotAngle);
-
-        double FrontRight = Range.clip(v2, -1, 1);
-        double FrontLeft = Range.clip(v1, -1, 1);
-        double BackLeft = Range.clip(v3, -1, 1);
-        double BackRight = Range.clip(v4, -1, 1);
-
-        motorBackLeft.setMode(RUN_WITHOUT_ENCODER);
-        motorBackRight.setMode(RUN_WITHOUT_ENCODER);
-        motorFrontLeft.setMode(RUN_WITHOUT_ENCODER);
-        motorFrontRight.setMode(RUN_WITHOUT_ENCODER);
-
-        motorFrontRight.setPower(FrontRight);
-        motorFrontLeft.setPower(FrontLeft);
-        motorBackLeft.setPower(BackLeft);
-        motorBackRight.setPower(BackRight);
-
-        colorSensor.enableLed(true);
 
 
-        Color.RGBToHSV((int) (colorSensor.red() * SCALE_FACTOR),
-                (int) (colorSensor.green() * SCALE_FACTOR),
-                (int) (colorSensor.blue() * SCALE_FACTOR),
-                hsvValues);
-
-        // send the info back to driver station using telemetry function.
-        telemetry.addData("Red  ", colorSensor.red());
-        telemetry.addData("Green", colorSensor.green());
-        telemetry.addData("Blue ", colorSensor.blue());
-        telemetry.addData("Hue", hsvValues[0]);
 
 
-        // change the background color to match the color detected by the RGB sensor.
-        // pass a reference to the hue, saturation, and value array as an argument
-        // to the HSVToColor method.
-        relativeLayout.post(new Runnable() {
-            boolean foundBlue=false;
-            boolean foundRed=false;
 
-            public void run() {
-                relativeLayout.setBackgroundColor(Color.HSVToColor(0xff, values));
-                //look for the hue in the blue range
-                if(hsvValues[0]>200 && hsvValues[0]<250) {
-                    relativeLayout.setBackgroundColor(Color.BLUE);
-                    foundBlue=true;
-                }
-                else{
-                    //look for the hue in the red range
-                    if(hsvValues[0]<10 || hsvValues[0]>330) {
-                        relativeLayout.setBackgroundColor(Color.RED);
-                        foundRed=true;
-                    }
-                }
-            }
-        });
-
-
-    //updates needed here to drive until foundRed or foundBlue;
-
-        while ((colorSensor.red() > R + (tolerance / 2) || colorSensor.red() < R - (tolerance / 2)) ||
-                (colorSensor.blue() > B + (tolerance / 2) || colorSensor.blue() < B - (tolerance / 2)) ||
-                (colorSensor.green() > G + (tolerance / 2) && colorSensor.green() < G - (tolerance / 2))) {
-            //get stuck
-        }
         colorSensor.enableLed(false);
     }
 

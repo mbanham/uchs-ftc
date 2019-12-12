@@ -6,8 +6,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Hardware;
 import com.qualcomm.robotcore.util.Range;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
@@ -78,6 +80,7 @@ public class TeleopDrive extends OpMode{
         // Initialize the hardware variables.
         // Send telemetry message to signify robot waiting
             telemetry.addData("Say", "Hello Driver");
+
 
             //initialize wheels
             motorFrontRight = hardwareMap.dcMotor.get("motor front right");
@@ -185,7 +188,7 @@ public class TeleopDrive extends OpMode{
             if(gamepad1.dpad_right)
                 x_int = -0.5;
             if(x_int != 0 || y_int != 0) {
-                teamUtils.drivebyDistance(x_int, y_int, 0, 1, "inch");
+                teamUtils.drivebyDistance(x_int, y_int, 0, 3, "inch");
             }
 
 
@@ -201,11 +204,11 @@ public class TeleopDrive extends OpMode{
             telemetry.update();
         }
         //arm
-        motorArm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        if (Range.clip(gamepad2.left_trigger, 0,1) > 0.1) {
-            motorArm.setPower(Range.clip(gamepad2.left_trigger, 0,1));
+        motorArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        if (Range.clip(gamepad2.left_trigger, 0,1) > 0.05) {
+            motorArm.setPower(-Range.clip(gamepad2.left_trigger, 0,0.75));
         } else {
-            if (Range.clip(gamepad2.right_trigger, 0,1) > 0.1) {
+            if (Range.clip(gamepad2.right_trigger, 0,1) > 0.05) {
                 motorArm.setPower(Range.clip(gamepad2.right_trigger, 0,1));
             } else {
                 motorArm.setPower(0.0);
@@ -214,12 +217,12 @@ public class TeleopDrive extends OpMode{
 
 
         //lift
-        motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         if (gamepad2.dpad_down) {
-            motorLift.setPower(-0.1);
+            motorLift.setPower(-0.75);
         } else {
             if (gamepad2.dpad_up) {
-                motorLift.setPower(0.1);
+                motorLift.setPower(1);
 
             } else {
                 motorLift.setPower(0);
