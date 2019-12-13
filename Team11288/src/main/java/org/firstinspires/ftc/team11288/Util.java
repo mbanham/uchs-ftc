@@ -346,11 +346,6 @@ public class Util {
         motorFrontRight.setPower(0);
         motorBackLeft.setPower(0);
 
-
-
-
-
-
         colorSensor.enableLed(false);
     }
 

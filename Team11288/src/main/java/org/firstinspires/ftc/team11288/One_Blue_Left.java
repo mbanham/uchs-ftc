@@ -20,7 +20,6 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENC
 
 @Autonomous(name = "One_Blue_Left", group = "Linear Opmode")
 //@Disabled                            // Comment this out to add to the opmode list
-
 public class One_Blue_Left extends LinearOpMode {
     //initialize these variables, override them in the constructor
     private int TEAM_COLOR = Color.BLUE;

@@ -7,12 +7,12 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import java.util.ArrayList;
 import java.util.List;
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Autonomous", group = "Linear Opmode")
-//@Disabled                            // Comment this out to add to the opmode list
-
+@Disabled                            // Comment this out to add to the opmode list
 public class Autonomous extends LinearOpMode {
 
     DcMotor mfl, mfr, mbl, mbr;
