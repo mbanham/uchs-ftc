@@ -71,7 +71,7 @@ public class One_Blue_Left extends LinearOpMode {
         claw = hardwareMap.servo.get("claw servo");
         platform = hardwareMap.servo.get("platform servo");
         claw.setPosition(0);
-        platform.setPosition(0);
+        platform.setPosition(1);
         motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
         motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -94,11 +94,10 @@ public class One_Blue_Left extends LinearOpMode {
             // run this loop until the end of the match (driver presses stop)
             teamUtils.drivebyDistance(0.5, 0.0, 0.0, 3, "inch");//drive away from wall
             teamUtils.drivebyDistance(0.0, 0.5, 0.0, 30, "inch");//drive to corner
-            platform.setPosition(0);
             teamUtils.drivebyDistance(0.5, 0, 0.0, 28, "inch");//drive to base plate
-            platform.setPosition(1);
-            teamUtils.drivebyDistance(-0.5, 0.0, 0.0, 28, "inch");//drive towards corner with base plate
             platform.setPosition(0);
+            teamUtils.drivebyDistance(-0.5, 0.0, 0.0, 28, "inch");//drive towards corner with base plate
+            platform.setPosition(1);
             teamUtils.driveUntilColor(0.0, -0.5, 0.0, 70, "inch");//drive away from corner
 
         //}

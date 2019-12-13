@@ -93,7 +93,7 @@ public class TeleopDrive extends OpMode{
             motorLift = hardwareMap.dcMotor.get("motor lift");
 
             claw.setPosition(0);
-            platform.setPosition(0);
+            platform.setPosition(1);
 
             motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
             motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -165,10 +165,12 @@ public class TeleopDrive extends OpMode{
 
         //platformArm
         if (gamepad1.a) {
+            //down
             platform.setPosition(0);
             telemetry.addData("MyActivity", "ServoPosition=0");
             telemetry.update();
         } else if (gamepad1.y) {
+            //up
             platform.setPosition(1);
             telemetry.addData("MyActivity", "ServoPosition=1");
             telemetry.update();
@@ -188,7 +190,7 @@ public class TeleopDrive extends OpMode{
             if(gamepad1.dpad_right)
                 x_int = -0.5;
             if(x_int != 0 || y_int != 0) {
-                teamUtils.drivebyDistance(x_int, y_int, 0, 3, "inch");
+                teamUtils.drivebyDistance(x_int, y_int, 0, 1, "inch");
             }
 
 
