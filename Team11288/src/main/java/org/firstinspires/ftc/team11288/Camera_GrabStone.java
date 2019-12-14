@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
@@ -22,7 +23,7 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENC
 
 
 @Autonomous(name = "Camera_GrabStone", group = "Linear Opmode")
-//@Disabled                            // Comment this out to add to the opmode list
+@Disabled                            // Comment this out to add to the opmode list
 public class Camera_GrabStone extends LinearOpMode {
     //initialize these variables, override them in the constructor
     private int TEAM_COLOR = Color.BLUE;
@@ -116,9 +117,9 @@ public class Camera_GrabStone extends LinearOpMode {
                 double threshold = 20;
                 while(center.x >  screen_center.x - threshold || center.x < screen_center.x + threshold){
                     if(center.x >  screen_center.x - threshold) {//left too muchs
-                        teamUtils.drivebySpeed(-0.5, 0, 0, opModeIsActive());
+                        teamUtils.drivebySpeed(-0.5, 0, 0);
                     }else if(center.x < screen_center.x + threshold){//right too much
-                        teamUtils.drivebySpeed(-0.5, 0, 0, opModeIsActive());
+                        teamUtils.drivebySpeed(-0.5, 0, 0);
                     }else{
                         teamUtils.stopWheelsSpeedMode();
                     }

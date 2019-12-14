@@ -68,15 +68,16 @@ public class One_Red_Right extends LinearOpMode {
 
         //utils class initializer
         teamUtils = new Util(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
-
+        teamUtils.InitExtraSensors(hardwareMap);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         //Play started
-        boolean stepsCompleted=false;
+        boolean stepsCompleted = false;
         runtime.reset();
         while (opModeIsActive()) {
-            if (!stepsCompleted)
+            if (!stepsCompleted) {
+                stepsCompleted = true;
                 // run this loop until the end of the match (driver presses stop)
                 teamUtils.drivebyDistance(0.8, 0.0, 0.0, 3, "inch");//drive away from wall
                 teamUtils.drivebyDistance(0.0, -0.8, 0.0, 30, "inch");//drive to corner
@@ -86,12 +87,13 @@ public class One_Red_Right extends LinearOpMode {
                 teamUtils.drivebyDistance(-0.8, 0.0, 0.0, 28.5, "inch");//drive towards corner with base plate
                 platform.setPosition(1);
                 sleep(1000);
-                teamUtils.driveUntilColor(0.0, 0.8, 0.0, 50, "inch");//drive away from corner
-                stepsCompleted = true;
+                teamUtils.drivebyDistance(0.0, 0.8, 0.0, 50, "inch");//drive away from corner
+
+            }
+
+            //}
         }
-
-        //}
     }
-}
 
+}
 
