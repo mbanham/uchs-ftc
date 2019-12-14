@@ -45,49 +45,51 @@ public class One_Blue_Left extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
+        try {
+            telemetry.addData("Status", "Initialized");
+            telemetry.update();
 
-        //initialize wheels
-        motorFrontRight = hardwareMap.dcMotor.get("motor front right");
-        motorFrontLeft = hardwareMap.dcMotor.get("motor front left");
-        motorBackLeft = hardwareMap.dcMotor.get("motor back left");
-        motorBackRight = hardwareMap.dcMotor.get("motor back right");
-        motorLift = hardwareMap.dcMotor.get("motor lift");
-        claw = hardwareMap.servo.get("claw servo");
-        platform = hardwareMap.servo.get("platform servo");
-        claw.setPosition(0);
-        platform.setPosition(1);
-        motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-        motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+            //initialize wheels
+            motorFrontRight = hardwareMap.dcMotor.get("motor front right");
+            motorFrontLeft = hardwareMap.dcMotor.get("motor front left");
+            motorBackLeft = hardwareMap.dcMotor.get("motor back left");
+            motorBackRight = hardwareMap.dcMotor.get("motor back right");
+            motorLift = hardwareMap.dcMotor.get("motor lift");
+            claw = hardwareMap.servo.get("claw servo");
+            platform = hardwareMap.servo.get("platform servo");
+            claw.setPosition(0);
+            platform.setPosition(1);
+            motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
+            motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+            motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
+            motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        motorLift.setDirection(DcMotorSimple.Direction.FORWARD);
-        motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motorLift.setMode(STOP_AND_RESET_ENCODER);
+            motorLift.setDirection(DcMotorSimple.Direction.FORWARD);
+            motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            motorLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            motorLift.setMode(STOP_AND_RESET_ENCODER);
 
-        //utils class initializer
-        teamUtils = new Util(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
-        teamUtils.InitExtraSensors(hardwareMap);
+            //utils class initializer
+            teamUtils = new Util(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
+            teamUtils.InitExtraSensors(hardwareMap);
 
-        // Wait for the game to start (driver presses PLAY)
-        waitForStart();
-        //Play started
-        runtime.reset();
-        //while (opModeIsActive()) {
+            // Wait for the game to start (driver presses PLAY)
+            waitForStart();
+            //Play started
+            runtime.reset();
+            //while (opModeIsActive()) {
             // run this loop until the end of the match (driver presses stop)
-            teamUtils.drivebyDistance(0.8, 0.0, 0.0, 3, "inch");//drive away from wall
-            teamUtils.drivebyDistance(0.0, 0.8, 0.0, 30, "inch");//drive to corner
-            teamUtils.drivebyDistance(0.8, 0, 0.0, 27, "inch");//drive to base plate
+            teamUtils.drivebyDistance(0.8, 0.0, 0.0, 3, "inch", opModeIsActive());//drive away from wall
+            teamUtils.drivebyDistance(0.0, 0.8, 0.0, 30, "inch", opModeIsActive());//drive to corner
+            teamUtils.drivebyDistance(0.8, 0, 0.0, 27, "inch", opModeIsActive());//drive to base plate
             platform.setPosition(0);
             sleep(1000);
-            teamUtils.drivebyDistance(-0.8, 0.0, 0.0, 28.5, "inch");//drive towards corner with base plate
+            teamUtils.drivebyDistance(-0.8, 0.0, 0.0, 28.5, "inch", opModeIsActive());//drive towards corner with base plate
             platform.setPosition(1);
             sleep(1000);
-            teamUtils.driveUntilColor(0.0, -0.8, 0.0, 50, "inch");//drive away from corner
-
+            teamUtils.driveUntilColor(0.0, -0.8, 0.0, 50, "inch", opModeIsActive());//drive away from corner
+        }catch (Exception e){
+        }
         //}
     }
 }
