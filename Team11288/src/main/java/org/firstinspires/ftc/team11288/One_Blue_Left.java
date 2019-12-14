@@ -75,20 +75,24 @@ public class One_Blue_Left extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         //Play started
-        runtime.reset();
-        //while (opModeIsActive()) {
-            // run this loop until the end of the match (driver presses stop)
-            teamUtils.drivebyDistance(0.8, 0.0, 0.0, 3, "inch");//drive away from wall
-            teamUtils.drivebyDistance(0.0, 0.8, 0.0, 30, "inch");//drive to corner
-            teamUtils.drivebyDistance(0.8, 0, 0.0, 27, "inch");//drive to base plate
-            platform.setPosition(0);
-            sleep(1000);
-            teamUtils.drivebyDistance(-0.8, 0.0, 0.0, 28.5, "inch");//drive towards corner with base plate
-            platform.setPosition(1);
-            sleep(1000);
-            teamUtils.driveUntilColor(0.0, -0.8, 0.0, 50, "inch");//drive away from corner
 
-        //}
+        boolean stepsCompleted=false;
+        runtime.reset();
+        while (opModeIsActive()) {
+            if (!stepsCompleted)
+                // run this loop until the end of the match (driver presses stop)
+                teamUtils.drivebyDistance(0.8, 0.0, 0.0, 3, "inch");//drive away from wall
+                teamUtils.drivebyDistance(0.0, 0.8, 0.0, 30, "inch");//drive to corner
+                teamUtils.drivebyDistance(0.8, 0, 0.0, 27, "inch");//drive to base plate
+                platform.setPosition(0);
+                sleep(1000);
+                teamUtils.drivebyDistance(-0.8, 0.0, 0.0, 28.5, "inch");//drive towards corner with base plate
+                platform.setPosition(1);
+                sleep(1000);
+                teamUtils.driveUntilColor(0.0, -0.8, 0.0, 50, "inch");//drive away from corner
+                stepsCompleted=true;
+            }
+        }
     }
 }
 
