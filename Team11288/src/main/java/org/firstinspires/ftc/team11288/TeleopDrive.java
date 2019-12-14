@@ -138,20 +138,22 @@ public class TeleopDrive extends OpMode{
     /*
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
      */
+    double multiplier = 1;
+    double arm_multiplier = 1;
     @Override
     public void loop() {
         double r = Math.hypot(scaleInput(gamepad1.left_stick_x), scaleInput(gamepad1.left_stick_y));
         double robotAngle = Math.atan2(scaleInput(gamepad1.left_stick_y), scaleInput(-gamepad1.left_stick_x)) - Math.PI / 4;
-        double rightX = scaleInput(gamepad1.right_stick_x);
+        double rightX = scaleInput(gamepad1.right_stick_x * multiplier);
         final double v1 = r * Math.cos(robotAngle) - rightX;
         final double v2 = -r * Math.sin(robotAngle) - rightX;
         final double v3 = r * Math.sin(robotAngle) - rightX;
         final double v4 = -r * Math.cos(robotAngle) - rightX;
 
-        double FrontRight = Range.clip(v2, -1, 1);
-        double FrontLeft = Range.clip(v1, -1, 1);
-        double BackLeft = Range.clip(v3, -1, 1);
-        double BackRight = Range.clip(v4, -1, 1);
+        double FrontRight = Range.clip(v2 * multiplier, -1, 1);
+        double FrontLeft = Range.clip(v1 * multiplier, -1, 1);
+        double BackLeft = Range.clip(v3 * multiplier, -1, 1);
+        double BackRight = Range.clip(v4 * multiplier, -1, 1);
 
         // write the values to the motors
         motorBackLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -164,6 +166,15 @@ public class TeleopDrive extends OpMode{
         motorBackRight.setPower(BackRight);
 
         //platformArm
+
+
+        if(gamepad1.right_bumper){
+            multiplier=0.7;
+
+        }else
+        {
+            multiplier = 1;
+        }
         if (gamepad1.a) {
             //down
             platform.setPosition(0);
@@ -190,7 +201,7 @@ public class TeleopDrive extends OpMode{
             if(gamepad1.dpad_right)
                 x_int = -0.5;
             if(x_int != 0 || y_int != 0) {
-                teamUtils.drivebyDistance(x_int, y_int, 0, 1, "inch");
+                teamUtils.drivebyDistance(x_int, y_int, 0, 12, "inch");
             }
 
 
@@ -206,15 +217,22 @@ public class TeleopDrive extends OpMode{
             telemetry.update();
         }
         //arm
+
         motorArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        if (Range.clip(gamepad2.left_trigger, 0,1) > 0.05) {
-            motorArm.setPower(-Range.clip(gamepad2.left_trigger, 0,0.75));
+        if (Range.clip(gamepad2.left_trigger, 0,1) > 0.02) {
+            motorArm.setPower(Range.clip(gamepad2.left_trigger, 0,1 * arm_multiplier ));
         } else {
-            if (Range.clip(gamepad2.right_trigger, 0,1) > 0.05) {
-                motorArm.setPower(Range.clip(gamepad2.right_trigger, 0,1));
+            if (Range.clip(gamepad2.right_trigger, 0,1) > 0.02) {
+                motorArm.setPower(-Range.clip(gamepad2.right_trigger, 0,1 * arm_multiplier  ));
             } else {
                 motorArm.setPower(0.0);
             }
+        }
+        if(gamepad2.x){
+            arm_multiplier = 0.3;
+        }else
+        {
+            arm_multiplier = 1;
         }
 
 

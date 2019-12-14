@@ -58,7 +58,7 @@ public class Util {
     private final double ARM_MOTOR_POWER = 0.15;
     private final double DRIVE_MOTOR_POWER = 0.75;
     static final double     COUNTS_PER_MOTOR_REV    = 1250.0; //HD Hex Motor (REV-41-1301) 40:1
-    static final double     COUNTS_PER_DRIVE_MOTOR_REV    = 300; // counts per reevaluation of the motor
+    static final double     COUNTS_PER_DRIVE_MOTOR_REV    = 180; // counts per reevaluation of the motor
     static final double INCREMENT_MOTOR_MOVE = 175.0; // move set amount at a time
     static final double INCREMENT_DRIVE_MOTOR_MOVE = 30.0; // move set amount at a time
     static final double INCHES_PER_ROTATION = 11.137; //inches per rotation of 90mm traction wheel
@@ -238,6 +238,41 @@ public class Util {
         motorBackLeft.setPower(0);
 
     }
+    public void drivebySpeed(double x, double y, double rotation) {//inches
+        setWheelsToEncoderMode();
+        double r = Math.hypot((-x), (-y));
+        double robotAngle = Math.atan2((-y), (-x)) - Math.PI / 4;
+        double rightX = rotation;
+        final double v1 = r * Math.cos(robotAngle) - rightX;
+        final double v2 = -r * Math.sin(robotAngle) - rightX;
+        final double v3 = r * Math.sin(robotAngle) - rightX;
+        final double v4 = -r * Math.cos(robotAngle) - rightX;
+
+        double FrontRight = Range.clip(v2, -1, 1);
+        double FrontLeft = Range.clip(v1, -1, 1);
+        double BackLeft = Range.clip(v3, -1, 1);
+        double BackRight = Range.clip(v4, -1, 1);
+
+        int backLeftTargetPosition = (int) (motorBackLeft.getCurrentPosition() + Math.signum(BackLeft));
+        int backRightTargetPosition = (int) (motorBackRight.getCurrentPosition() + Math.signum(BackRight));
+        int frontLeftTargetPosition = (int) (motorFrontLeft.getCurrentPosition() + Math.signum(FrontLeft));
+        int frontRightTargetPosition = (int) (motorFrontRight.getCurrentPosition() + Math.signum(FrontRight));
+
+        motorBackLeft.setTargetPosition((int) backLeftTargetPosition);
+        motorBackRight.setTargetPosition((int) backRightTargetPosition);
+        motorFrontLeft.setTargetPosition((int) frontLeftTargetPosition);
+        motorFrontRight.setTargetPosition((int) frontRightTargetPosition);
+
+        motorBackLeft.setMode(RUN_WITHOUT_ENCODER);
+        motorBackRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motorFrontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motorFrontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        motorFrontRight.setPower(FrontRight);
+        motorFrontLeft.setPower(FrontLeft);
+        motorBackLeft.setPower(BackLeft);
+        motorBackRight.setPower(BackRight);
+    }
     @SuppressLint("NewApi")
     public void driveUntilColor(double x, double y, double rotation, double distance, String unit) {//inches
         setWheelsToEncoderMode();
@@ -310,12 +345,16 @@ public class Util {
         if(hsvValues[0]>200 && hsvValues[0]<250) {
             relativeLayout.setBackgroundColor(Color.BLUE);
             foundBlue=true;
+            telemetry.addData("Blue", hsvValues[0]);
+            telemetry.update();
         }
         else{
             //look for the hue in the red range
             if(hsvValues[0]<10 || hsvValues[0]>330) {
                 relativeLayout.setBackgroundColor(Color.RED);
                 foundRed=true;
+                telemetry.addData("Blue", hsvValues[0]);
+                telemetry.update();
             }
         }
 

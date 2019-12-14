@@ -92,13 +92,15 @@ public class One_Blue_Left extends LinearOpMode {
         runtime.reset();
         //while (opModeIsActive()) {
             // run this loop until the end of the match (driver presses stop)
-            teamUtils.drivebyDistance(0.5, 0.0, 0.0, 3, "inch");//drive away from wall
-            teamUtils.drivebyDistance(0.0, 0.5, 0.0, 30, "inch");//drive to corner
-            teamUtils.drivebyDistance(0.5, 0, 0.0, 28, "inch");//drive to base plate
+            teamUtils.drivebyDistance(0.8, 0.0, 0.0, 3, "inch");//drive away from wall
+            teamUtils.drivebyDistance(0.0, 0.8, 0.0, 30, "inch");//drive to corner
+            teamUtils.drivebyDistance(0.8, 0, 0.0, 27, "inch");//drive to base plate
             platform.setPosition(0);
-            teamUtils.drivebyDistance(-0.5, 0.0, 0.0, 28, "inch");//drive towards corner with base plate
+            sleep(1000);
+            teamUtils.drivebyDistance(-0.8, 0.0, 0.0, 28.5, "inch");//drive towards corner with base plate
             platform.setPosition(1);
-            teamUtils.driveUntilColor(0.0, -0.5, 0.0, 70, "inch");//drive away from corner
+            sleep(1000);
+            teamUtils.driveUntilColor(0.0, -0.8, 0.0, 50, "inch");//drive away from corner
 
         //}
     }

@@ -12,13 +12,16 @@ import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+
+import java.util.List;
+
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
 
-@Autonomous(name = "One_Red_Right", group = "Linear Opmode")
+@Autonomous(name = "Camera_GrabStone", group = "Linear Opmode")
 //@Disabled                            // Comment this out to add to the opmode list
-
-public class One_Red_Right extends LinearOpMode {
+public class Camera_GrabStone extends LinearOpMode {
     //initialize these variables, override them in the constructor
     private int TEAM_COLOR = Color.BLUE;
     private static final int teleopType1 = 0, teleopType2 = 1, teleopType3 = 2, teleopTypeLinear = 3, teleopTypeRev = 4;
@@ -42,8 +45,6 @@ public class One_Red_Right extends LinearOpMode {
 //    private Servo wrist       = null;
     private Servo claw = null;
     private Servo platform = null;
-     //color sensorl
-    NormalizedColorSensor colorSensor;
 
     //TODO touch sensor
     DigitalChannel touchSensor;  // Hardware Device Object
@@ -74,6 +75,10 @@ public class One_Red_Right extends LinearOpMode {
         motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
         motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+        motorBackLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motorBackRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motorFrontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motorFrontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         motorLift.setDirection(DcMotorSimple.Direction.FORWARD);
         motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -82,26 +87,32 @@ public class One_Red_Right extends LinearOpMode {
 
         //utils class initializer
         teamUtils = new Util(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
+        teamUtils.InitExtraSensors(hardwareMap);
+        teamUtils.InitVuforia(hardwareMap);
 
-
+        
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         //Play started
         runtime.reset();
-        //while (opModeIsActive()) {
-            // run this loop until the end of the match (driver presses stop)
-        teamUtils.drivebyDistance(0.8, 0.0, 0.0, 3, "inch");//drive away from wall
-        teamUtils.drivebyDistance(0.0, -0.8, 0.0, 30, "inch");//drive to corner
-        teamUtils.drivebyDistance(0.8, 0, 0.0, 27, "inch");//drive to base plate
-        platform.setPosition(0);
-        sleep(1000);
-        teamUtils.drivebyDistance(-0.8, 0.0, 0.0, 28.5, "inch");//drive towards corner with base plate
-        platform.setPosition(1);
-        sleep(1000);
-        teamUtils.driveUntilColor(0.0, 0.8, 0.0, 50, "inch");//drive away from corner
+        List<Recognition> recog = teamUtils.GetObjectsInFrame();
+        for (Recognition r : recog){
+            if(r.getLabel().equals(Util.STONE)){
+                double width = r.getImageWidth();
+                double height = r.getImageHeight();
+                double box_width = Math.abs(r.getRight() - r.getLeft());
+                double threshold = 20;
+                while(r.getLeft() >  r.getWidth()/2 - threshold - box_width/2 || r.getLeft() >  + r.getWidth()/2 + threshold - box_width/2){
+                    if(r.getLeft() >  r.getWidth()/2 - threshold - box_width/2) {//left too muchs
+                        teamUtils.drivebySpeed(-0.5, 0, 0);
+                    }if(r.getLeft() >  + r.getWidth()/2 + threshold - box_width/2){//right too much
+                        teamUtils.drivebySpeed(-0.5, 0, 0);
+                    }
 
-        //}
+                }
+
+
+            }
+        }
     }
 }
-
-
