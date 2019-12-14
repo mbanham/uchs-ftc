@@ -20,9 +20,6 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENC
 
 public class One_Red_Right extends LinearOpMode {
     //initialize these variables, override them in the constructor
-    private int TEAM_COLOR = Color.BLUE;
-    private static final int teleopType1 = 0, teleopType2 = 1, teleopType3 = 2, teleopTypeLinear = 3, teleopTypeRev = 4;
-    private int currentScaleInputMode = teleopTypeLinear;
 
     /* Declare OpMode members. */
     //wheels
@@ -35,21 +32,10 @@ public class One_Red_Right extends LinearOpMode {
     private Util teamUtils;
 
 
-    //claw and arm
-    static final double COUNTS_PER_MOTOR_REV = 1250.0; //HD Hex Motor (REV-41-1301) 40:1
-
     //    private elbow             = null;
 //    private Servo wrist       = null;
     private Servo claw = null;
     private Servo platform = null;
-     //color sensorl
-    NormalizedColorSensor colorSensor;
-
-    //TODO touch sensor
-    DigitalChannel touchSensor;  // Hardware Device Object
-
-    private int directionArm = 1;
-    private int rotations = 12;
 
 
     private ElapsedTime runtime = new ElapsedTime();

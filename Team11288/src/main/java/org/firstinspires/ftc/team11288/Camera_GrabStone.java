@@ -2,6 +2,7 @@ package org.firstinspires.ftc.team11288;
 
 
 import android.graphics.Color;
+import android.graphics.Point;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -12,6 +13,7 @@ import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 
 import java.util.List;
@@ -90,7 +92,7 @@ public class Camera_GrabStone extends LinearOpMode {
         teamUtils.InitExtraSensors(hardwareMap);
         teamUtils.InitVuforia(hardwareMap);
 
-        
+
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         //Play started
@@ -100,16 +102,29 @@ public class Camera_GrabStone extends LinearOpMode {
             if(r.getLabel().equals(Util.STONE)){
                 double width = r.getImageWidth();
                 double height = r.getImageHeight();
-                double box_width = Math.abs(r.getRight() - r.getLeft());
+                double angle = r.estimateAngleToObject(AngleUnit.DEGREES);
+
+                Point screen_center = new Point((int)(width / 2), (int)(height / 2));
+                Point center = new Point((int)(r.getImageWidth() - (r.getRight() + r.getLeft())), (int)(r.getImageHeight() - (r.getTop() + r.getBottom())));
+                Point bottom_left = new Point((int)r.getLeft(), (int)r.getBottom());
+                Point bottom_right = new Point((int)r.getRight(), (int)r.getBottom());
+                Point top_left = new Point((int)r.getLeft(), (int)r.getTop());
+                Point top_right = new Point((int)r.getRight(), (int)r.getTop());
+                
+                
+
                 double threshold = 20;
-                while(r.getLeft() >  r.getWidth()/2 - threshold - box_width/2 || r.getLeft() >  + r.getWidth()/2 + threshold - box_width/2){
-                    if(r.getLeft() >  r.getWidth()/2 - threshold - box_width/2) {//left too muchs
+                while(center.x >  screen_center.x - threshold || center.x < screen_center.x + threshold){
+                    if(center.x >  screen_center.x - threshold) {//left too muchs
                         teamUtils.drivebySpeed(-0.5, 0, 0);
-                    }if(r.getLeft() >  + r.getWidth()/2 + threshold - box_width/2){//right too much
+                    }else if(center.x < screen_center.x + threshold){//right too much
                         teamUtils.drivebySpeed(-0.5, 0, 0);
+                    }else{
+                        teamUtils.stopWheelsSpeedMode();
                     }
 
                 }
+
 
 
             }

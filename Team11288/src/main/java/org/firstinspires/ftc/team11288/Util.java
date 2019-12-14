@@ -37,7 +37,6 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
-
 public class Util {
     private DcMotor motorRight;
     private DcMotor motorLeft;
@@ -46,7 +45,7 @@ public class Util {
     private Telemetry telemetry;
     private DigitalChannel touchSensor;
     private DigitalChannel liftSensor;
-    //vuforia
+    // vuforia
     private static final String TFOD_MODEL_ASSET = "Skystone.tflite";
     public static final String STONE = "Stone";
     public static final String SKYSTONE = "Skystone";
@@ -57,65 +56,72 @@ public class Util {
     private final double LIFT_MOTOR_POWER = 0.65;
     private final double ARM_MOTOR_POWER = 0.15;
     private final double DRIVE_MOTOR_POWER = 0.75;
-    static final double     COUNTS_PER_MOTOR_REV    = 1250.0; //HD Hex Motor (REV-41-1301) 40:1
-    static final double     COUNTS_PER_DRIVE_MOTOR_REV    = 180; // counts per reevaluation of the motor
+    static final double COUNTS_PER_MOTOR_REV = 1250.0; // HD Hex Motor (REV-41-1301) 40:1
+    static final double COUNTS_PER_DRIVE_MOTOR_REV = 180; // counts per reevaluation of the motor
     static final double INCREMENT_MOTOR_MOVE = 175.0; // move set amount at a time
     static final double INCREMENT_DRIVE_MOTOR_MOVE = 30.0; // move set amount at a time
-    static final double INCHES_PER_ROTATION = 11.137; //inches per rotation of 90mm traction wheel
-    static final double DEG_PER_ROTATION = 100.0; //inches per rotation of 90mm traction wheel
+    static final double INCHES_PER_ROTATION = 11.137; // inches per rotation of 90mm traction wheel
+    static final double DEG_PER_ROTATION = 100.0; // inches per rotation of 90mm traction wheel
     static final double claw_arm_max_distance = 200;
 
-    //2019 Code changes
-    private DcMotor  motorBackLeft;
-    private DcMotor  motorBackRight;
-    private DcMotor  motorFrontLeft;
-    private DcMotor  motorFrontRight;
+    // 2019 Code changes
+    private DcMotor motorBackLeft;
+    private DcMotor motorBackRight;
+    private DcMotor motorFrontLeft;
+    private DcMotor motorFrontRight;
 
-    static final int COUNTS_PER_INCH= (int) ((1.4142 * (COUNTS_PER_DRIVE_MOTOR_REV)) / (4.0 * Math.PI)); //for 45deg wheels
-    static final int COUNTS_PER_SQUARE = (int) (COUNTS_PER_INCH * 1); //for 45deg wheels
+    static final int COUNTS_PER_INCH = (int) ((1.4142 * (COUNTS_PER_DRIVE_MOTOR_REV)) / (4.0 * Math.PI)); // for 45deg
+                                                                                                          // wheels
+    static final int COUNTS_PER_SQUARE = (int) (COUNTS_PER_INCH * 1); // for 45deg wheels
 
-    //initialize these in InitExtraSensors if using
+    // initialize these in InitExtraSensors if using
     private ColorSensor colorSensor;
-    float hsvValues[] = {0F, 0F, 0F};
+    float hsvValues[] = { 0F, 0F, 0F };
     float values[];
     final double SCALE_FACTOR = 255;
     int relativeLayoutId;
     static View relativeLayout;
 
-
     ///
 
+    //#region Initialization
     public Util(DcMotor frontRightMotor, DcMotor frontLeftMotor, DcMotor backRightMotor, DcMotor backLeftMotor,
-                Telemetry telemetryIn) {
+            Telemetry telemetryIn) {
 
-        motorBackLeft=backLeftMotor;
-        motorBackRight=backRightMotor;
-        motorFrontLeft=frontLeftMotor;
-        motorFrontRight=frontRightMotor;
+        motorBackLeft = backLeftMotor;
+        motorBackRight = backRightMotor;
+        motorFrontLeft = frontLeftMotor;
+        motorFrontRight = frontRightMotor;
 
-        telemetry=telemetryIn;
-//        motorLeft = leftMotor;
-//        motorRight = rightMotor;
-//        liftMotor = liftMotorIn;
-//        armMotor = armMotorIn;
-//        telemetry = telemetryIn;
-//        touchSensor = touchSensorIn;
-//       // liftSensor = liftSensorIn;
+        telemetry = telemetryIn;
+        // motorLeft = leftMotor;
+        // motorRight = rightMotor;
+        // liftMotor = liftMotorIn;
+        // armMotor = armMotorIn;
+        // telemetry = telemetryIn;
+        // touchSensor = touchSensorIn;
+        // // liftSensor = liftSensorIn;
     }
 
-    public void InitExtraSensors(HardwareMap hardwareMap){
+    public void InitExtraSensors(HardwareMap hardwareMap) {
         // get a reference to the color sensor.
         colorSensor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
-        // hsvValues is an array that will hold the hue, saturation, and value information.
-        hsvValues = new float[] {0F, 0F, 0F};
+        // hsvValues is an array that will hold the hue, saturation, and value
+        // information.
+        hsvValues = new float[] { 0F, 0F, 0F };
         // values is a reference to the hsvValues array.
         float values[] = hsvValues;
         // get a reference to the RelativeLayout so we can change the background
-        // color of the Robot Controller app to match the hue detected by the RGB sensor.
-        relativeLayoutId = hardwareMap.appContext.getResources().getIdentifier("RelativeLayout", "id", hardwareMap.appContext.getPackageName());
+        // color of the Robot Controller app to match the hue detected by the RGB
+        // sensor.
+        relativeLayoutId = hardwareMap.appContext.getResources().getIdentifier("RelativeLayout", "id",
+                hardwareMap.appContext.getPackageName());
         View relativeLayout = ((Activity) hardwareMap.appContext).findViewById(relativeLayoutId);
     }
-    public void InitVuforia(HardwareMap hwm){
+    //#endregion
+
+    //#region Vuforia PatternRecog
+    public void InitVuforia(HardwareMap hwm) {
         initVuforiaRaw();
 
         if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
@@ -125,8 +131,9 @@ public class Util {
         }
 
         /**
-         * Activate TensorFlow Object Detection before we wait for the start command.
-         * Do it here so that the Camera Stream window will have the TensorFlow annotations visible.
+         * Activate TensorFlow Object Detection before we wait for the start command. Do
+         * it here so that the Camera Stream window will have the TensorFlow annotations
+         * visible.
          **/
         if (tfod != null) {
             tfod.activate();
@@ -137,39 +144,66 @@ public class Util {
         telemetry.update();
 
     }
-
     private void initVuforiaRaw() {
         /*
-         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+         * Configure Vuforia by creating a Parameter object, and passing it to the
+         * Vuforia engine.
          */
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
 
-        //  Instantiate the Vuforia engine
+        // Instantiate the Vuforia engine
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
 
-        // Loading trackables is not necessary for the TensorFlow Object Detection engine.
+        // Loading trackables is not necessary for the TensorFlow Object Detection
+        // engine.
     }
     private void initTfod(HardwareMap hwm) {
-        int tfodMonitorViewId = hwm.appContext.getResources().getIdentifier(
-                "tfodMonitorViewId", "id", hwm.appContext.getPackageName());
+        int tfodMonitorViewId = hwm.appContext.getResources().getIdentifier("tfodMonitorViewId", "id",
+                hwm.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
         tfodParameters.minimumConfidence = 0.8;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, STONE, SKYSTONE);
     }
-
-    public List<Recognition> GetObjectsInFrame(){
+    public List<Recognition> GetObjectsInFrame() {
         List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
         return updatedRecognitions;
     }
+    //#endregion
 
-    //Routines for 2019-2020 - based on TeleopDrive code from
-    // 2017
+    //#region MotorUnilities
+    public void setWheelsToEncoderMode() {
+        motorBackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-    public void drivebyDistance(double x, double y, double rotation, double distance, String unit) {//inches
+        motorFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motorFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motorBackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motorBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
+    public void setWheelsToSpeedMode() {
+
+        motorBackLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motorBackRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motorFrontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motorFrontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+    public void stopWheelsSpeedMode() {
+
+        motorBackLeft.setPower(0);
+        motorBackRight.setPower(0);
+        motorFrontLeft.setPower(0);
+        motorFrontRight.setPower(0);
+    }
+    //#endregion
+
+    //#region Driving
+    public void drivebyDistance(double x, double y, double rotation, double distance, String unit) {// inches
         setWheelsToEncoderMode();
         double r = Math.hypot((-x), (-y));
         double robotAngle = Math.atan2((-y), (-x)) - Math.PI / 4;
@@ -184,18 +218,18 @@ public class Util {
         double BackLeft = Range.clip(v3, -1, 1);
         double BackRight = Range.clip(v4, -1, 1);
 
-
         int moveAmount = (int) (distance * COUNTS_PER_INCH);
-//        if(unit.equals("inch")) {
-//            moveAmount = (int) (distance * COUNTS_PER_INCH);
-//        }else
-//        if(unit.equals("square")) {
-//            moveAmount = (int) (distance * COUNTS_PER_SQUARE);
-//        }
-        int backLeftTargetPosition = (int) (motorBackLeft.getCurrentPosition() + Math.signum(BackLeft)* moveAmount);
-        int backRightTargetPosition = (int) (motorBackRight.getCurrentPosition() + Math.signum(BackRight)* moveAmount);
-        int frontLeftTargetPosition = (int) (motorFrontLeft.getCurrentPosition() + Math.signum(FrontLeft)* moveAmount);
-        int frontRightTargetPosition = (int) (motorFrontRight.getCurrentPosition() + Math.signum(FrontRight)* moveAmount);
+        // if(unit.equals("inch")) {
+        // moveAmount = (int) (distance * COUNTS_PER_INCH);
+        // }else
+        // if(unit.equals("square")) {
+        // moveAmount = (int) (distance * COUNTS_PER_SQUARE);
+        // }
+        int backLeftTargetPosition = (int) (motorBackLeft.getCurrentPosition() + Math.signum(BackLeft) * moveAmount);
+        int backRightTargetPosition = (int) (motorBackRight.getCurrentPosition() + Math.signum(BackRight) * moveAmount);
+        int frontLeftTargetPosition = (int) (motorFrontLeft.getCurrentPosition() + Math.signum(FrontLeft) * moveAmount);
+        int frontRightTargetPosition = (int) (motorFrontRight.getCurrentPosition()
+                + Math.signum(FrontRight) * moveAmount);
 
         motorBackLeft.setTargetPosition((int) backLeftTargetPosition);
         motorBackRight.setTargetPosition((int) backRightTargetPosition);
@@ -212,19 +246,37 @@ public class Util {
         motorBackLeft.setPower(BackLeft);
         motorBackRight.setPower(BackRight);
 
-        //for those motors that should be busy (power!=0) wait until they are done
-        //reaching target position before returning from this function.
+        // for those motors that should be busy (power!=0) wait until they are done
+        // reaching target position before returning from this function.
 
         double tolerance = INCREMENT_DRIVE_MOTOR_MOVE;
-        while ((((Math.abs(FrontRight)) > 0.01 && Math.abs(motorFrontRight.getCurrentPosition() - frontRightTargetPosition) > tolerance)) ||
-                (((Math.abs(FrontLeft)) > 0.01 && Math.abs(motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition) > tolerance)) ||
-                (((Math.abs(BackLeft)) > 0.01 && Math.abs(motorBackLeft.getCurrentPosition() - backLeftTargetPosition) > tolerance)) ||
-                (((Math.abs(BackRight)) > 0.01 && Math.abs(motorBackRight.getCurrentPosition() - backRightTargetPosition) > tolerance))){
-            //wait and check again until done running
-            telemetry.addData("front right", "=%.2f  %d %b", FrontRight, motorFrontRight.getCurrentPosition() - frontRightTargetPosition,((Math.ceil(Math.abs(FrontRight)) > 0.0 && Math.abs(motorFrontRight.getCurrentPosition() - frontRightTargetPosition) > tolerance)));//, frontRightTargetPosition);
-            telemetry.addData("front left", "=%.2f %d %b", FrontLeft, motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition,((Math.ceil(Math.abs(FrontLeft)) > 0.0 && Math.abs(motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition) > tolerance)));//, frontLeftTargetPosition);
-            telemetry.addData("back left", "=%.2f %d %b",  BackLeft, motorBackLeft.getCurrentPosition() - backLeftTargetPosition, ((Math.ceil(Math.abs(BackLeft)) > 0.0 && Math.abs(motorBackLeft.getCurrentPosition() - backLeftTargetPosition) > tolerance)));//, backLeftTargetPosition);
-            telemetry.addData("back right", "=%.2f %d %b", BackRight, motorBackRight.getCurrentPosition() - backRightTargetPosition, ((Math.ceil(Math.abs(BackRight)) > 0.0 && Math.abs(motorBackRight.getCurrentPosition() - backRightTargetPosition) > tolerance)));
+        while ((((Math.abs(FrontRight)) > 0.01
+                && Math.abs(motorFrontRight.getCurrentPosition() - frontRightTargetPosition) > tolerance))
+                || (((Math.abs(FrontLeft)) > 0.01
+                        && Math.abs(motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition) > tolerance))
+                || (((Math.abs(BackLeft)) > 0.01
+                        && Math.abs(motorBackLeft.getCurrentPosition() - backLeftTargetPosition) > tolerance))
+                || (((Math.abs(BackRight)) > 0.01
+                        && Math.abs(motorBackRight.getCurrentPosition() - backRightTargetPosition) > tolerance))) {
+            // wait and check again until done running
+            telemetry.addData("front right", "=%.2f  %d %b", FrontRight,
+                    motorFrontRight.getCurrentPosition() - frontRightTargetPosition,
+                    ((Math.ceil(Math.abs(FrontRight)) > 0.0
+                            && Math.abs(motorFrontRight.getCurrentPosition() - frontRightTargetPosition) > tolerance)));// ,
+                                                                                                                        // frontRightTargetPosition);
+            telemetry.addData("front left", "=%.2f %d %b", FrontLeft,
+                    motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition,
+                    ((Math.ceil(Math.abs(FrontLeft)) > 0.0
+                            && Math.abs(motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition) > tolerance)));// ,
+                                                                                                                      // frontLeftTargetPosition);
+            telemetry.addData("back left", "=%.2f %d %b", BackLeft,
+                    motorBackLeft.getCurrentPosition() - backLeftTargetPosition, ((Math.ceil(Math.abs(BackLeft)) > 0.0
+                            && Math.abs(motorBackLeft.getCurrentPosition() - backLeftTargetPosition) > tolerance)));// ,
+                                                                                                                    // backLeftTargetPosition);
+            telemetry.addData("back right", "=%.2f %d %b", BackRight,
+                    motorBackRight.getCurrentPosition() - backRightTargetPosition,
+                    ((Math.ceil(Math.abs(BackRight)) > 0.0
+                            && Math.abs(motorBackRight.getCurrentPosition() - backRightTargetPosition) > tolerance)));
             telemetry.update();
             try {
                 Thread.sleep(500);
@@ -238,7 +290,7 @@ public class Util {
         motorBackLeft.setPower(0);
 
     }
-    public void drivebySpeed(double x, double y, double rotation) {//inches
+    public void drivebySpeed(double x, double y, double rotation) {// inches
         setWheelsToEncoderMode();
         double r = Math.hypot((-x), (-y));
         double robotAngle = Math.atan2((-y), (-x)) - Math.PI / 4;
@@ -274,7 +326,7 @@ public class Util {
         motorBackRight.setPower(BackRight);
     }
     @SuppressLint("NewApi")
-    public void driveUntilColor(double x, double y, double rotation, double distance, String unit) {//inches
+    public void driveUntilColor(double x, double y, double rotation, double distance, String unit) {// inches
         setWheelsToEncoderMode();
         double r = Math.hypot((-x), (-y));
         double robotAngle = Math.atan2((-y), (-x)) - Math.PI / 4;
@@ -289,20 +341,17 @@ public class Util {
         double BackLeft = Range.clip(v3, -1, 1);
         double BackRight = Range.clip(v4, -1, 1);
 
-
-
-
         double moveAmount = distance;
-        if(unit.equals("inch")) {
+        if (unit.equals("inch")) {
             moveAmount = (int) (distance * COUNTS_PER_INCH);
-        }else
-        if(unit.equals("square")) {
+        } else if (unit.equals("square")) {
             moveAmount = (int) (distance * COUNTS_PER_SQUARE);
         }
-        int backLeftTargetPosition = (int) (motorBackLeft.getCurrentPosition() + Math.signum(BackLeft)* moveAmount);
-        int backRightTargetPosition = (int) (motorBackRight.getCurrentPosition() + Math.signum(BackRight)* moveAmount);
-        int frontLeftTargetPosition = (int) (motorFrontLeft.getCurrentPosition() + Math.signum(FrontLeft)* moveAmount);
-        int frontRightTargetPosition = (int) (motorFrontRight.getCurrentPosition() + Math.signum(FrontRight)* moveAmount);
+        int backLeftTargetPosition = (int) (motorBackLeft.getCurrentPosition() + Math.signum(BackLeft) * moveAmount);
+        int backRightTargetPosition = (int) (motorBackRight.getCurrentPosition() + Math.signum(BackRight) * moveAmount);
+        int frontLeftTargetPosition = (int) (motorFrontLeft.getCurrentPosition() + Math.signum(FrontLeft) * moveAmount);
+        int frontRightTargetPosition = (int) (motorFrontRight.getCurrentPosition()
+                + Math.signum(FrontRight) * moveAmount);
 
         motorBackLeft.setTargetPosition((int) backLeftTargetPosition);
         motorBackRight.setTargetPosition((int) backRightTargetPosition);
@@ -319,16 +368,12 @@ public class Util {
         motorBackLeft.setPower(BackLeft);
         motorBackRight.setPower(BackRight);
 
-
-
         colorSensor.enableLed(true);
-        //for those motors that should be busy (power!=0) wait until they are done
-        //reaching target position before returning from this function.
+        // for those motors that should be busy (power!=0) wait until they are done
+        // reaching target position before returning from this function.
 
-        Color.RGBToHSV((int) (colorSensor.red() * SCALE_FACTOR),
-                (int) (colorSensor.green() * SCALE_FACTOR),
-                (int) (colorSensor.blue() * SCALE_FACTOR),
-                hsvValues);
+        Color.RGBToHSV((int) (colorSensor.red() * SCALE_FACTOR), (int) (colorSensor.green() * SCALE_FACTOR),
+                (int) (colorSensor.blue() * SCALE_FACTOR), hsvValues);
 
         // send the info back to driver station using telemetry function.
         telemetry.addData("Red  ", colorSensor.red());
@@ -339,41 +384,58 @@ public class Util {
         // change the background color to match the color detected by the RGB sensor.
         // pass a reference to the hue, saturation, and value array as an argument
         // to the HSVToColor method.
-        boolean foundBlue=false;
-        boolean foundRed=false;
+        boolean foundBlue = false;
+        boolean foundRed = false;
 
-        if(hsvValues[0]>200 && hsvValues[0]<250) {
+        if (hsvValues[0] > 200 && hsvValues[0] < 250) {
             relativeLayout.setBackgroundColor(Color.BLUE);
-            foundBlue=true;
+            foundBlue = true;
             telemetry.addData("Blue", hsvValues[0]);
             telemetry.update();
-        }
-        else{
-            //look for the hue in the red range
-            if(hsvValues[0]<10 || hsvValues[0]>330) {
+        } else {
+            // look for the hue in the red range
+            if (hsvValues[0] < 10 || hsvValues[0] > 330) {
                 relativeLayout.setBackgroundColor(Color.RED);
-                foundRed=true;
+                foundRed = true;
                 telemetry.addData("Blue", hsvValues[0]);
                 telemetry.update();
             }
         }
 
-
-
-    //updates needed here to drive until foundRed or foundBlue;
+        // updates needed here to drive until foundRed or foundBlue;
 
         double tolerance = INCREMENT_DRIVE_MOTOR_MOVE;
-        while ((((Math.abs(FrontRight)) > 0.01 && Math.abs(motorFrontRight.getCurrentPosition() - frontRightTargetPosition) > tolerance)) ||
-                (((Math.abs(FrontLeft)) > 0.01 && Math.abs(motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition) > tolerance)) ||
-                (((Math.abs(BackLeft)) > 0.01 && Math.abs(motorBackLeft.getCurrentPosition() - backLeftTargetPosition) > tolerance)) ||
-                (((Math.abs(BackRight)) > 0.01 && Math.abs(motorBackRight.getCurrentPosition() - backRightTargetPosition) > tolerance)) ||
-                (!foundBlue || !foundRed)){
-            //wait and check again until done running
-//            telemetry.addData("front right", "=%.2f  %d %b", FrontRight, motorFrontRight.getCurrentPosition() - frontRightTargetPosition,((Math.ceil(Math.abs(FrontRight)) > 0.0 && Math.abs(motorFrontRight.getCurrentPosition() - frontRightTargetPosition) > tolerance)));//, frontRightTargetPosition);
-//            telemetry.addData("front left", "=%.2f %d %b", FrontLeft, motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition,((Math.ceil(Math.abs(FrontLeft)) > 0.0 && Math.abs(motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition) > tolerance)));//, frontLeftTargetPosition);
-//            telemetry.addData("back left", "=%.2f %d %b",  BackLeft, motorBackLeft.getCurrentPosition() - backLeftTargetPosition, ((Math.ceil(Math.abs(BackLeft)) > 0.0 && Math.abs(motorBackLeft.getCurrentPosition() - backLeftTargetPosition) > tolerance)));//, backLeftTargetPosition);
-//            telemetry.addData("back right", "=%.2f %d %b", BackRight, motorBackRight.getCurrentPosition() - backRightTargetPosition, ((Math.ceil(Math.abs(BackRight)) > 0.0 && Math.abs(motorBackRight.getCurrentPosition() - backRightTargetPosition) > tolerance)));
-//            telemetry.update();
+        while ((((Math.abs(FrontRight)) > 0.01
+                && Math.abs(motorFrontRight.getCurrentPosition() - frontRightTargetPosition) > tolerance))
+                || (((Math.abs(FrontLeft)) > 0.01
+                        && Math.abs(motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition) > tolerance))
+                || (((Math.abs(BackLeft)) > 0.01
+                        && Math.abs(motorBackLeft.getCurrentPosition() - backLeftTargetPosition) > tolerance))
+                || (((Math.abs(BackRight)) > 0.01
+                        && Math.abs(motorBackRight.getCurrentPosition() - backRightTargetPosition) > tolerance))
+                || (!foundBlue || !foundRed)) {
+            // wait and check again until done running
+            // telemetry.addData("front right", "=%.2f %d %b", FrontRight,
+            // motorFrontRight.getCurrentPosition() -
+            // frontRightTargetPosition,((Math.ceil(Math.abs(FrontRight)) > 0.0 &&
+            // Math.abs(motorFrontRight.getCurrentPosition() - frontRightTargetPosition) >
+            // tolerance)));//, frontRightTargetPosition);
+            // telemetry.addData("front left", "=%.2f %d %b", FrontLeft,
+            // motorFrontLeft.getCurrentPosition() -
+            // frontLeftTargetPosition,((Math.ceil(Math.abs(FrontLeft)) > 0.0 &&
+            // Math.abs(motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition) >
+            // tolerance)));//, frontLeftTargetPosition);
+            // telemetry.addData("back left", "=%.2f %d %b", BackLeft,
+            // motorBackLeft.getCurrentPosition() - backLeftTargetPosition,
+            // ((Math.ceil(Math.abs(BackLeft)) > 0.0 &&
+            // Math.abs(motorBackLeft.getCurrentPosition() - backLeftTargetPosition) >
+            // tolerance)));//, backLeftTargetPosition);
+            // telemetry.addData("back right", "=%.2f %d %b", BackRight,
+            // motorBackRight.getCurrentPosition() - backRightTargetPosition,
+            // ((Math.ceil(Math.abs(BackRight)) > 0.0 &&
+            // Math.abs(motorBackRight.getCurrentPosition() - backRightTargetPosition) >
+            // tolerance)));
+            // telemetry.update();
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
@@ -387,42 +449,30 @@ public class Util {
 
         colorSensor.enableLed(false);
     }
+    //#endregion
 
-    public void setWheelsToEncoderMode(){
-            motorBackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            motorBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            motorFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            motorFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-            motorFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            motorFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            motorBackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            motorBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        }
-
-        public void moveClaw(final DcMotor motor, double position){
+    //#region Other Utilities
+    public void moveClaw(final DcMotor motor, double position) {
 
         Thread thr = new Thread(new Runnable() {
             @Override
             public void run() {
-//                while() //while the motor is not at the position specified which would either be the top position or 0(Where it starts at the bottor)
+                // while() //while the motor is not at the position specified which would either
+                // be the top position or 0(Where it starts at the bottor)
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
 
                     }
                 });
-                }
+            }
 
         });
         thr.start();
-        }
-    ///
-
-    //Drive Routines
-    public void twoWheelDrive(double leftInput, double rightInput,int mode) {
-        double rightDrive = scaleInput(rightInput,mode);
-        double leftDrive = scaleInput(-leftInput,mode);
+    }
+    public void twoWheelDrive(double leftInput, double rightInput, int mode) {
+        double rightDrive = scaleInput(rightInput, mode);
+        double leftDrive = scaleInput(-leftInput, mode);
 
         double finalRight = Range.clip(rightDrive, -1, 1);
         double finalLeft = Range.clip(leftDrive, -1, 1);
@@ -439,28 +489,36 @@ public class Util {
         motorLeft.setMode(STOP_AND_RESET_ENCODER);
         motorLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         double rotations = inches / INCHES_PER_ROTATION;
-        int targetPositionR = (int) (motorRight.getCurrentPosition() + (directionDrive * rotations * COUNTS_PER_DRIVE_MOTOR_REV));
-        int targetPositionL = (int) (motorLeft.getCurrentPosition() + (directionDrive * rotations * COUNTS_PER_DRIVE_MOTOR_REV));
-        telemetry.addData("Drive Position R",  "= %d  %d  %d", motorRight.getCurrentPosition(),motorRight.getTargetPosition(),targetPositionR);
-        telemetry.addData("Drive Position L",  "= %d  %d  %d", motorLeft.getCurrentPosition(),motorLeft.getTargetPosition(),targetPositionL);
+        int targetPositionR = (int) (motorRight.getCurrentPosition()
+                + (directionDrive * rotations * COUNTS_PER_DRIVE_MOTOR_REV));
+        int targetPositionL = (int) (motorLeft.getCurrentPosition()
+                + (directionDrive * rotations * COUNTS_PER_DRIVE_MOTOR_REV));
+        telemetry.addData("Drive Position R", "= %d  %d  %d", motorRight.getCurrentPosition(),
+                motorRight.getTargetPosition(), targetPositionR);
+        telemetry.addData("Drive Position L", "= %d  %d  %d", motorLeft.getCurrentPosition(),
+                motorLeft.getTargetPosition(), targetPositionL);
         telemetry.update();
-        while((/*touchSensor.getState() == false &&*/
-                Math.abs(motorRight.getCurrentPosition() - (targetPositionR)) >INCREMENT_DRIVE_MOTOR_MOVE)
-                || Math.abs(motorLeft.getCurrentPosition() - (targetPositionL)) >INCREMENT_DRIVE_MOTOR_MOVE) {
-            motorRight.setTargetPosition((int) (motorRight.getCurrentPosition() + (int) directionDrive*INCREMENT_DRIVE_MOTOR_MOVE));
+        while ((/* touchSensor.getState() == false && */
+        Math.abs(motorRight.getCurrentPosition() - (targetPositionR)) > INCREMENT_DRIVE_MOTOR_MOVE)
+                || Math.abs(motorLeft.getCurrentPosition() - (targetPositionL)) > INCREMENT_DRIVE_MOTOR_MOVE) {
+            motorRight.setTargetPosition(
+                    (int) (motorRight.getCurrentPosition() + (int) directionDrive * INCREMENT_DRIVE_MOTOR_MOVE));
             if (isFast) {
                 motorRight.setPower(DRIVE_MOTOR_POWER * 2);
             } else {
                 motorRight.setPower(DRIVE_MOTOR_POWER);
             }
-            motorLeft.setTargetPosition((int) (motorRight.getCurrentPosition() + (int) directionDrive*INCREMENT_DRIVE_MOTOR_MOVE));
+            motorLeft.setTargetPosition(
+                    (int) (motorRight.getCurrentPosition() + (int) directionDrive * INCREMENT_DRIVE_MOTOR_MOVE));
             if (isFast) {
                 motorLeft.setPower(DRIVE_MOTOR_POWER * 2);
             } else {
                 motorLeft.setPower(DRIVE_MOTOR_POWER);
             }
-            telemetry.addData("Drive Position R",  "= %d  %d  %d", motorRight.getCurrentPosition(),motorRight.getTargetPosition(),targetPositionR);
-            telemetry.addData("Drive Position L",  "= %d  %d  %d", motorLeft.getCurrentPosition(),motorLeft.getTargetPosition(),targetPositionL);
+            telemetry.addData("Drive Position R", "= %d  %d  %d", motorRight.getCurrentPosition(),
+                    motorRight.getTargetPosition(), targetPositionR);
+            telemetry.addData("Drive Position L", "= %d  %d  %d", motorLeft.getCurrentPosition(),
+                    motorLeft.getTargetPosition(), targetPositionL);
             telemetry.update();
 
         }
@@ -472,35 +530,43 @@ public class Util {
     }
 
     void driveAngledDistance(double directionDrive, double inches, boolean isFast) {
-        double WEIGHT_R=1.2;
+        double WEIGHT_R = 1.2;
         motorRight.setMode(STOP_AND_RESET_ENCODER);
         motorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motorRight.setDirection(DcMotorSimple.Direction.REVERSE);
         motorLeft.setMode(STOP_AND_RESET_ENCODER);
         motorLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         double rotations = inches / INCHES_PER_ROTATION;
-        int targetPositionR = (int) (motorRight.getCurrentPosition() + (directionDrive * WEIGHT_R*rotations * COUNTS_PER_DRIVE_MOTOR_REV));
-        int targetPositionL = (int) (motorLeft.getCurrentPosition() + (directionDrive * rotations * COUNTS_PER_DRIVE_MOTOR_REV));
-        telemetry.addData("Drive Position R",  "= %d  %d  %d", motorRight.getCurrentPosition(),motorRight.getTargetPosition(),targetPositionR);
-        telemetry.addData("Drive Position L",  "= %d  %d  %d", motorLeft.getCurrentPosition(),motorLeft.getTargetPosition(),targetPositionL);
+        int targetPositionR = (int) (motorRight.getCurrentPosition()
+                + (directionDrive * WEIGHT_R * rotations * COUNTS_PER_DRIVE_MOTOR_REV));
+        int targetPositionL = (int) (motorLeft.getCurrentPosition()
+                + (directionDrive * rotations * COUNTS_PER_DRIVE_MOTOR_REV));
+        telemetry.addData("Drive Position R", "= %d  %d  %d", motorRight.getCurrentPosition(),
+                motorRight.getTargetPosition(), targetPositionR);
+        telemetry.addData("Drive Position L", "= %d  %d  %d", motorLeft.getCurrentPosition(),
+                motorLeft.getTargetPosition(), targetPositionL);
         telemetry.update();
-        while((/*touchSensor.getState() == false &&*/
-                Math.abs(motorRight.getCurrentPosition() - (targetPositionR)) >INCREMENT_DRIVE_MOTOR_MOVE)
-                || Math.abs(motorLeft.getCurrentPosition() - (targetPositionL)) >INCREMENT_DRIVE_MOTOR_MOVE) {
-            motorRight.setTargetPosition((int) (motorRight.getCurrentPosition() + (int) directionDrive*INCREMENT_DRIVE_MOTOR_MOVE));
+        while ((/* touchSensor.getState() == false && */
+        Math.abs(motorRight.getCurrentPosition() - (targetPositionR)) > INCREMENT_DRIVE_MOTOR_MOVE)
+                || Math.abs(motorLeft.getCurrentPosition() - (targetPositionL)) > INCREMENT_DRIVE_MOTOR_MOVE) {
+            motorRight.setTargetPosition(
+                    (int) (motorRight.getCurrentPosition() + (int) directionDrive * INCREMENT_DRIVE_MOTOR_MOVE));
             if (isFast) {
-                motorRight.setPower(WEIGHT_R*DRIVE_MOTOR_POWER * 2);
+                motorRight.setPower(WEIGHT_R * DRIVE_MOTOR_POWER * 2);
             } else {
-                motorRight.setPower(WEIGHT_R*DRIVE_MOTOR_POWER);
+                motorRight.setPower(WEIGHT_R * DRIVE_MOTOR_POWER);
             }
-            motorLeft.setTargetPosition((int) (motorRight.getCurrentPosition() + (int) directionDrive*INCREMENT_DRIVE_MOTOR_MOVE));
+            motorLeft.setTargetPosition(
+                    (int) (motorRight.getCurrentPosition() + (int) directionDrive * INCREMENT_DRIVE_MOTOR_MOVE));
             if (isFast) {
                 motorLeft.setPower(DRIVE_MOTOR_POWER * 2);
             } else {
                 motorLeft.setPower(DRIVE_MOTOR_POWER);
             }
-            telemetry.addData("Drive Position R",  "= %d  %d  %d", motorRight.getCurrentPosition(),motorRight.getTargetPosition(),targetPositionR);
-            telemetry.addData("Drive Position L",  "= %d  %d  %d", motorLeft.getCurrentPosition(),motorLeft.getTargetPosition(),targetPositionL);
+            telemetry.addData("Drive Position R", "= %d  %d  %d", motorRight.getCurrentPosition(),
+                    motorRight.getTargetPosition(), targetPositionR);
+            telemetry.addData("Drive Position L", "= %d  %d  %d", motorLeft.getCurrentPosition(),
+                    motorLeft.getTargetPosition(), targetPositionL);
             telemetry.update();
 
         }
@@ -511,30 +577,34 @@ public class Util {
         motorLeft.setMode(RUN_WITHOUT_ENCODER);
     }
 
-
-
     void driveFixedDegrees(double directionDrive, double degrees) {
         motorRight.setMode(STOP_AND_RESET_ENCODER);
         motorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motorLeft.setMode(STOP_AND_RESET_ENCODER);
         motorLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         double rotations = degrees / DEG_PER_ROTATION;
-        int targetPositionR = (int) (motorRight.getCurrentPosition() + (directionDrive * rotations *
-                COUNTS_PER_DRIVE_MOTOR_REV));
-        int targetPositionL = (int) (motorLeft.getCurrentPosition() + (directionDrive * rotations *
-                COUNTS_PER_DRIVE_MOTOR_REV));
-        telemetry.addData("Drive Position R",  "= %d  %d  %d", motorRight.getCurrentPosition(),motorRight.getTargetPosition(),targetPositionR);
-        telemetry.addData("Drive Position L",  "= %d  %d  %d", motorLeft.getCurrentPosition(),motorLeft.getTargetPosition(),targetPositionL);
+        int targetPositionR = (int) (motorRight.getCurrentPosition()
+                + (directionDrive * rotations * COUNTS_PER_DRIVE_MOTOR_REV));
+        int targetPositionL = (int) (motorLeft.getCurrentPosition()
+                + (directionDrive * rotations * COUNTS_PER_DRIVE_MOTOR_REV));
+        telemetry.addData("Drive Position R", "= %d  %d  %d", motorRight.getCurrentPosition(),
+                motorRight.getTargetPosition(), targetPositionR);
+        telemetry.addData("Drive Position L", "= %d  %d  %d", motorLeft.getCurrentPosition(),
+                motorLeft.getTargetPosition(), targetPositionL);
         telemetry.update();
-        while((/*touchSensor.getState() == false &&*/
-                Math.abs(motorRight.getCurrentPosition() - (targetPositionR)) >INCREMENT_DRIVE_MOTOR_MOVE)
-                || Math.abs(motorLeft.getCurrentPosition() - (targetPositionL)) >INCREMENT_DRIVE_MOTOR_MOVE) {
-            motorRight.setTargetPosition((int) (motorRight.getCurrentPosition() + (int) directionDrive*INCREMENT_DRIVE_MOTOR_MOVE));
+        while ((/* touchSensor.getState() == false && */
+        Math.abs(motorRight.getCurrentPosition() - (targetPositionR)) > INCREMENT_DRIVE_MOTOR_MOVE)
+                || Math.abs(motorLeft.getCurrentPosition() - (targetPositionL)) > INCREMENT_DRIVE_MOTOR_MOVE) {
+            motorRight.setTargetPosition(
+                    (int) (motorRight.getCurrentPosition() + (int) directionDrive * INCREMENT_DRIVE_MOTOR_MOVE));
             motorRight.setPower(DRIVE_MOTOR_POWER);
-            motorLeft.setTargetPosition((int) (motorRight.getCurrentPosition() + (int) directionDrive*INCREMENT_DRIVE_MOTOR_MOVE));
+            motorLeft.setTargetPosition(
+                    (int) (motorRight.getCurrentPosition() + (int) directionDrive * INCREMENT_DRIVE_MOTOR_MOVE));
             motorLeft.setPower(DRIVE_MOTOR_POWER);
-            telemetry.addData("Drive Position R",  "= %d  %d  %d", motorRight.getCurrentPosition(),motorRight.getTargetPosition(),targetPositionR);
-            telemetry.addData("Drive Position L",  "= %d  %d  %d", motorLeft.getCurrentPosition(),motorLeft.getTargetPosition(),targetPositionL);
+            telemetry.addData("Drive Position R", "= %d  %d  %d", motorRight.getCurrentPosition(),
+                    motorRight.getTargetPosition(), targetPositionR);
+            telemetry.addData("Drive Position L", "= %d  %d  %d", motorLeft.getCurrentPosition(),
+                    motorLeft.getTargetPosition(), targetPositionL);
             telemetry.update();
 
         }
@@ -543,32 +613,29 @@ public class Util {
         motorLeft.setPower(0.0);
         motorLeft.setMode(RUN_WITHOUT_ENCODER);
     }
-    //Lift Routines
-    /*TODO:Here use the touch sensor to detect that the lift has moved to zero
-    TODO  While not pressed, move lift ok
-            */
-    //            while(touchSensor.getState() == false){
-      public void liftDrive(int direction) {
-            //  if (liftSensor.getState())
-            if (direction == 1) {
-                liftMotor.setPower(LIFT_MOTOR_POWER);
-            } else if (direction == -1) {
-                liftMotor.setPower(-LIFT_MOTOR_POWER);
-            } else {
-                liftMotor.setPower(0);
-            }
+
+    public void liftDrive(int direction) {
+        // if (liftSensor.getState())
+        if (direction == 1) {
+            liftMotor.setPower(LIFT_MOTOR_POWER);
+        } else if (direction == -1) {
+            liftMotor.setPower(-LIFT_MOTOR_POWER);
+        } else {
+            liftMotor.setPower(0);
         }
-
-
+    }
 
     void runliftFixedDistance(double directionLift, double rotations) {
         liftMotor.setMode(STOP_AND_RESET_ENCODER);
         liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         int targetPosition = (int) (liftMotor.getCurrentPosition() + (rotations * COUNTS_PER_MOTOR_REV));
-        while((/*touchSensor.getState() == false &&*/ Math.abs(liftMotor.getCurrentPosition() - (directionLift * targetPosition)) >INCREMENT_MOTOR_MOVE)) {
-            liftMotor.setTargetPosition((int) (liftMotor.getCurrentPosition() + (int) directionLift*INCREMENT_MOTOR_MOVE));
+        while ((/* touchSensor.getState() == false && */ Math
+                .abs(liftMotor.getCurrentPosition() - (directionLift * targetPosition)) > INCREMENT_MOTOR_MOVE)) {
+            liftMotor.setTargetPosition(
+                    (int) (liftMotor.getCurrentPosition() + (int) directionLift * INCREMENT_MOTOR_MOVE));
             liftMotor.setPower(directionLift * LIFT_MOTOR_POWER);
-            telemetry.addData("Lift Position",  "= %d  %d  %d", liftMotor.getCurrentPosition(),liftMotor.getTargetPosition(),targetPosition);
+            telemetry.addData("Lift Position", "= %d  %d  %d", liftMotor.getCurrentPosition(),
+                    liftMotor.getTargetPosition(), targetPosition);
             telemetry.update();
 
         }
@@ -576,37 +643,40 @@ public class Util {
         liftMotor.setMode(RUN_WITHOUT_ENCODER);
     }
 
-    //Retrieval Routines
-    public void servoSet(Servo myServo,double pos){
+    // Retrieval Routines
+    public void servoSet(Servo myServo, double pos) {
         double newPos = Range.clip(pos, -0.5, 0.5);
         myServo.setPosition(newPos);
-        telemetry.addData(myServo.getDeviceName(),  "= %.2f", newPos);
+        telemetry.addData(myServo.getDeviceName(), "= %.2f", newPos);
         telemetry.update();
     }
 
     public void armDrive(int direction) {
-            if(direction == 1) {
-                if (touchSensor.getState()) {
-                    armMotor.setPower(ARM_MOTOR_POWER);
-                }
-            } else if (direction == -1) {
-                armMotor.setPower(-ARM_MOTOR_POWER);
-            } else {
-                armMotor.setPower(0);
+        if (direction == 1) {
+            if (touchSensor.getState()) {
+                armMotor.setPower(ARM_MOTOR_POWER);
             }
+        } else if (direction == -1) {
+            armMotor.setPower(-ARM_MOTOR_POWER);
+        } else {
+            armMotor.setPower(0);
+        }
     }
 
     void runArmFixedDistance(double directionArm, double rotations) {
         armMotor.setMode(STOP_AND_RESET_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         armMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        int targetPosition = (int) (armMotor.getCurrentPosition() + (directionArm*rotations * COUNTS_PER_MOTOR_REV));
-        while((Math.abs(armMotor.getCurrentPosition() - (/*directionArm * */targetPosition)) > INCREMENT_MOTOR_MOVE)) {
-            armMotor.setTargetPosition((int) (armMotor.getCurrentPosition() + (int) directionArm*INCREMENT_MOTOR_MOVE));
+        int targetPosition = (int) (armMotor.getCurrentPosition() + (directionArm * rotations * COUNTS_PER_MOTOR_REV));
+        while ((Math
+                .abs(armMotor.getCurrentPosition() - (/* directionArm * */targetPosition)) > INCREMENT_MOTOR_MOVE)) {
+            armMotor.setTargetPosition(
+                    (int) (armMotor.getCurrentPosition() + (int) directionArm * INCREMENT_MOTOR_MOVE));
             if ((touchSensor.getState() && directionArm == 1) || (directionArm == -1)) {
-                armMotor.setPower(/*directionArm * */ARM_MOTOR_POWER);
+                armMotor.setPower(/* directionArm * */ARM_MOTOR_POWER);
             }
-            telemetry.addData("Arm Position",  "= %d  %d  %d", armMotor.getCurrentPosition(),armMotor.getTargetPosition(),targetPosition);
+            telemetry.addData("Arm Position", "= %d  %d  %d", armMotor.getCurrentPosition(),
+                    armMotor.getTargetPosition(), targetPosition);
             telemetry.update();
 
         }
@@ -614,49 +684,47 @@ public class Util {
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-
-    //Sensors
-    public void printColorDistance (ColorSensor sensorColor, DistanceSensor sensorDistance){
+    // Sensors
+    public void printColorDistance(ColorSensor sensorColor, DistanceSensor sensorDistance) {
         final double SCALE_FACTOR = 255;
-        float hsvValues[] = {0F, 0F, 0F};
+        float hsvValues[] = { 0F, 0F, 0F };
 
-        Color.RGBToHSV((int) (sensorColor.red() * SCALE_FACTOR),
-                (int) (sensorColor.green() * SCALE_FACTOR),
-                (int) (sensorColor.blue() * SCALE_FACTOR),
-                hsvValues);
+        Color.RGBToHSV((int) (sensorColor.red() * SCALE_FACTOR), (int) (sensorColor.green() * SCALE_FACTOR),
+                (int) (sensorColor.blue() * SCALE_FACTOR), hsvValues);
 
         // send the info back to driver station using telemetry function.
         telemetry.addData("Distance (cm)",
                 String.format(Locale.US, "%.02f", sensorDistance.getDistance(DistanceUnit.CM)));
-      //  telemetry.addData("Alpha", sensorColor.alpha());
-      //  telemetry.addData("Red  ", sensorColor.red());
-      //  telemetry.addData("Green", sensorColor.green());
-      //  telemetry.addData("Blue ", sensorColor.blue());
-      //  telemetry.addData("Sat", hsvValues[1]);
+        // telemetry.addData("Alpha", sensorColor.alpha());
+        // telemetry.addData("Red ", sensorColor.red());
+        // telemetry.addData("Green", sensorColor.green());
+        // telemetry.addData("Blue ", sensorColor.blue());
+        // telemetry.addData("Sat", hsvValues[1]);
 
         telemetry.update();
     }
 
-    //Utils
+    // Utils
     static double scaleInput(double dVal, int mode) {
-        double[] scaleArray= {};
+        double[] scaleArray = {};
 
-        if(mode == 0) {
-            scaleArray = new double[] {0.0, 0.05, 0.09, 0.10, 0.12, 0.15, 0.18, 0.24,
-                    0.30, 0.36, 0.4883, 0.50, 0.60, 0.72, 0.85, 1.00, 1.00};
-        } else if(mode  == 1) {
-            scaleArray = new double[]   {0.0, 0.002, 0.002, 0.006, 0.015, 0.03, 0.05, 0.08,
-                    0.125, 0.17, 0.24, 0.3, 0.4, 0.5, 0.67, 0.82, 1.00};
-        } else if(mode == 2) {
-            scaleArray = new double[]  {0.0, 0.0, 0.003, 0.01, 0.03, 0.06, 0.1, 0.167,
-                    0.25, 0.36, 0.43, 0.6499, 0.84, 1.00, 1.00, 1.00, 1.00};
-        } else if(mode == 3) {
-            scaleArray = new double[]{0, 0.0625, 0.125, 0.1875, 0.25, 0.3125, 0.375,
-                    0.4375, 0.5, 0.5625, 0.625, 0.6875, 0.75, 0.8125, 0.875, 0.9375, 1};
-        } else if(mode == 4) {
-            //this mode scales down the speed except for highest power since Rev motor is higher torque
-            scaleArray = new double[]  {0.0, 0.002, 0.003, 0.01, 0.03, 0.06, 0.1, 0.167,
-                    0.25, 0.36, 0.43, 0.5, 0.6, 0.65, 0.7, 0.75, 1.00};
+        if (mode == 0) {
+            scaleArray = new double[] { 0.0, 0.05, 0.09, 0.10, 0.12, 0.15, 0.18, 0.24, 0.30, 0.36, 0.4883, 0.50, 0.60,
+                    0.72, 0.85, 1.00, 1.00 };
+        } else if (mode == 1) {
+            scaleArray = new double[] { 0.0, 0.002, 0.002, 0.006, 0.015, 0.03, 0.05, 0.08, 0.125, 0.17, 0.24, 0.3, 0.4,
+                    0.5, 0.67, 0.82, 1.00 };
+        } else if (mode == 2) {
+            scaleArray = new double[] { 0.0, 0.0, 0.003, 0.01, 0.03, 0.06, 0.1, 0.167, 0.25, 0.36, 0.43, 0.6499, 0.84,
+                    1.00, 1.00, 1.00, 1.00 };
+        } else if (mode == 3) {
+            scaleArray = new double[] { 0, 0.0625, 0.125, 0.1875, 0.25, 0.3125, 0.375, 0.4375, 0.5, 0.5625, 0.625,
+                    0.6875, 0.75, 0.8125, 0.875, 0.9375, 1 };
+        } else if (mode == 4) {
+            // this mode scales down the speed except for highest power since Rev motor is
+            // higher torque
+            scaleArray = new double[] { 0.0, 0.002, 0.003, 0.01, 0.03, 0.06, 0.1, 0.167, 0.25, 0.36, 0.43, 0.5, 0.6,
+                    0.65, 0.7, 0.75, 1.00 };
         }
         // get the corresponding index for the scaleInput array.
         int index = (int) (dVal * 16.0);
@@ -678,4 +746,5 @@ public class Util {
         // return scaled value.
         return dScale;
     }
+    ////#endregion
 }

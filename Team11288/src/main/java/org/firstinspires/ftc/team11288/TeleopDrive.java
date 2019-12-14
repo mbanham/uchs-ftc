@@ -105,7 +105,7 @@ public class TeleopDrive extends OpMode{
             motorArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             motorArm.setMode(STOP_AND_RESET_ENCODER);
             motorArm.setDirection(DcMotorSimple.Direction.FORWARD);
-            
+
             motorLift.setDirection(DcMotorSimple.Direction.FORWARD);
             motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             motorLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -144,7 +144,7 @@ public class TeleopDrive extends OpMode{
     public void loop() {
         double r = Math.hypot(scaleInput(gamepad1.left_stick_x), scaleInput(gamepad1.left_stick_y));
         double robotAngle = Math.atan2(scaleInput(gamepad1.left_stick_y), scaleInput(-gamepad1.left_stick_x)) - Math.PI / 4;
-        double rightX = scaleInput(gamepad1.right_stick_x * multiplier);
+        double rightX = scaleInput(gamepad1.right_stick_x * (multiplier * 0.8));
         final double v1 = r * Math.cos(robotAngle) - rightX;
         final double v2 = -r * Math.sin(robotAngle) - rightX;
         final double v3 = r * Math.sin(robotAngle) - rightX;
@@ -156,10 +156,7 @@ public class TeleopDrive extends OpMode{
         double BackRight = Range.clip(v4 * multiplier, -1, 1);
 
         // write the values to the motors
-        motorBackLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motorBackRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motorFrontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motorFrontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        teamUtils.setWheelsToSpeedMode();
         motorFrontRight.setPower(FrontRight);
         motorFrontLeft.setPower(FrontLeft);
         motorBackLeft.setPower(BackLeft);
@@ -168,13 +165,13 @@ public class TeleopDrive extends OpMode{
         //platformArm
 
 
-        if(gamepad1.right_bumper){
-            multiplier=0.7;
-
+        if(Range.clip(gamepad1.right_trigger, 0.4, 1) > 0.41){
+            multiplier=Range.clip(gamepad1.right_trigger, 0.4, 1);
         }else
         {
             multiplier = 1;
         }
+        //#region PLATFORM_GRABBER
         if (gamepad1.a) {
             //down
             platform.setPosition(0);
@@ -186,7 +183,7 @@ public class TeleopDrive extends OpMode{
             telemetry.addData("MyActivity", "ServoPosition=1");
             telemetry.update();
         }
-
+        //#endregion
 
 
             //dpad control 1 inch
@@ -229,7 +226,7 @@ public class TeleopDrive extends OpMode{
             }
         }
         if(gamepad2.x){
-            arm_multiplier = 0.3;
+            arm_multiplier = 0.4;
         }else
         {
             arm_multiplier = 1;
