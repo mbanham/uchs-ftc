@@ -11,9 +11,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
 
-@Autonomous(name = "Drive_18_In_Fwd_BLUE", group = "Linear Opmode")
+@Autonomous(name = "Drive_30_In_Fwd_BLUE", group = "Linear Opmode")
 //@Disabled                            // Comment this out to add to the opmode list
-public class Drive_18_In_Fwd_BLUE extends LinearOpMode {
+public class Drive_30_In_Fwd_BLUE extends LinearOpMode {
     //initialize these variables, override them in the constructor
 
     /* Declare OpMode members. */
@@ -79,7 +79,8 @@ public class Drive_18_In_Fwd_BLUE extends LinearOpMode {
                 teamUtils.drivebyDistance(0.0, 0.8, 0, 30, "inch");
 
                 teamUtils.drivebyDistance(-0.8, 0.0, 0.0, 30, "inch");//drive to corner
-
+                teamUtils.stopWheelsSpeedMode();
+                requestOpModeStop();
 
             }
         }

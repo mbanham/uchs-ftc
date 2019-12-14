@@ -83,12 +83,13 @@ public class One_Red_Right extends LinearOpMode {
                 teamUtils.drivebyDistance(0.0, -0.8, 0.0, 30, "inch");//drive to corner
                 teamUtils.drivebyDistance(0.8, 0, 0.0, 27, "inch");//drive to base plate
                 platform.setPosition(0);
-                sleep(1000);
-                teamUtils.drivebyDistance(-0.8, 0.0, 0.0, 28.5, "inch");//drive towards corner with base plate
+                sleep(800);
+                teamUtils.drivebyDistance(-0.8, 0.0, 0.0, 32, "inch");//drive towards corner with base plate
                 platform.setPosition(1);
-                sleep(1000);
+                sleep(800);
                 teamUtils.drivebyDistance(0.0, 0.8, 0.0, 50, "inch");//drive away from corner
-
+                teamUtils.stopWheelsSpeedMode();
+                requestOpModeStop();
             }
 
             //}
