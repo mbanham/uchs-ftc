@@ -116,9 +116,9 @@ public class Camera_GrabStone extends LinearOpMode {
                 double threshold = 20;
                 while(center.x >  screen_center.x - threshold || center.x < screen_center.x + threshold){
                     if(center.x >  screen_center.x - threshold) {//left too muchs
-                        teamUtils.drivebySpeed(-0.5, 0, 0);
+                        teamUtils.drivebySpeed(-0.5, 0, 0, opModeIsActive());
                     }else if(center.x < screen_center.x + threshold){//right too much
-                        teamUtils.drivebySpeed(-0.5, 0, 0);
+                        teamUtils.drivebySpeed(-0.5, 0, 0, opModeIsActive());
                     }else{
                         teamUtils.stopWheelsSpeedMode();
                     }
