@@ -166,7 +166,7 @@ public class TeleopDrive extends OpMode{
 
 
         if(Range.clip(gamepad1.right_trigger, 0.4, 1) > 0.41){
-            multiplier=Range.clip(gamepad1.right_trigger, 0.4, 1);
+            multiplier=1-Range.clip(gamepad1.right_trigger, 0, 0.4);
         }else
         {
             multiplier = 1;
