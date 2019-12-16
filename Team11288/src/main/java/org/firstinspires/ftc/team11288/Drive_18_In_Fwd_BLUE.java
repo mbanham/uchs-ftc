@@ -1,26 +1,19 @@
 package org.firstinspires.ftc.team11288;
 
 
-import android.graphics.Color;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
 
-@Autonomous(name = "One_Blue_Left", group = "Linear Opmode")
+@Autonomous(name = "Drive_18_In_Fwd_BLUE", group = "Linear Opmode")
 //@Disabled                            // Comment this out to add to the opmode list
-public class One_Blue_Left extends LinearOpMode {
+public class Drive_18_In_Fwd_BLUE extends LinearOpMode {
     //initialize these variables, override them in the constructor
 
     /* Declare OpMode members. */
@@ -70,7 +63,7 @@ public class One_Blue_Left extends LinearOpMode {
 
         //utils class initializer
         teamUtils = new Util(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
-        teamUtils.InitExtraSensors(hardwareMap);
+        // teamUtils.InitExtraSensors(hardwareMap);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -82,15 +75,11 @@ public class One_Blue_Left extends LinearOpMode {
             if (!stepsCompleted) {
                 stepsCompleted = true;
                 // run this loop until the end of the match (driver presses stop)
-                teamUtils.drivebyDistance(0.8, 0.0, 0.0, 3, "inch");//drive away from wall
-                teamUtils.drivebyDistance(0.0, 0.8, 0.0, 30, "inch");//drive to corner
-                teamUtils.drivebyDistance(0.8, 0, 0.0, 27, "inch");//drive to base plate
-                platform.setPosition(0);
-                sleep(1000);
-                teamUtils.drivebyDistance(-0.8, 0.0, 0.0, 28.5, "inch");//drive towards corner with base plate
-                platform.setPosition(1);
-                sleep(1000);
-                teamUtils.drivebyDistance(0.0, -0.8, 0.0, 50, "inch");//drive away from corner
+
+                teamUtils.drivebyDistance(0.0, 0.8, 0, 30, "inch");
+
+                teamUtils.drivebyDistance(-0.8, 0.0, 0.0, 30, "inch");//drive to corner
+
 
             }
         }

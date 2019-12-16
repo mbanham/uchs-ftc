@@ -166,7 +166,7 @@ public class TeleopDrive extends OpMode{
 
 
         if(Range.clip(gamepad1.right_trigger, 0.4, 1) > 0.41){
-            multiplier=Range.clip(gamepad1.right_trigger, 0.4, 1);
+            multiplier=1-Range.clip(gamepad1.right_trigger, 0, 0.4);
         }else
         {
             multiplier = 1;
@@ -250,11 +250,11 @@ public class TeleopDrive extends OpMode{
             double x_int = 0;
             double y_int = 0;
             if (gamepad1.dpad_up)
-                y_int = 0.5;
+                y_int = 0.3;
             if(gamepad1.dpad_down)
-                y_int = -0.5;
+                y_int = -0.3;
             if(gamepad1.dpad_left)
-                x_int = 0.5;
+                x_int = 0.3;
             if(gamepad1.dpad_right)
                 x_int = -0.5;
             if((x_int != 0 || y_int != 0) && !gamepad1.x) {
@@ -290,7 +290,7 @@ public class TeleopDrive extends OpMode{
             }
         }
         if(gamepad2.x){
-            arm_multiplier = 0.4;
+            arm_multiplier = 0.3;
         }else
         {
             arm_multiplier = 1;
@@ -300,7 +300,7 @@ public class TeleopDrive extends OpMode{
         //lift
         motorLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         if (gamepad2.dpad_down) {
-            motorLift.setPower(-0.75);
+            motorLift.setPower(-1);
         } else {
             if (gamepad2.dpad_up) {
                 motorLift.setPower(1);
