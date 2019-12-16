@@ -185,6 +185,66 @@ public class TeleopDrive extends OpMode{
         }
         //#endregion
 
+        //press x
+        //while x is pressed, press dpad buttons to proper degree
+        //release x to start with parameters
+        //press x to stop the robot and debug
+
+        if(gamepad1.x){
+            if(gamepad1.dpad_up || gamepad1.dpad_down || gamepad1.dpad_left || gamepad1.dpad_right) {
+                teamUtils.resetEncoderOnMotors();
+                double x_int = 0.5;
+                double y_int = 0.5;
+                while(gamepad1.x) {
+                    //y int
+                    if (gamepad1.dpad_up) {
+                        y_int += 0.1;
+                        while(gamepad1.dpad_up) {
+                        }
+                        telemetry.addData("MyActivity", "val=" + y_int);
+                        telemetry.update();
+                    }
+                    else
+                    if (gamepad1.dpad_down){
+                        y_int -= 0.1;
+                        while(gamepad1.dpad_down) {
+                        }
+                        telemetry.addData("MyActivity", "val=" + y_int);
+                        telemetry.update();
+
+                    }
+                    //x int
+                    if (gamepad1.dpad_left) {
+                        x_int -= 0.1;
+                        while(gamepad1.dpad_left) {
+                        }
+                        telemetry.addData("MyActivity", "val=" + x_int);
+                        telemetry.update();
+                    }
+                    else
+                    if (gamepad1.dpad_right)
+                    {
+                        x_int += 0.1;
+                        while(gamepad1.dpad_right) {
+                        }
+                        telemetry.addData("MyActivity", "val=" + x_int);
+                        telemetry.update();
+                    }
+                }
+
+                teamUtils.drivebySpeed(x_int, y_int, 0);
+                while(!gamepad1.x){
+
+                }
+                teamUtils.stopWheelsSpeedMode();
+                double dist_y = Util.COUNTS_PER_INCH * (motorBackLeft.getTargetPosition() + motorFrontLeft.getTargetPosition() + motorBackRight.getTargetPosition() + motorFrontRight.getTargetPosition()) / 4;
+                double dist_x = Util.COUNTS_PER_INCH * (-motorBackLeft.getTargetPosition() + motorFrontLeft.getTargetPosition() + motorBackRight.getTargetPosition() + -motorFrontRight.getTargetPosition()) / 4;
+
+                String output = x_int + "-" + y_int + Math.sqrt(Math.pow(dist_x, 2) + Math.pow(dist_y, 2));
+                telemetry.addData("MyActivity", output);
+
+            }
+        }
 
             //dpad control 1 inch
             double x_int = 0;
@@ -197,8 +257,12 @@ public class TeleopDrive extends OpMode{
                 x_int = 0.5;
             if(gamepad1.dpad_right)
                 x_int = -0.5;
-            if(x_int != 0 || y_int != 0) {
-                teamUtils.drivebyDistance(x_int, y_int, 0, 12, "inch");
+            if((x_int != 0 || y_int != 0) && !gamepad1.x) {
+                teamUtils.drivebySpeed(x_int, y_int, 0);
+                while(x_int != 0 || y_int != 0){
+
+                }
+                teamUtils.stopWheelsSpeedMode();
             }
 
 
