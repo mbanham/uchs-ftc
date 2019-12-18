@@ -87,18 +87,17 @@ public class One_Blue_Left extends LinearOpMode {
                 teamUtils.drivebyDistance(0.8, 0, 0.0, 27, "inch");//drive to base plate
                 platform.setPosition(0);
                 sleep(800);
-    //drive back to corner
+                //drive back to corner
                 teamUtils.drivebyDistance(-0.8, 0, 0.0, 20, "inch");//drive towards corner
                 platform.setPosition(1);
                 sleep(800);
-                teamUtils.drivebyDistance(-0.8, 0, 0.0, 3, "inch");//drive to base plate
-                teamUtils.drivebyDistance(0.0, -8.0, 0.0, 28, "inch");//
-                teamUtils.drivebyDistance(0.8, 0, 0.0, 36, "inch");//
-                teamUtils.drivebyDistance(0.0, 8.0, 0.0, 36, "inch");//
-                teamUtils.drivebyDistance(-0.8, 0, 0.0, 12, "inch");//
-
-
-                teamUtils.drivebyDistance(0.08, -0.8, 0.0, 40, "inch");//drive away from corner
+                //These steps need adjustment, but seemed like the safest way to push the platform into place
+                teamUtils.drivebyDistance(-0.8, 0, 0.0, 3, "inch");//drive away from foundation
+                teamUtils.drivebyDistance(0.0, -8.0, 0.0, 28, "inch");//drive towards bridge
+                teamUtils.drivebyDistance(0.8, 0, 0.0, 36, "inch");//drive towards center
+                teamUtils.drivebyDistance(0.0, 8.0, 0.0, 36, "inch");//drive towards wall
+                teamUtils.drivebyDistance(-0.8, 0, 0.0, 12, "inch");//put foundation
+                teamUtils.drivebyDistance(0.08, -0.8, 0.0, 40, "inch");//drive up to park
                 teamUtils.stopWheelsSpeedMode();
                 requestOpModeStop();
             }
