@@ -96,7 +96,7 @@ public class One_Blue_Left extends LinearOpMode {
                 teamUtils.drivebyDistance(0.0, -8.0, 0.0, 28, "inch");//drive towards bridge
                 teamUtils.drivebyDistance(0.8, 0, 0.0, 36, "inch");//drive towards center
                 teamUtils.drivebyDistance(0.0, 8.0, 0.0, 36, "inch");//drive towards wall
-                teamUtils.drivebyDistance(-0.8, 0, 0.0, 12, "inch");//put foundation
+                teamUtils.drivebyDistance(-0.8, 0, 0.0, 12, "inch");//push foundation
                 teamUtils.drivebyDistance(0.08, -0.8, 0.0, 40, "inch");//drive up to park
                 teamUtils.stopWheelsSpeedMode();
                 requestOpModeStop();
