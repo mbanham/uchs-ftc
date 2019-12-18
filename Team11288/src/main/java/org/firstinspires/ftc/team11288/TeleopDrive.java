@@ -22,7 +22,7 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENC
  *
  */
 
-@TeleOp(name="TeleopDrive Test", group="Teleop")
+@TeleOp(name="TeleopDrive", group="Teleop")
 public class TeleopDrive extends OpMode{
 
     /* Declare OpMode members. */

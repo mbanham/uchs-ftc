@@ -294,7 +294,7 @@ public class Util {
 
     }
     public void drivebySpeed(double x, double y, double rotation) {// inches
-        setWheelsToEncoderMode();
+
         double r = Math.hypot((-x), (-y));
         double robotAngle = Math.atan2((-y), (-x)) - Math.PI / 4;
         double rightX = rotation;
@@ -308,17 +308,8 @@ public class Util {
         double BackLeft = Range.clip(v3, -1, 1);
         double BackRight = Range.clip(v4, -1, 1);
 
-        int backLeftTargetPosition = (int) (motorBackLeft.getCurrentPosition() + Math.signum(BackLeft));
-        int backRightTargetPosition = (int) (motorBackRight.getCurrentPosition() + Math.signum(BackRight));
-        int frontLeftTargetPosition = (int) (motorFrontLeft.getCurrentPosition() + Math.signum(FrontLeft));
-        int frontRightTargetPosition = (int) (motorFrontRight.getCurrentPosition() + Math.signum(FrontRight));
 
-        motorBackLeft.setTargetPosition((int) backLeftTargetPosition);
-        motorBackRight.setTargetPosition((int) backRightTargetPosition);
-        motorFrontLeft.setTargetPosition((int) frontLeftTargetPosition);
-        motorFrontRight.setTargetPosition((int) frontRightTargetPosition);
-
-        motorBackLeft.setMode(RUN_WITHOUT_ENCODER);
+        motorBackLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motorBackRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motorFrontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motorFrontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
