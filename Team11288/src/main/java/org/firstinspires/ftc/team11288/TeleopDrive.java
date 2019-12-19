@@ -155,6 +155,29 @@ public class TeleopDrive extends OpMode{
         double BackLeft = Range.clip(v3 * multiplier, -1, 1);
         double BackRight = Range.clip(v4 * multiplier, -1, 1);
 
+
+        ///NOTE for changing to Mecanum wheels, see
+        //https://github.com/FTC7393/EVLib/wiki/Mecanum-Wheels
+        //it is not a big change, just remove the 45deg angle conversions (no trig needed)
+        /*
+                Now we have this table:
+
+                    FORWARD(+x)   SIDEWAYS RIGHT(+y)   TURN RIGHT(+r)
+        front left      +                 +                  +
+        front right     +                 -                  -
+        back left       +                 -                  +
+        back right      +                 +                  -
+        And we can convert this table to an algorithm:
+
+        inputs: x, y, and r - [For Us: gamepad1.left_stick_x,gamepad1.left_stick_y,gamepad1.right_stick_x]
+
+        flPower = + x + y + r
+        frPower = + x - y - r
+        blPower = + x - y + r
+        brPower = + x + y - r
+
+        */
+
         // write the values to the motors
         teamUtils.setWheelsToSpeedMode();
         motorFrontRight.setPower(FrontRight);
