@@ -206,25 +206,116 @@ public class Util {
     //#endregion
 
     //#region Driving
-    public void drivebyDistance(double x, double y, double rotation, double distance, String unit) {// inches
+    public void drivebyDistance(double x, double y, double distance, String unit) {// inches
         setWheelsToEncoderMode();
         double r = Math.hypot((-x), (-y));
         double robotAngle = Math.atan2((-y), (-x)) - Math.PI / 4;
-        double rightX = rotation;
-
-        double radians = rotation * 3.1415/180;
-        double distanceRot = rotation * CENTER_TO_WHEEL_DIST;
-
-        final double v1 = r * Math.cos(robotAngle) - rightX;
-        final double v2 = -r * Math.sin(robotAngle) - rightX;
-        final double v3 = r * Math.sin(robotAngle) - rightX;
-        final double v4 = -r * Math.cos(robotAngle) - rightX;
+        final double v1 = r * Math.cos(robotAngle);
+        final double v2 = -r * Math.sin(robotAngle);
+        final double v3 = r * Math.sin(robotAngle);
+        final double v4 = -r * Math.cos(robotAngle);
 
         double FrontRight = Range.clip(v2, -1, 1);
         double FrontLeft = Range.clip(v1, -1, 1);
         double BackLeft = Range.clip(v3, -1, 1);
         double BackRight = Range.clip(v4, -1, 1);
 
+        int moveAmount = (int) (distance * COUNTS_PER_INCH);
+        // if(unit.equals("inch")) {
+        // moveAmount = (int) (distance * COUNTS_PER_INCH);
+        // }else
+        // if(unit.equals("square")) {
+        // moveAmount = (int) (distance * COUNTS_PER_SQUARE);
+        // }
+        int backLeftTargetPosition = (int) (motorBackLeft.getCurrentPosition() + Math.signum(BackLeft) * moveAmount);
+        int backRightTargetPosition = (int) (motorBackRight.getCurrentPosition() + Math.signum(BackRight) * moveAmount);
+        int frontLeftTargetPosition = (int) (motorFrontLeft.getCurrentPosition() + Math.signum(FrontLeft) * moveAmount);
+        int frontRightTargetPosition = (int) (motorFrontRight.getCurrentPosition()
+                + Math.signum(FrontRight) * moveAmount);
+
+
+        motorBackLeft.setTargetPosition((int) backLeftTargetPosition);
+        motorBackRight.setTargetPosition((int) backRightTargetPosition);
+        motorFrontLeft.setTargetPosition((int) frontLeftTargetPosition);
+        motorFrontRight.setTargetPosition((int) frontRightTargetPosition);
+
+        motorBackLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorBackRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorFrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorFrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        motorFrontRight.setPower(FrontRight);
+        motorFrontLeft.setPower(FrontLeft);
+        motorBackLeft.setPower(BackLeft);
+        motorBackRight.setPower(BackRight);
+
+        // for those motors that should be busy (power!=0) wait until they are done
+        // reaching target position before returning from this function.
+
+        double tolerance = INCREMENT_DRIVE_MOTOR_MOVE;
+        while ((((Math.abs(FrontRight)) > 0.01
+                && Math.abs(motorFrontRight.getCurrentPosition() - frontRightTargetPosition) > tolerance))
+                || (((Math.abs(FrontLeft)) > 0.01
+                        && Math.abs(motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition) > tolerance))
+                || (((Math.abs(BackLeft)) > 0.01
+                        && Math.abs(motorBackLeft.getCurrentPosition() - backLeftTargetPosition) > tolerance))
+                || (((Math.abs(BackRight)) > 0.01
+                        && Math.abs(motorBackRight.getCurrentPosition() - backRightTargetPosition) > tolerance))) {
+            // wait and check again until done running
+            telemetry.addData("front right", "=%.2f  %d %b", FrontRight,
+                    motorFrontRight.getCurrentPosition() - frontRightTargetPosition,
+                    ((Math.ceil(Math.abs(FrontRight)) > 0.0
+                            && Math.abs(motorFrontRight.getCurrentPosition() - frontRightTargetPosition) > tolerance)));// ,
+                                                                                                                        // frontRightTargetPosition);
+            telemetry.addData("front left", "=%.2f %d %b", FrontLeft,
+                    motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition,
+                    ((Math.ceil(Math.abs(FrontLeft)) > 0.0
+                            && Math.abs(motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition) > tolerance)));// ,
+                                                                                                                      // frontLeftTargetPosition);
+            telemetry.addData("back left", "=%.2f %d %b", BackLeft,
+                    motorBackLeft.getCurrentPosition() - backLeftTargetPosition, ((Math.ceil(Math.abs(BackLeft)) > 0.0
+                            && Math.abs(motorBackLeft.getCurrentPosition() - backLeftTargetPosition) > tolerance)));// ,
+                                                                                                                    // backLeftTargetPosition);
+            telemetry.addData("back right", "=%.2f %d %b", BackRight,
+                    motorBackRight.getCurrentPosition() - backRightTargetPosition,
+                    ((Math.ceil(Math.abs(BackRight)) > 0.0
+                            && Math.abs(motorBackRight.getCurrentPosition() - backRightTargetPosition) > tolerance)));
+            telemetry.update();
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        motorFrontLeft.setPower(0);
+        motorBackRight.setPower(0);
+        motorFrontRight.setPower(0);
+        motorBackLeft.setPower(0);
+
+    }
+    public void drivebyDistAndRot(double x, double y, double rotation, double distance, String unit) {// inches
+        setWheelsToEncoderMode();
+        double r = Math.hypot((-x), (-y));
+        double robotAngle = Math.atan2((-y), (-x)) - Math.PI / 4;
+
+        double radians = rotation * 3.1415/180;
+        double distanceRot = radians * CENTER_TO_WHEEL_DIST;
+
+        final double v1 = r * Math.cos(robotAngle);
+        final double v2 = -r * Math.sin(robotAngle);
+        final double v3 = r * Math.sin(robotAngle);
+        final double v4 = -r * Math.cos(robotAngle);
+
+        double FrontRight = Range.clip(v2, -1, 1);
+        double FrontLeft = Range.clip(v1, -1, 1);
+        double BackLeft = Range.clip(v3, -1, 1);
+        double BackRight = Range.clip(v4, -1, 1);
+
+        telemetry.addData("Util", "FRONTRIGHT=" + FrontRight);
+        telemetry.addData("Util", "FRONTLEFT=" + FrontLeft);
+        telemetry.addData("Util", "BACKLEFT=" + BackLeft);
+        telemetry.addData("Util", "BACKRIGH=" + BackRight);
+        telemetry.update();
         int moveAmount = (int) (distance * COUNTS_PER_INCH);
         // if(unit.equals("inch")) {
         // moveAmount = (int) (distance * COUNTS_PER_INCH);
@@ -257,10 +348,10 @@ public class Util {
             }
         }
 
-        motorFrontRight.setPower(FrontRight*(frontRightTargetPosition/maxTargetPosition));
-        motorFrontLeft.setPower(FrontLeft*(frontLeftTargetPosition/maxTargetPosition));
-        motorBackLeft.setPower(BackLeft*(backLeftTargetPosition/maxTargetPosition));
-        motorBackRight.setPower(BackRight*(backRightTargetPosition/maxTargetPosition));
+        motorFrontRight.setPower(Math.signum(FrontRight)*(frontRightTargetPosition/maxTargetPosition));
+        motorFrontLeft.setPower(Math.signum(FrontLeft)*(frontLeftTargetPosition/maxTargetPosition));
+        motorBackLeft.setPower(Math.signum(BackLeft)*(backLeftTargetPosition/maxTargetPosition));
+        motorBackRight.setPower(Math.signum(BackRight)*(backRightTargetPosition/maxTargetPosition));
 
         // for those motors that should be busy (power!=0) wait until they are done
         // reaching target position before returning from this function.
@@ -269,26 +360,26 @@ public class Util {
         while ((((Math.abs(FrontRight)) > 0.01
                 && Math.abs(motorFrontRight.getCurrentPosition() - frontRightTargetPosition) > tolerance))
                 || (((Math.abs(FrontLeft)) > 0.01
-                        && Math.abs(motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition) > tolerance))
+                && Math.abs(motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition) > tolerance))
                 || (((Math.abs(BackLeft)) > 0.01
-                        && Math.abs(motorBackLeft.getCurrentPosition() - backLeftTargetPosition) > tolerance))
+                && Math.abs(motorBackLeft.getCurrentPosition() - backLeftTargetPosition) > tolerance))
                 || (((Math.abs(BackRight)) > 0.01
-                        && Math.abs(motorBackRight.getCurrentPosition() - backRightTargetPosition) > tolerance))) {
+                && Math.abs(motorBackRight.getCurrentPosition() - backRightTargetPosition) > tolerance))) {
             // wait and check again until done running
             telemetry.addData("front right", "=%.2f  %d %b", FrontRight,
                     motorFrontRight.getCurrentPosition() - frontRightTargetPosition,
                     ((Math.ceil(Math.abs(FrontRight)) > 0.0
                             && Math.abs(motorFrontRight.getCurrentPosition() - frontRightTargetPosition) > tolerance)));// ,
-                                                                                                                        // frontRightTargetPosition);
+            // frontRightTargetPosition);
             telemetry.addData("front left", "=%.2f %d %b", FrontLeft,
                     motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition,
                     ((Math.ceil(Math.abs(FrontLeft)) > 0.0
                             && Math.abs(motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition) > tolerance)));// ,
-                                                                                                                      // frontLeftTargetPosition);
+            // frontLeftTargetPosition);
             telemetry.addData("back left", "=%.2f %d %b", BackLeft,
                     motorBackLeft.getCurrentPosition() - backLeftTargetPosition, ((Math.ceil(Math.abs(BackLeft)) > 0.0
                             && Math.abs(motorBackLeft.getCurrentPosition() - backLeftTargetPosition) > tolerance)));// ,
-                                                                                                                    // backLeftTargetPosition);
+            // backLeftTargetPosition);
             telemetry.addData("back right", "=%.2f %d %b", BackRight,
                     motorBackRight.getCurrentPosition() - backRightTargetPosition,
                     ((Math.ceil(Math.abs(BackRight)) > 0.0
