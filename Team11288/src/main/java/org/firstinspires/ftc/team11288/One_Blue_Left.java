@@ -82,9 +82,9 @@ public class One_Blue_Left extends LinearOpMode {
             if (!stepsCompleted) {
                 stepsCompleted = true;
                 // run this loop until the end of the match (driver presses stop)
-                teamUtils.drivebyDistance(0.8, 0.0, 3, "inch");//drive away from wall
-                teamUtils.drivebyDistance(0.0, 0.8, 26, "inch");//drive to corner
-                teamUtils.drivebyDistance(0.8, 0, 27, "inch");//drive to base plate
+                teamUtils.drivebyDistance(0.85, 0.0, 3, "inch");//drive away from wall
+                teamUtils.drivebyDistance(0.0, 0.85, 28, "inch");//drive to corner
+                teamUtils.drivebyDistance(0.85, 0, 27, "inch");//drive to base plate
                 platform.setPosition(0);
                 sleep(800);
                 //drive back to corner
@@ -92,14 +92,14 @@ public class One_Blue_Left extends LinearOpMode {
                 platform.setPosition(1);
                 sleep(800);
                 //These steps need adjustment, but seemed like the safest way to push the platform into place
-                teamUtils.drivebyDistance(-0.8, 0, 3, "inch");//drive away from foundation
-                teamUtils.drivebyDistance(0.0, -0.8, 28, "inch");//drive towards bridge
-                teamUtils.drivebyDistance(0.8, 0, 43, "inch");//drive towards center
-                teamUtils.drivebyDistance(0.0, 0.8, 29, "inch");//drive towards wall
-                teamUtils.drivebyDistance(-0.8, 0, 24, "inch");//push foundation
-                teamUtils.drivebyDistance(0.0, -0.8, 20, "inch");//drive up to park
-                teamUtils.drivebyDistance(-0.8, 0.0, 6, "inch");//drive away from center
-                teamUtils.drivebyDistance(0.0, -0.8, 16, "inch");//drive away from center
+                teamUtils.drivebyDistance(-0.85, 0, 3, "inch");//drive away from foundation
+                teamUtils.drivebyDistance(0.0, -0.85, 28, "inch");//drive towards bridge
+                teamUtils.drivebyDistance(0.85, 0, 42, "inch");//drive towards center
+                teamUtils.drivebyDistance(0.0, 0.85, 29, "inch");//drive towards wall
+                teamUtils.drivebyDistance(-0.85, 0, 24, "inch");//push foundation
+                teamUtils.drivebyDistance(0.0, -0.85, 20, "inch");//drive up to park
+                teamUtils.drivebyDistance(-0.85, 0.0, 6, "inch");//drive away from center
+                teamUtils.drivebyDistance(0.0, -0.9, 26, "inch");//drive away from center
                 teamUtils.stopWheelsSpeedMode();
                 requestOpModeStop();
             }
