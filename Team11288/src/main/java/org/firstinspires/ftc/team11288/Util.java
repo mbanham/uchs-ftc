@@ -73,7 +73,7 @@ public class Util {
     static final int COUNTS_PER_INCH = (int) ((1.4142 * (COUNTS_PER_DRIVE_MOTOR_REV)) / (4.0 * Math.PI)); // for 45deg
                                                                                                           // wheels
     static final int COUNTS_PER_SQUARE = (int) (COUNTS_PER_INCH * 1); // for 45deg wheels
-
+    static final double CENTER_TO_WHEEL_DIST = COUNTS_PER_INCH * 8;//8 inches
     // initialize these in InitExtraSensors if using
     private ColorSensor colorSensor;
     float hsvValues[] = { 0F, 0F, 0F };
@@ -211,6 +211,10 @@ public class Util {
         double r = Math.hypot((-x), (-y));
         double robotAngle = Math.atan2((-y), (-x)) - Math.PI / 4;
         double rightX = rotation;
+
+        double radians = rotation * 3.1415/180;
+        double distanceRot = rotation * CENTER_TO_WHEEL_DIST;
+
         final double v1 = r * Math.cos(robotAngle) - rightX;
         final double v2 = -r * Math.sin(robotAngle) - rightX;
         final double v3 = r * Math.sin(robotAngle) - rightX;
@@ -228,11 +232,12 @@ public class Util {
         // if(unit.equals("square")) {
         // moveAmount = (int) (distance * COUNTS_PER_SQUARE);
         // }
-        int backLeftTargetPosition = (int) (motorBackLeft.getCurrentPosition() + Math.signum(BackLeft) * moveAmount);
-        int backRightTargetPosition = (int) (motorBackRight.getCurrentPosition() + Math.signum(BackRight) * moveAmount);
-        int frontLeftTargetPosition = (int) (motorFrontLeft.getCurrentPosition() + Math.signum(FrontLeft) * moveAmount);
+        int backLeftTargetPosition = (int) (motorBackLeft.getCurrentPosition() + Math.signum(BackLeft) * moveAmount + distanceRot);
+        int backRightTargetPosition = (int) (motorBackRight.getCurrentPosition() + Math.signum(BackRight) * moveAmount + distanceRot);
+        int frontLeftTargetPosition = (int) (motorFrontLeft.getCurrentPosition() + Math.signum(FrontLeft) * moveAmount + distanceRot);
         int frontRightTargetPosition = (int) (motorFrontRight.getCurrentPosition()
-                + Math.signum(FrontRight) * moveAmount);
+                + Math.signum(FrontRight) * moveAmount + distanceRot);
+
 
         motorBackLeft.setTargetPosition((int) backLeftTargetPosition);
         motorBackRight.setTargetPosition((int) backRightTargetPosition);
@@ -244,10 +249,18 @@ public class Util {
         motorFrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motorFrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        motorFrontRight.setPower(FrontRight);
-        motorFrontLeft.setPower(FrontLeft);
-        motorBackLeft.setPower(BackLeft);
-        motorBackRight.setPower(BackRight);
+        int maxTargetPosition = 0;
+        int[] tpArray = new int[] {backLeftTargetPosition, backRightTargetPosition, frontLeftTargetPosition, frontRightTargetPosition};
+        for(int i = 0; i < 4; i++) {
+            if(maxTargetPosition < Math.abs(tpArray[i])) {
+                maxTargetPosition = Math.abs(tpArray[i]);
+            }
+        }
+
+        motorFrontRight.setPower(FrontRight*(frontRightTargetPosition/maxTargetPosition));
+        motorFrontLeft.setPower(FrontLeft*(frontLeftTargetPosition/maxTargetPosition));
+        motorBackLeft.setPower(BackLeft*(backLeftTargetPosition/maxTargetPosition));
+        motorBackRight.setPower(BackRight*(backRightTargetPosition/maxTargetPosition));
 
         // for those motors that should be busy (power!=0) wait until they are done
         // reaching target position before returning from this function.
