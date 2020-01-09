@@ -142,14 +142,44 @@ public class TeleopDrive extends OpMode{
     double arm_multiplier = 1;
     @Override
     public void loop() {
-        double left_wheels = gamepad1.left_stick_y;
-        double right_wheels = gamepad1.left_stick_y;
-        
+        double r = Math.hypot(scaleInput(gamepad1.left_stick_x), scaleInput(gamepad1.left_stick_y));
+        double robotAngle = Math.atan2(scaleInput(gamepad1.left_stick_y), scaleInput(-gamepad1.left_stick_x)) - Math.PI / 4;
+        double rightX = scaleInput(gamepad1.right_stick_x * (multiplier * 0.8));
+        final double v1 = r * Math.cos(robotAngle) - rightX;
+        final double v2 = -r * Math.sin(robotAngle) - rightX;
+        final double v3 = r * Math.sin(robotAngle) - rightX;
+        final double v4 = -r * Math.cos(robotAngle) - rightX;
+
+        double FrontRight = Range.clip(v2 * multiplier, -1, 1);
+        double FrontLeft = Range.clip(v1 * multiplier, -1, 1);
+        double BackLeft = Range.clip(v3 * multiplier, -1, 1);
+        double BackRight = Range.clip(v4 * multiplier, -1, 1);
+
+
+        ///NOTE for changing to Mecanum wheels, see
+        //https://github.com/FTC7393/EVLib/wiki/Mecanum-Wheels
+        //it is not a big change, just remove the 45deg angle conversions (no trig needed)
+        /*
+                Now we have this table:
+                    FORWARD(+x)   SIDEWAYS RIGHT(+y)   TURN RIGHT(+r)
+        front left      +                 +                  +
+        front right     +                 -                  -
+        back left       +                 -                  +
+        back right      +                 +                  -
+        And we can convert this table to an algorithm:
+        inputs: x, y, and r - [For Us: gamepad1.left_stick_x,gamepad1.left_stick_y,gamepad1.right_stick_x]
+        flPower = + x + y + r
+        frPower = + x - y - r
+        blPower = + x - y + r
+        brPower = + x + y - r
+        */
+
+        // write the values to the motors
         teamUtils.setWheelsToSpeedMode();
-        motorFrontRight.setPower(right_wheels);
-        motorFrontLeft.setPower(left_wheels);
-        motorBackLeft.setPower(left_wheels);
-        motorBackRight.setPower(right_wheels);
+        motorFrontRight.setPower(FrontRight);
+        motorFrontLeft.setPower(FrontLeft);
+        motorBackLeft.setPower(BackLeft);
+        motorBackRight.setPower(BackRight);
 
         //platformArm
 
