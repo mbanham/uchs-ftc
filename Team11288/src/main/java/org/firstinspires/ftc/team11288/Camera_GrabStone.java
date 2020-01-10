@@ -3,7 +3,6 @@ package org.firstinspires.ftc.team11288;
 
 import android.graphics.Color;
 import android.graphics.Point;
-import android.util.Size;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -107,8 +106,7 @@ public class Camera_GrabStone extends LinearOpMode {
                 double angle = r.estimateAngleToObject(AngleUnit.DEGREES);
 
                 Point screen_center = new Point((int)(width / 2), (int)(height / 2));
-                Point size = new Point((int)r.getWidth(), (int)r.getHeight());
-                Point center = new Point((int)(r.getLeft() + size.x/2), (int)(r.getBottom() + size.y/2));
+                Point center = new Point((int)(r.getImageWidth() - (r.getRight() + r.getLeft())), (int)(r.getImageHeight() - (r.getTop() + r.getBottom())));
                 Point bottom_left = new Point((int)r.getLeft(), (int)r.getBottom());
                 Point bottom_right = new Point((int)r.getRight(), (int)r.getBottom());
                 Point top_left = new Point((int)r.getLeft(), (int)r.getTop());
@@ -117,14 +115,13 @@ public class Camera_GrabStone extends LinearOpMode {
                 
 
                 double threshold = 20;
-                while(center.x >  screen_center.x + threshold || center.x < screen_center.x - threshold){
-                    if(center.x >  screen_center.x + threshold) {//left too muchs
-                        teamUtils.drivebySpeed(0.5, 0, 0);
-                    }else if(center.x < screen_center.x - threshold){//right too much
+                while(center.x >  screen_center.x - threshold || center.x < screen_center.x + threshold){
+                    if(center.x >  screen_center.x - threshold) {//left too muchs
+                        teamUtils.drivebySpeed(-0.5, 0, 0);
+                    }else if(center.x < screen_center.x + threshold){//right too much
                         teamUtils.drivebySpeed(-0.5, 0, 0);
                     }else{
                         teamUtils.stopWheelsSpeedMode();
-                        requestOpModeStop();
                     }
 
                 }
