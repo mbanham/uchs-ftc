@@ -1,33 +1,21 @@
 package org.firstinspires.ftc.team11288;
 
 
-import android.graphics.Color;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-
-import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-
-import java.util.List;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
 
-@Autonomous(name = "Two_Red_Left", group = "Linear Opmode")
-@Disabled                            // Comment this out to add to the opmode list
+@Autonomous(name = "One_Red_Right_Swerve", group = "Linear Opmode")
+//@Disabled                            // Comment this out to add to the opmode list
 
-public class Two_Red_Left extends LinearOpMode {
+public class One_Red_Right_Swerve extends LinearOpMode {
     //initialize these variables, override them in the constructor
-    private int TEAM_COLOR = Color.BLUE;
-    private static final int teleopType1 = 0, teleopType2 = 1, teleopType3 = 2, teleopTypeLinear = 3, teleopTypeRev = 4;
-    private int currentScaleInputMode = teleopTypeLinear;
 
     /* Declare OpMode members. */
     //wheels
@@ -40,21 +28,10 @@ public class Two_Red_Left extends LinearOpMode {
     private Util teamUtils;
 
 
-    //claw and arm
-    static final double COUNTS_PER_MOTOR_REV = 1250.0; //HD Hex Motor (REV-41-1301) 40:1
-
     //    private elbow             = null;
 //    private Servo wrist       = null;
     private Servo claw = null;
     private Servo platform = null;
-     //color sensorl
-    NormalizedColorSensor colorSensor;
-
-    //TODO touch sensor
-    DigitalChannel touchSensor;  // Hardware Device Object
-
-    private int directionArm = 1;
-    private int rotations = 12;
 
 
     private ElapsedTime runtime = new ElapsedTime();
@@ -87,36 +64,32 @@ public class Two_Red_Left extends LinearOpMode {
 
         //utils class initializer
         teamUtils = new Util(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
-
+        teamUtils.InitExtraSensors(hardwareMap);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         //Play started
-        runtime.reset();
-        //while (opModeIsActive()) {
-            // run this loop until the end of the match (driver presses stop)
-        List<Recognition> recognitions = teamUtils.GetObjectsInFrame();
-        if(recognitions != null) {
-            telemetry.addData("# Object Detected", recognitions.size());
 
-            // step through the list of recognitions and display boundary info.
-            int i = 0;
-            for (Recognition recognition : recognitions) {
-                telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
-                telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
-                        recognition.getLeft(), recognition.getTop());
-                telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
-                        recognition.getRight(), recognition.getBottom());
-                if(recognition.getLabel().equals(Util.SKYSTONE)) {
+        boolean stepsCompleted = false;
 
-                }
-
+        while (opModeIsActive()) {
+            if (!stepsCompleted) {
+                stepsCompleted = true;
+                // run this loop until the end of the match (driver presses stop)
+                teamUtils.drivebyDistance(-0.8, 0.0,  3, "inch");//drive away from wall
+                teamUtils.drivebyDistance(0.0, 0.8, 24, "inch");//drive to corner
+                teamUtils.drivebyDistance(-0.8, 0, 27, "inch");//drive to base plate
+                platform.setPosition(0);
+                sleep(800);
+                //drive back to corner
+                teamUtils.drivebyDistAndRot(0.8, 0, 90, 20, "inch");//drive to start position
+                platform.setPosition(1);
+                sleep(800);
+                teamUtils.drivebyDistance(0.0, 0.8, 24, "inch");//push platform to corner
+                requestOpModeStop();
             }
-            telemetry.update();
-
         }
-        //}
     }
-}
 
+}
 
