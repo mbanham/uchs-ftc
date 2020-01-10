@@ -75,10 +75,9 @@ public class Drive_30_In_Fwd_RED extends LinearOpMode {
             if (!stepsCompleted) {
                 stepsCompleted = true;
                 // run this loop until the end of the match (driver presses stop)
-                teamUtils.drivebyDistance(0.0, 0.8, 0, 30, "inch");
+                teamUtils.drivebyDistance(0.0, 0.8, 30, "inch");
 
-                teamUtils.drivebyDistance(0.8, 0.0, 0.0, 30, "inch");//drive to corner
-                teamUtils.stopWheelsSpeedMode();
+
                 requestOpModeStop();
 
             }

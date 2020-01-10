@@ -62,7 +62,6 @@ public class Util {
     static final double INCREMENT_DRIVE_MOTOR_MOVE = 30.0; // move set amount at a time
     static final double INCHES_PER_ROTATION = 11.137; // inches per rotation of 90mm traction wheel
     static final double DEG_PER_ROTATION = 100.0; // inches per rotation of 90mm traction wheel
-    static final double claw_arm_max_distance = 200;
 
     // 2019 Code changes
     private DcMotor motorBackLeft;
@@ -287,10 +286,7 @@ public class Util {
                 e.printStackTrace();
             }
         }
-        motorFrontLeft.setPower(0);
-        motorBackRight.setPower(0);
-        motorFrontRight.setPower(0);
-        motorBackLeft.setPower(0);
+        stopWheelsSpeedMode();
 
     }
     public void drivebyDistAndRot(double x, double y, double rotation, double distance, String unit) {// inches
@@ -328,6 +324,7 @@ public class Util {
         int frontLeftTargetPosition = (int) (motorFrontLeft.getCurrentPosition() + Math.signum(FrontLeft) * moveAmount + distanceRot);
         int frontRightTargetPosition = (int) (motorFrontRight.getCurrentPosition()
                 + Math.signum(FrontRight) * moveAmount + distanceRot);
+        
 
 
         motorBackLeft.setTargetPosition((int) backLeftTargetPosition);
@@ -348,11 +345,18 @@ public class Util {
             }
         }
 
-        motorFrontRight.setPower(Math.signum(FrontRight)*(frontRightTargetPosition/maxTargetPosition));
-        motorFrontLeft.setPower(Math.signum(FrontLeft)*(frontLeftTargetPosition/maxTargetPosition));
-        motorBackLeft.setPower(Math.signum(BackLeft)*(backLeftTargetPosition/maxTargetPosition));
-        motorBackRight.setPower(Math.signum(BackRight)*(backRightTargetPosition/maxTargetPosition));
-
+        double mfr = Math.signum(FrontRight)*(frontRightTargetPosition/maxTargetPosition);
+        double mfl = Math.signum(FrontLeft)*(frontLeftTargetPosition/maxTargetPosition);
+        double mbl = Math.signum(BackLeft)*(backLeftTargetPosition/maxTargetPosition);
+        double mbr = Math.signum(BackRight)*(backRightTargetPosition/maxTargetPosition);
+        motorFrontRight.setPower(mfr);
+        motorFrontLeft.setPower(mfl);
+        motorBackLeft.setPower(mbl);
+        motorBackRight.setPower(mbr);
+        telemetry.addData("[setPower]:", "mfr=%d", mfr);
+        telemetry.addData("[setPower]:", "mfl=%d", mfl);
+        telemetry.addData("[setPower]:", "mbl=%d", mbl);
+        telemetry.addData("[setPower]:", "mbr=%d", mbr);
         // for those motors that should be busy (power!=0) wait until they are done
         // reaching target position before returning from this function.
 
@@ -391,10 +395,7 @@ public class Util {
                 e.printStackTrace();
             }
         }
-        motorFrontLeft.setPower(0);
-        motorBackRight.setPower(0);
-        motorFrontRight.setPower(0);
-        motorBackLeft.setPower(0);
+        stopWheelsSpeedMode();
 
     }
     public void drivebySpeed(double x, double y, double rotation) {// inches
