@@ -11,13 +11,13 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
 
 @Autonomous(name = "One_Blue_Left_Swerve", group = "Linear Opmode")
-//@Disabled                            // Comment this out to add to the opmode list
-
+@Disabled                            // Comment this out to add to the opmode list
 public class One_Blue_Left_Swerve extends LinearOpMode {
     //initialize these variables, override them in the constructor
 

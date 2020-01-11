@@ -144,7 +144,7 @@ public class TeleopDrive extends OpMode{
     public void loop() {
         double r = Math.hypot(scaleInput(gamepad1.left_stick_x), scaleInput(gamepad1.left_stick_y));
         double robotAngle = Math.atan2(scaleInput(gamepad1.left_stick_y), scaleInput(-gamepad1.left_stick_x)) - Math.PI / 4;
-        double rightX = scaleInput(gamepad1.right_stick_x * (multiplier * 0.8));
+        double rightX = scaleInput(gamepad1.right_stick_x * (multiplier));
         final double v1 = r * Math.cos(robotAngle) - rightX;
         final double v2 = -r * Math.sin(robotAngle) - rightX;
         final double v3 = r * Math.sin(robotAngle) - rightX;

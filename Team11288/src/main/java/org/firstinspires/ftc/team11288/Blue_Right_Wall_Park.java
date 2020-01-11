@@ -7,14 +7,13 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
 
-@Autonomous(name = "Drive_30_In_Fwd_RED", group = "Linear Opmode")
-@Disabled                            // Comment this out to add to the opmode list
-public class Drive_30_In_Fwd_RED extends LinearOpMode {
+@Autonomous(name = "Blue_Right_Wall_Park", group = "Linear Opmode")
+//@Disabled                            // Comment this out to add to the opmode list
+public class Blue_Right_Wall_Park extends LinearOpMode {
     //initialize these variables, override them in the constructor
 
     /* Declare OpMode members. */
@@ -76,9 +75,16 @@ public class Drive_30_In_Fwd_RED extends LinearOpMode {
             if (!stepsCompleted) {
                 stepsCompleted = true;
                 // run this loop until the end of the match (driver presses stop)
-                teamUtils.drivebyDistance(0.0, 0.8, 30, "inch");
 
+                try {
+                    Thread.sleep(15000);
+                } catch(Exception e) {}
 
+                teamUtils.drivebyDistance(0.85, 0.0, 3, "inch");//drive away from wall
+                teamUtils.drivebyDistance(0.0, 0.8, 24, "inch");//drive towards bridge
+                //teamUtils.drivebyDistance(0.8, 0.0, 24, "inch");//drive towards center
+
+                teamUtils.stopWheelsSpeedMode();
                 requestOpModeStop();
 
             }

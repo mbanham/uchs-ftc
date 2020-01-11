@@ -7,14 +7,13 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
 
-@Autonomous(name = "Drive_30_In_Fwd_RED", group = "Linear Opmode")
-@Disabled                            // Comment this out to add to the opmode list
-public class Drive_30_In_Fwd_RED extends LinearOpMode {
+@Autonomous(name = "Blue_Left_Platf_Wall_Park", group = "Linear Opmode")
+//@Disabled                            // Comment this out to add to the opmode list
+public class Blue_Left_Platf_Wall_Park extends LinearOpMode {
     //initialize these variables, override them in the constructor
 
     /* Declare OpMode members. */
@@ -64,23 +63,38 @@ public class Drive_30_In_Fwd_RED extends LinearOpMode {
 
         //utils class initializer
         teamUtils = new Util(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
-        // teamUtils.InitExtraSensors(hardwareMap);
+        teamUtils.InitExtraSensors(hardwareMap);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         //Play started
 
         boolean stepsCompleted = false;
-        runtime.reset();
+
         while (opModeIsActive()) {
             if (!stepsCompleted) {
                 stepsCompleted = true;
                 // run this loop until the end of the match (driver presses stop)
-                teamUtils.drivebyDistance(0.0, 0.8, 30, "inch");
-
-
+                teamUtils.drivebyDistance(0.85, 0.0, 3, "inch");//drive away from wall
+                teamUtils.drivebyDistance(0.0, 0.85, 28, "inch");//drive to corner
+                teamUtils.drivebyDistance(0.85, 0, 27, "inch");//drive to base plate
+                platform.setPosition(0);
+                sleep(800);
+                //drive back to corner
+                teamUtils.drivebyDistance(-0.85, 0, 23, "inch");//drive towards corner
+                platform.setPosition(1);
+                sleep(800);
+                //These steps need adjustment, but seemed like the safest way to push the platform into place
+                teamUtils.drivebyDistance(-0.85, 0, 3, "inch");//drive away from foundation
+                teamUtils.drivebyDistance(0.0, -0.85, 30, "inch");//drive towards bridge
+                teamUtils.drivebyDistance(0.85, 0, 43, "inch");//drive towards center
+                teamUtils.drivebyDistance(0.0, 0.85, 31, "inch");//drive towards wall
+                teamUtils.drivebyDistance(-0.85, 0, 25, "inch");//push foundation
+                teamUtils.drivebyDistance(0.0, -0.85, 22, "inch");//drive up to park
+                teamUtils.drivebyDistance(-0.85, 0.0, 36, "inch");//drive away from center
+                teamUtils.drivebyDistance(0.0, -0.85, 27, "inch");//drive up to park
+                teamUtils.stopWheelsSpeedMode();
                 requestOpModeStop();
-
             }
         }
     }
