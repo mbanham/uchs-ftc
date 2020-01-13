@@ -92,7 +92,7 @@ public class Blue_Left_Platf_Wall_Park extends LinearOpMode {
                 teamUtils.drivebyDistance(-0.85, 0, 25, "inch");//push foundation
                 teamUtils.drivebyDistance(0.0, -0.85, 22, "inch");//drive up to park
                 teamUtils.drivebyDistance(-0.85, 0.0, 36, "inch");//drive away from center
-                teamUtils.drivebyDistance(0.0, -0.85, 27, "inch");//drive up to park
+                teamUtils.drivebyDistance(0.0, -0.85, 32, "inch");//drive up to park
                 teamUtils.stopWheelsSpeedMode();
                 requestOpModeStop();
             }

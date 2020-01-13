@@ -92,7 +92,7 @@ public class Red_Right_Platf_Center_Park extends LinearOpMode {
                 teamUtils.drivebyDistance(-0.85, 0, 24, "inch");//push foundation
                 teamUtils.drivebyDistance(0.0, 0.85, 20, "inch");//drive up to park
                 teamUtils.drivebyDistance(-0.85, 0.0, 6, "inch");//drive away from center
-                teamUtils.drivebyDistance(0.0, 0.85, 26, "inch");//drive up to park
+                teamUtils.drivebyDistance(0.0, 0.85, 32, "inch");//drive up to park
                 teamUtils.stopWheelsSpeedMode();
                 requestOpModeStop();
             }
