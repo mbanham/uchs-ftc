@@ -7,13 +7,14 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
 
-@Autonomous(name = "Blue_Left_Platf_Test", group = "Linear Opmode")
-//@Disabled                            // Comment this out to add to the opmode list
-public class Blue_Left_Platf_Test extends LinearOpMode {
+@Autonomous(name = "Blue_Left_Platf_Test_Close", group = "Linear Opmode")
+@Disabled                            // Comment this out to add to the opmode list
+public class Blue_Left_Platf_Test_Close extends LinearOpMode {
     //initialize these variables, override them in the constructor
 
     /* Declare OpMode members. */
@@ -86,7 +87,7 @@ public class Blue_Left_Platf_Test extends LinearOpMode {
                 platform.setPosition(1);//let go of platform
                 sleep(800);
 
-                teamUtils.drivebyDistance(0.0, -0.85, 16, "inch");//drive up to park at wall
+                teamUtils.drivebyDistance(0.0, -0.85, 40 , "inch");//drive up to park at wall
                 teamUtils.stopWheelsSpeedMode();
                 requestOpModeStop();
             }
