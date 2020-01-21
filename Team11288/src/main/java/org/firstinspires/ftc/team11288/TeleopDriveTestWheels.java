@@ -11,8 +11,6 @@ import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
-import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
-
 /*
  * This file provides Teleop driving for the Team11288 TeleopDrive drive robot.
  * The code is structured as an Iterative OpMode
@@ -33,7 +31,7 @@ public class TeleopDriveTestWheels extends OpMode{
     private DcMotor motorArm;
     private DcMotor motorLift;
 
-    private Util teamUtils;
+    private UtilHolonomic teamUtils;
 
 
     //claw and arm
@@ -94,7 +92,7 @@ public class TeleopDriveTestWheels extends OpMode{
 
 
             //utils class initializer
-            teamUtils = new Util(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft,telemetry);
+            teamUtils = new UtilHolonomic(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft,telemetry);
     }
     /*
       * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
@@ -213,8 +211,8 @@ public class TeleopDriveTestWheels extends OpMode{
 
                 }
                 teamUtils.stopWheelsSpeedMode();
-                double dist_y = Util.COUNTS_PER_INCH * (motorBackLeft.getTargetPosition() + motorFrontLeft.getTargetPosition() + motorBackRight.getTargetPosition() + motorFrontRight.getTargetPosition()) / 4;
-                double dist_x = Util.COUNTS_PER_INCH * (-motorBackLeft.getTargetPosition() + motorFrontLeft.getTargetPosition() + motorBackRight.getTargetPosition() + -motorFrontRight.getTargetPosition()) / 4;
+                double dist_y = UtilHolonomic.COUNTS_PER_INCH * (motorBackLeft.getTargetPosition() + motorFrontLeft.getTargetPosition() + motorBackRight.getTargetPosition() + motorFrontRight.getTargetPosition()) / 4;
+                double dist_x = UtilHolonomic.COUNTS_PER_INCH * (-motorBackLeft.getTargetPosition() + motorFrontLeft.getTargetPosition() + motorBackRight.getTargetPosition() + -motorFrontRight.getTargetPosition()) / 4;
 
                 String output = x_int + "-" + y_int + Math.sqrt(Math.pow(dist_x, 2) + Math.pow(dist_y, 2));
                 telemetry.addData("MyActivity", output);

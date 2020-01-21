@@ -32,7 +32,7 @@ public class TeleopDriveMecanum extends OpMode{
     private DcMotor motorArm;
     private DcMotor motorLift;
 
-    private Util teamUtils;
+    private UtilHolonomic teamUtils;
 
 
     //claw and arm
@@ -44,6 +44,7 @@ public class TeleopDriveMecanum extends OpMode{
     static final double     COUNTS_PER_MOTOR_REV    = 1250.0; //HD Hex Motor (REV-41-1301) 40:1
     static final double     COUNTS_PER_DRIVE_MOTOR_REV    = 300.0; // counts per reevaluation of the motor
     static final double INCREMENT_DRIVE_MOTOR_MOVE = 30.0; // move set amount at a time
+    static final double MOTOR_STRAFE_INFLUENCE = 1;
 
     private DcMotor shoulder; //bottom pivot of the new claw
     private int currentPosition; //used to track shoulder motor current position
@@ -116,7 +117,7 @@ public class TeleopDriveMecanum extends OpMode{
             targetPosition = (int) (motorArm.getCurrentPosition() + (directionArm * rotations * COUNTS_PER_MOTOR_REV));
 
             //utils class initializer
-            teamUtils = new Util(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft,telemetry);
+            teamUtils = new UtilHolonomic(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft,telemetry);
     }
     /*
       * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
@@ -136,72 +137,41 @@ public class TeleopDriveMecanum extends OpMode{
     /*
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
      */
-    double multiplier = 1;
+    double speed_multiplier = 1;
     double arm_multiplier = 1;
     @Override
     public void loop() {
-        //double r = Math.hypot(scaleInput(gamepad1.left_stick_x), scaleInput(gamepad1.left_stick_y));
-        //double robotAngle = Math.atan2(scaleInput(gamepad1.left_stick_y), scaleInput(-gamepad1.left_stick_x)) - Math.PI / 4;
-        //double rightX = scaleInput(gamepad1.right_stick_x * (multiplier));
-        //final double v1 = r * Math.cos(robotAngle) - rightX;
-        //final double v2 = -r * Math.sin(robotAngle) - rightX;
-        //final double v3 = r * Math.sin(robotAngle) - rightX;
-        //final double v4 = -r * Math.cos(robotAngle) - rightX;
-        double x = gamepad1.left_stick_x * 0.8;
-
-        double FrontLeft = Range.clip(gamepad1.left_stick_y - x, -1, 1);
-        double BackLeft = Range.clip(gamepad1.left_stick_y + x, -1, 1);
-        double FrontRight = Range.clip(gamepad1.right_stick_y - x, -1, 1);
-        double BackRight = Range.clip(gamepad1.right_stick_y + x, -1, 1);
-
-
-
-        //double FrontRight = Range.clip(v2 * multiplier, -1, 1);
-        //double FrontLeft = Range.clip(v1 * multiplier, -1, 1);
-        //double BackLeft = Range.clip(v3 * multiplier, -1, 1);
-        //double BackRight = Range.clip(v4 * multiplier, -1, 1);
-
-
-        ///NOTE for changing to Mecanum wheels, see
-        //https://github.com/FTC7393/EVLib/wiki/Mecanum-Wheels
-        //it is not a big change, just remove the 45deg angle conversions (no trig needed)
-        /*
-                Now we have this table:
-                    FORWARD(+x)   SIDEWAYS RIGHT(+y)   TURN RIGHT(+r)
-        front left      +                 +                  +
-        front right     +                 -                  -
-        back left       +                 -                  +
-        back right      +                 +                  -
-        And we can convert this table to an algorithm:
-        inputs: x, y, and r - [For Us: gamepad1.left_stick_x,gamepad1.left_stick_y,gamepad1.right_stick_x]
-        flPower = + x + y + r
-        frPower = + x - y - r
-        blPower = + x - y + r
-        brPower = + x + y - r
-        */
 
         //car
-        double xcar = gamepad1.left_stick_x;
-        double ycar = gamepad1.left_stick_y;
-        double rcar = gamepad1.right_stick_x;
+        double stick_l = gamepad1.left_stick_y;
+        double stick_r = gamepad1.right_stick_y;
+        double horizontal = UtilMain.MathLimit(-1, 0, gamepad1.left_stick_x) + UtilMain.MathLimit(0, 1, gamepad1.right_stick_x);
+        //horizontal - left stick left = move left; right stick right = move right
 
-        double fl = xcar + ycar + rcar;
+        //  x * 1 in case forward direction is reversed
+        double fl = (stick_l * 1) - (MOTOR_STRAFE_INFLUENCE * horizontal);
+        double fr = (stick_r * 1) + (MOTOR_STRAFE_INFLUENCE * horizontal);
+        double bl = (stick_l * 1) + (MOTOR_STRAFE_INFLUENCE * horizontal);
+        double br = (stick_r * 1) - (MOTOR_STRAFE_INFLUENCE * horizontal);
+
+        double[] motors = UtilMain.LimitList(-1, 1, new double[]{fl, fr, bl, br});
+        //order of motors is dictated by input
 
         // write the values to the motors
         teamUtils.setWheelsToSpeedMode();
-        motorFrontRight.setPower(FrontRight);
-        motorFrontLeft.setPower(FrontLeft);
-        motorBackLeft.setPower(BackLeft);
-        motorBackRight.setPower(BackRight);
+        motorFrontLeft.setPower(motors[0] * speed_multiplier);
+        motorFrontRight.setPower(motors[1] * speed_multiplier);
+        motorBackLeft.setPower(motors[2] * speed_multiplier);
+        motorBackRight.setPower(motors[3] * speed_multiplier);
 
         //platformArm
 
 
-        if(Range.clip(gamepad1.right_trigger, 0.4, 1) > 0.41){
-            multiplier=1-Range.clip(gamepad1.right_trigger, 0, 0.4);
+        if(Range.clip(gamepad1.right_trigger, 0.4, 1) > 0.4){//from 0.4 to 1 = 0.6
+            speed_multiplier =1-Range.clip(gamepad1.right_trigger, 0, 0.4); //speed speed_multiplier 1 - 0.6
         }else
         {
-            multiplier = 1;
+            speed_multiplier = 1;
         }
         //#region PLATFORM_GRABBER
         if (gamepad1.a) {
@@ -269,8 +239,8 @@ public class TeleopDriveMecanum extends OpMode{
 
                 }
                 teamUtils.stopWheelsSpeedMode();
-                double dist_y = Util.COUNTS_PER_INCH * (motorBackLeft.getTargetPosition() + motorFrontLeft.getTargetPosition() + motorBackRight.getTargetPosition() + motorFrontRight.getTargetPosition()) / 4;
-                double dist_x = Util.COUNTS_PER_INCH * (-motorBackLeft.getTargetPosition() + motorFrontLeft.getTargetPosition() + motorBackRight.getTargetPosition() + -motorFrontRight.getTargetPosition()) / 4;
+                double dist_y = UtilHolonomic.COUNTS_PER_INCH * (motorBackLeft.getTargetPosition() + motorFrontLeft.getTargetPosition() + motorBackRight.getTargetPosition() + motorFrontRight.getTargetPosition()) / 4;
+                double dist_x = UtilHolonomic.COUNTS_PER_INCH * (-motorBackLeft.getTargetPosition() + motorFrontLeft.getTargetPosition() + motorBackRight.getTargetPosition() + -motorFrontRight.getTargetPosition()) / 4;
 
                 String output = x_int + "-" + y_int + Math.sqrt(Math.pow(dist_x, 2) + Math.pow(dist_y, 2));
                 telemetry.addData("MyActivity", output);

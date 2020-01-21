@@ -3,20 +3,16 @@ package org.firstinspires.ftc.team11288;
 import android.graphics.Color;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
-import java.util.ArrayList;
-import java.util.List;
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Autonomous", group = "Linear Opmode")
 @Disabled                            // Comment this out to add to the opmode list
 public class Autonomous extends LinearOpMode {
 
     DcMotor mfl, mfr, mbl, mbr;
-    private Util teamUtils;
+    private UtilHolonomic teamUtils;
     private ColorSensor colorSensor;
     private float[] hsvValues;
     private int SCALE_FACTOR = 255;

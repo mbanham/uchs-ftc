@@ -1,20 +1,13 @@
 package org.firstinspires.ftc.team11288;
 
 
-import android.graphics.Color;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
 
@@ -31,7 +24,7 @@ public class Blue_Left_Platf_Center_Park extends LinearOpMode {
     private DcMotor motorBackLeft;
     private DcMotor motorLift;
 
-    private Util teamUtils;
+    private UtilHolonomic teamUtils;
 
 
     //    private elbow             = null;
@@ -69,7 +62,7 @@ public class Blue_Left_Platf_Center_Park extends LinearOpMode {
         motorLift.setMode(STOP_AND_RESET_ENCODER);
 
         //utils class initializer
-        teamUtils = new Util(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
+        teamUtils = new UtilHolonomic(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
         teamUtils.InitExtraSensors(hardwareMap);
 
         // Wait for the game to start (driver presses PLAY)

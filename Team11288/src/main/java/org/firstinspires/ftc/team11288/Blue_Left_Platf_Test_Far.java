@@ -25,7 +25,7 @@ public class Blue_Left_Platf_Test_Far extends LinearOpMode {
     private DcMotor motorBackLeft;
     private DcMotor motorLift;
 
-    private Util teamUtils;
+    private UtilHolonomic teamUtils;
 
 
     //    private elbow             = null;
@@ -63,7 +63,7 @@ public class Blue_Left_Platf_Test_Far extends LinearOpMode {
         motorLift.setMode(STOP_AND_RESET_ENCODER);
 
         //utils class initializer
-        teamUtils = new Util(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
+        teamUtils = new UtilHolonomic(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
         teamUtils.InitExtraSensors(hardwareMap);
 
         // Wait for the game to start (driver presses PLAY)

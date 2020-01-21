@@ -3,14 +3,12 @@ package org.firstinspires.ftc.team11288;
 
 import android.graphics.Color;
 import android.graphics.Point;
-import android.util.Size;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -39,7 +37,7 @@ public class Camera_GrabStone extends LinearOpMode {
     private DcMotor motorBackLeft;
     private DcMotor motorLift;
 
-    private Util teamUtils;
+    private UtilHolonomic teamUtils;
 
 
     //claw and arm
@@ -90,7 +88,7 @@ public class Camera_GrabStone extends LinearOpMode {
         motorLift.setMode(STOP_AND_RESET_ENCODER);
 
         //utils class initializer
-        teamUtils = new Util(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
+        teamUtils = new UtilHolonomic(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
         teamUtils.InitExtraSensors(hardwareMap);
         teamUtils.InitVuforia(hardwareMap);
 
@@ -101,7 +99,7 @@ public class Camera_GrabStone extends LinearOpMode {
         runtime.reset();
         List<Recognition> recog = teamUtils.GetObjectsInFrame();
         for (Recognition r : recog){
-            if(r.getLabel().equals(Util.STONE)){
+            if(r.getLabel().equals(UtilHolonomic.STONE)){
                 double width = r.getImageWidth();
                 double height = r.getImageHeight();
                 double angle = r.estimateAngleToObject(AngleUnit.DEGREES);
