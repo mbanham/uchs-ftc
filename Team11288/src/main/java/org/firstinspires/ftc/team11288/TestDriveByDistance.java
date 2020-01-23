@@ -1,14 +1,13 @@
 // Team11288_Teleop
 package org.firstinspires.ftc.team11288;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
@@ -19,54 +18,25 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENC
  * Assumes claw with arm having shoulder motor, elbow servo and wrist servo - all having 180deg servos
  *
  */
-@Disabled
-@TeleOp(name="TestNewLift", group="Teleop")
-public class TestNewLift extends OpMode{
+//@Disabled
+@TeleOp(name="TeleopDrive", group="Teleop")
+public class TestDriveByDistance extends OpMode{
 
     /* Declare OpMode members. */
   //wheels
-
+    private DcMotor motorFrontRight;
+    private DcMotor motorFrontLeft;
+    private DcMotor motorBackRight;
+    private DcMotor motorBackLeft;
+    private DcMotor motorArm;
     private DcMotor motorLift;
 
     private UtilHolonomic teamUtils;
 
-
-    //claw and arm
- //  static final double     COUNTS_PER_MOTOR_REV    = 1120 ;    // NeveRest Classic 40 Gearmotor (am-2964a)
-    static final double INCREMENT_MOTOR_MOVE = 100; // move about 10 degrees at a time
-
-    private final double ARM_MOTOR_POWER = 0.5;
-    private final double DRIVE_MOTOR_POWER = 0.75;
-    static final double     COUNTS_PER_MOTOR_REV    = 1250.0; //HD Hex Motor (REV-41-1301) 40:1
-    static final double     COUNTS_PER_DRIVE_MOTOR_REV    = 300.0; // counts per reevaluation of the motor
-    static final double INCREMENT_DRIVE_MOTOR_MOVE = 30.0; // move set amount at a time
-
-    private DcMotor shoulder; //bottom pivot of the new claw
-    private int currentPosition; //used to track shoulder motor current position
-    private int targetPosition; //used to track target shoulder position
-    private double minPosition; //minimum allowed position of shoulder motor
-    private double maxPosition; //maximum allowed positon of shoulder motor
-
-//    private elbow             = null;
-//    private Servo wrist       = null;
     private Servo claw        = null;
     private Servo platform    = null;
 
 
-    //arm for knocking jewel - keep it out of the way in Driver Mode
-    private Servo knockingArm = null;
-    private static final double SAFE_ARM_POSITION       =  0.0 ;
-    //color sensorl
-    NormalizedColorSensor colorSensor;
-
-    //TODO touch sensor
-    DigitalChannel touchSensor;  // Hardware Device Object
-
-
-    private int directionArm=1;
-    private int rotations=12;
-    private int initialPosition;
-    double distanceToDrive=6.0;  //test parameter
 
     /* Code to run ONCE when the driver hits INIT */
         @Override
@@ -74,20 +44,29 @@ public class TestNewLift extends OpMode{
         // Initialize the hardware variables.
         // Send telemetry message to signify robot waiting
             telemetry.addData("Say", "Hello Driver");
-
-
-            //initialize wheels
-
-            claw = hardwareMap.servo.get("claw servo");
+           //initialize wheels
+            motorFrontRight = hardwareMap.dcMotor.get("motor front right");
+            motorFrontLeft = hardwareMap.dcMotor.get("motor front left");
+            motorBackLeft = hardwareMap.dcMotor.get("motor back left");
+            motorBackRight = hardwareMap.dcMotor.get("motor back right");
             motorLift = hardwareMap.dcMotor.get("motor lift");
-
+            claw = hardwareMap.servo.get("claw servo");
+            platform = hardwareMap.servo.get("platform servo");
             claw.setPosition(0);
+            platform.setPosition(1);
+            motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
+            motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+            motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
+            motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);
 
             motorLift.setDirection(DcMotorSimple.Direction.FORWARD);
             motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             motorLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             motorLift.setMode(STOP_AND_RESET_ENCODER);
-            motorLift.setDirection(DcMotorSimple.Direction.FORWARD);
+
+            //utils class initializer
+            teamUtils = new UtilHolonomic(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
+            // teamUtils.InitExtraSensors(hardwareMap);
     }
     /*
       * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
@@ -112,7 +91,43 @@ public class TestNewLift extends OpMode{
     @Override
     public void loop() {
 
+        //platformArm
+       if(Range.clip(gamepad1.right_trigger, 0.4, 1) > 0.41){
+            multiplier=1-Range.clip(gamepad1.right_trigger, 0, 0.4);
+        }else
+        {
+            multiplier = 1;
+        }
+        //#region PLATFORM_GRABBER
+        if (gamepad1.a) {
+            //down
+            platform.setPosition(0);
+            telemetry.addData("MyActivity", "ServoPosition=0");
+            telemetry.update();
+        } else if (gamepad1.y) {
+            //up
+            platform.setPosition(1);
+            telemetry.addData("MyActivity", "ServoPosition=1");
+            telemetry.update();
+        }
+        //#endregion
 
+
+
+            //dpad control 12 inch
+            double x_int = 0;
+            double y_int = 0;
+            if (gamepad1.dpad_up)
+                y_int = 0.8;
+            if(gamepad1.dpad_down)
+                y_int = -0.8;
+            if(gamepad1.dpad_left)
+                x_int = 0.8;
+            if(gamepad1.dpad_right)
+                x_int = -0.8;
+            if(x_int != 0 || y_int != 0) {
+                teamUtils.drivebyDistance(x_int, y_int, 10, "inch");
+            }
 
 
         //claw
@@ -126,8 +141,6 @@ public class TestNewLift extends OpMode{
             telemetry.addData("MyActivity", "ClawPosition=0");
             telemetry.update();
         }
-        //arm
-
 
 
 
@@ -186,4 +199,24 @@ public class TestNewLift extends OpMode{
         return dScale;
     }
 
+    public void drive(double lsx, double lsy, double rsx) {
+        double r = Math.hypot(scaleInput(lsx), scaleInput(lsy));
+        double robotAngle = Math.atan2(scaleInput(lsy), scaleInput(-lsx)) - Math.PI / 4;
+        double rightX = scaleInput(rsx);
+        final double v1 = r * Math.cos(robotAngle) - rightX;
+        final double v2 = -r * Math.sin(robotAngle) - rightX;
+        final double v3 = r * Math.sin(robotAngle) - rightX;
+        final double v4 = -r * Math.cos(robotAngle) - rightX;
+
+        double FrontRight = Range.clip(v2, -1, 1);
+        double FrontLeft = Range.clip(v1, -1, 1);
+        double BackLeft = Range.clip(v3, -1, 1);
+        double BackRight = Range.clip(v4, -1, 1);
+
+        // write the values to the motors
+        motorFrontRight.setPower(FrontRight);
+        motorFrontLeft.setPower(FrontLeft);
+        motorBackLeft.setPower(BackLeft);
+        motorBackRight.setPower(BackRight);
+    }
 }

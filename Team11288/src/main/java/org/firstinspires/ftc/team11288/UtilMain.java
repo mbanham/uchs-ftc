@@ -66,6 +66,8 @@ public class UtilMain {
         this.armMotor = armMotor;
         this.telemetry = telemetry;
     }
+
+    //not being used in 2020 config
     public void InitExtraSensors(HardwareMap hardwareMap) {
         // get a reference to the color sensor.
         colorSensor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");

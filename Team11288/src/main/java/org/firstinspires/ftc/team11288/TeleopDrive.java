@@ -1,6 +1,7 @@
 // Team11288_Teleop
 package org.firstinspires.ftc.team11288;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -19,7 +20,7 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENC
  * Assumes claw with arm having shoulder motor, elbow servo and wrist servo - all having 180deg servos
  *
  */
-
+//@Disabled
 @TeleOp(name="TeleopDrive", group="Teleop")
 public class TeleopDrive extends OpMode{
 
@@ -64,7 +65,7 @@ public class TeleopDrive extends OpMode{
     NormalizedColorSensor colorSensor;
 
     //TODO touch sensor
-    DigitalChannel touchSensor;  // Hardware Device Object
+    //DigitalChannel touchSensor;  // Hardware Device Object
 
 
     private int directionArm=1;
@@ -85,7 +86,7 @@ public class TeleopDrive extends OpMode{
             motorFrontLeft = hardwareMap.dcMotor.get("motor front left");
             motorBackLeft = hardwareMap.dcMotor.get("motor back left");
             motorBackRight = hardwareMap.dcMotor.get("motor back right");
-            motorArm = hardwareMap.dcMotor.get("motor arm");
+
             claw = hardwareMap.servo.get("claw servo");
             platform = hardwareMap.servo.get("platform servo");
             motorLift = hardwareMap.dcMotor.get("motor lift");
@@ -98,11 +99,6 @@ public class TeleopDrive extends OpMode{
             motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
             motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);
 
-            motorArm.setDirection(DcMotorSimple.Direction.FORWARD);
-            motorArm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            motorArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            motorArm.setMode(STOP_AND_RESET_ENCODER);
-            motorArm.setDirection(DcMotorSimple.Direction.FORWARD);
 
             motorLift.setDirection(DcMotorSimple.Direction.FORWARD);
             motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -154,24 +150,6 @@ public class TeleopDrive extends OpMode{
         double BackRight = Range.clip(v4 * multiplier, -1, 1);
 
 
-        ///NOTE for changing to Mecanum wheels, see
-        //https://github.com/FTC7393/EVLib/wiki/Mecanum-Wheels
-        //it is not a big change, just remove the 45deg angle conversions (no trig needed)
-        /*
-                Now we have this table:
-                    FORWARD(+x)   SIDEWAYS RIGHT(+y)   TURN RIGHT(+r)
-        front left      +                 +                  +
-        front right     +                 -                  -
-        back left       +                 -                  +
-        back right      +                 +                  -
-        And we can convert this table to an algorithm:
-        inputs: x, y, and r - [For Us: gamepad1.left_stick_x,gamepad1.left_stick_y,gamepad1.right_stick_x]
-        flPower = + x + y + r
-        frPower = + x - y - r
-        blPower = + x - y + r
-        brPower = + x + y - r
-        */
-
         // write the values to the motors
         teamUtils.setWheelsToSpeedMode();
         motorFrontRight.setPower(FrontRight);
@@ -186,7 +164,7 @@ public class TeleopDrive extends OpMode{
             multiplier=1-Range.clip(gamepad1.right_trigger, 0, 0.4);
         }else
         {
-            multiplier = 1;
+            multiplier = 1.4; //check if we are inadvertently slowing the robot by the cos() sin() scalar, range clip protects
         }
         //#region PLATFORM_GRABBER
         if (gamepad1.a) {
@@ -202,82 +180,6 @@ public class TeleopDrive extends OpMode{
         }
         //#endregion
 
-        //press x
-        //while x is pressed, press dpad buttons to proper degree
-        //release x to start with parameters
-        //press x to stop the robot and debug
-
-        /*if(gamepad1.x){
-            if(gamepad1.dpad_up || gamepad1.dpad_down || gamepad1.dpad_left || gamepad1.dpad_right) {
-                teamUtils.resetEncoderOnMotors();
-                double x_int = 0.5;
-                double y_int = 0.5;
-                while(gamepad1.x) {
-                    //y int
-                    if (gamepad1.dpad_up) {
-                        y_int += 0.1;
-                        while(gamepad1.dpad_up) {
-                        }
-                        telemetry.addData("MyActivity", "val=" + y_int);
-                        telemetry.update();
-                    }
-                    else
-                    if (gamepad1.dpad_down){
-                        y_int -= 0.1;
-                        while(gamepad1.dpad_down) {
-                        }
-                        telemetry.addData("MyActivity", "val=" + y_int);
-                        telemetry.update();
-
-                    }
-                    //x int
-                    if (gamepad1.dpad_left) {
-                        x_int -= 0.1;
-                        while(gamepad1.dpad_left) {
-                        }
-                        telemetry.addData("MyActivity", "val=" + x_int);
-                        telemetry.update();
-                    }
-                    else
-                    if (gamepad1.dpad_right)
-                    {
-                        x_int += 0.1;
-                        while(gamepad1.dpad_right) {
-                        }
-                        telemetry.addData("MyActivity", "val=" + x_int);
-                        telemetry.update();
-                    }
-                }
-
-                teamUtils.drivebySpeed(x_int, y_int, 0);
-                while(!gamepad1.x){
-
-                }
-                teamUtils.stopWheelsSpeedMode();
-                double dist_y = UtilHolonomic.COUNTS_PER_INCH * (motorBackLeft.getTargetPosition() + motorFrontLeft.getTargetPosition() + motorBackRight.getTargetPosition() + motorFrontRight.getTargetPosition()) / 4;
-                double dist_x = UtilHolonomic.COUNTS_PER_INCH * (-motorBackLeft.getTargetPosition() + motorFrontLeft.getTargetPosition() + motorBackRight.getTargetPosition() + -motorFrontRight.getTargetPosition()) / 4;
-
-                String output = x_int + "-" + y_int + Math.sqrt(Math.pow(dist_x, 2) + Math.pow(dist_y, 2));
-                telemetry.addData("MyActivity", output);
-
-            }
-        }*/
-
-            //dpad control 1 inch
-//            double x_int = 0;
-//            double y_int = 0;
-//            if (gamepad1.dpad_up)
-//                y_int = 0.3;
-//            if(gamepad1.dpad_down)
-//                y_int = -0.3;
-//            if(gamepad1.dpad_left)
-//                x_int = 0.3;
-//            if(gamepad1.dpad_right)
-//                x_int = -0.3;
-//            if(x_int != 0 || y_int != 0) {
-//                teamUtils.drivebyDistance(x_int, y_int, 1, "inch");
-//            }
-
 
         //claw
         if (gamepad2.right_bumper) {
@@ -290,25 +192,6 @@ public class TeleopDrive extends OpMode{
             telemetry.addData("MyActivity", "ClawPosition=0");
             telemetry.update();
         }
-        //arm
-
-        motorArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        if (Range.clip(gamepad2.left_trigger, 0,1) > 0.02) {
-            motorArm.setPower(Range.clip(gamepad2.left_trigger, 0,1 * arm_multiplier ));
-        } else {
-            if (Range.clip(gamepad2.right_trigger, 0,1) > 0.02) {
-                motorArm.setPower(-Range.clip(gamepad2.right_trigger, 0,1 * arm_multiplier  ));
-            } else {
-                motorArm.setPower(0.0);
-            }
-        }
-        if(gamepad2.x){
-            arm_multiplier = 0.3;
-        }else
-        {
-            arm_multiplier = 1;
-        }
-
 
         //lift
         motorLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

@@ -7,33 +7,14 @@ import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ThreadFactory;
-
-import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
@@ -43,11 +24,11 @@ public class UtilHolonomic {
     private Telemetry telemetry;
 
     private final double DRIVE_MOTOR_POWER = 0.75;
-    static final double COUNTS_PER_MOTOR_REV = 1250.0; // HD Hex Motor (REV-41-1301) 40:1
-    static final double COUNTS_PER_DRIVE_MOTOR_REV = 180; // counts per reevaluation of the motor
-    static final double INCREMENT_MOTOR_MOVE = 175.0; // move set amount at a time
-    static final double INCREMENT_DRIVE_MOTOR_MOVE = 30.0; // move set amount at a time
-    static final double INCHES_PER_ROTATION = 11.137; // inches per rotation of 90mm traction wheel
+    // HD Hex Motor (REV-41-1301) 40:1
+    static final double COUNTS_PER_DRIVE_MOTOR_REV = 1120; // counts per reevaluation of the motor
+     static final double TOLERANCE_WHEEL_POS = 200.0; //tolerance
+    //75mm Rev Mecanum wheels = 2.95 inch diameter
+    static final double INCHES_PER_ROTATION = 9.273; // inches per rotation of 75mm Mecanum wheel
     static final double DEG_PER_ROTATION = 100.0; // inches per rotation of 90mm traction wheel
 
     // 2019 Code changes
@@ -89,6 +70,7 @@ public class UtilHolonomic {
         // // liftSensor = liftSensorIn;
     }
 
+    //not being used in 2020 config
     public void InitExtraSensors(HardwareMap hardwareMap) {
         // get a reference to the color sensor.
         colorSensor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
@@ -155,17 +137,16 @@ public class UtilHolonomic {
         double BackRight = Range.clip(v4, -1, 1);
 
         int moveAmount = (int) (distance * COUNTS_PER_INCH);
-        // if(unit.equals("inch")) {
-        // moveAmount = (int) (distance * COUNTS_PER_INCH);
-        // }else
-        // if(unit.equals("square")) {
-        // moveAmount = (int) (distance * COUNTS_PER_SQUARE);
-        // }
+
+        int backLeftStartPosition = (int) (motorBackLeft.getCurrentPosition());
+        int backRightStartPosition = (int) (motorBackRight.getCurrentPosition());
+        int frontLeftStartPosition = (int) (motorFrontLeft.getCurrentPosition());
+        int frontRightStartPosition = (int) (motorFrontRight.getCurrentPosition());
+
         int backLeftTargetPosition = (int) (motorBackLeft.getCurrentPosition() + Math.signum(BackLeft) * moveAmount);
         int backRightTargetPosition = (int) (motorBackRight.getCurrentPosition() + Math.signum(BackRight) * moveAmount);
         int frontLeftTargetPosition = (int) (motorFrontLeft.getCurrentPosition() + Math.signum(FrontLeft) * moveAmount);
-        int frontRightTargetPosition = (int) (motorFrontRight.getCurrentPosition()
-                + Math.signum(FrontRight) * moveAmount);
+        int frontRightTargetPosition = (int) (motorFrontRight.getCurrentPosition() + Math.signum(FrontRight) * moveAmount);
 
 
         motorBackLeft.setTargetPosition((int) backLeftTargetPosition);
@@ -186,7 +167,7 @@ public class UtilHolonomic {
         // for those motors that should be busy (power!=0) wait until they are done
         // reaching target position before returning from this function.
 
-        double tolerance = INCREMENT_DRIVE_MOTOR_MOVE;
+        double tolerance = TOLERANCE_WHEEL_POS;
         while ((((Math.abs(FrontRight)) > 0.01
                 && Math.abs(motorFrontRight.getCurrentPosition() - frontRightTargetPosition) > tolerance))
                 || (((Math.abs(FrontLeft)) > 0.01
@@ -196,22 +177,22 @@ public class UtilHolonomic {
                 || (((Math.abs(BackRight)) > 0.01
                         && Math.abs(motorBackRight.getCurrentPosition() - backRightTargetPosition) > tolerance))) {
             // wait and check again until done running
-            telemetry.addData("front right", "=%.2f  %d %b", FrontRight,
-                    motorFrontRight.getCurrentPosition() - frontRightTargetPosition,
+            telemetry.addData("front right", "=%.2f %d %d %d %b", FrontRight, frontRightStartPosition,
+                    motorFrontRight.getCurrentPosition(), frontRightTargetPosition,
                     ((Math.ceil(Math.abs(FrontRight)) > 0.0
                             && Math.abs(motorFrontRight.getCurrentPosition() - frontRightTargetPosition) > tolerance)));// ,
                                                                                                                         // frontRightTargetPosition);
-            telemetry.addData("front left", "=%.2f %d %b", FrontLeft,
-                    motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition,
+            telemetry.addData("front left", "=%.2f %d %d %d %b", FrontLeft,frontLeftStartPosition,
+                    motorFrontLeft.getCurrentPosition(), frontLeftTargetPosition,
                     ((Math.ceil(Math.abs(FrontLeft)) > 0.0
                             && Math.abs(motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition) > tolerance)));// ,
                                                                                                                       // frontLeftTargetPosition);
-            telemetry.addData("back left", "=%.2f %d %b", BackLeft,
-                    motorBackLeft.getCurrentPosition() - backLeftTargetPosition, ((Math.ceil(Math.abs(BackLeft)) > 0.0
+            telemetry.addData("back left", "=%.2f %d %d %d %b", BackLeft,backLeftStartPosition,
+                    motorBackLeft.getCurrentPosition(),backLeftTargetPosition, ((Math.ceil(Math.abs(BackLeft)) > 0.0
                             && Math.abs(motorBackLeft.getCurrentPosition() - backLeftTargetPosition) > tolerance)));// ,
                                                                                                                     // backLeftTargetPosition);
-            telemetry.addData("back right", "=%.2f %d %b", BackRight,
-                    motorBackRight.getCurrentPosition() - backRightTargetPosition,
+            telemetry.addData("back right", "=%.2f %d %d %d %b", BackRight,backRightStartPosition,
+                    motorBackRight.getCurrentPosition(),backRightTargetPosition,
                     ((Math.ceil(Math.abs(BackRight)) > 0.0
                             && Math.abs(motorBackRight.getCurrentPosition() - backRightTargetPosition) > tolerance)));
             telemetry.update();
@@ -295,7 +276,7 @@ public class UtilHolonomic {
         // for those motors that should be busy (power!=0) wait until they are done
         // reaching target position before returning from this function.
 
-        double tolerance = INCREMENT_DRIVE_MOTOR_MOVE;
+        double tolerance = TOLERANCE_WHEEL_POS;
         while ((((Math.abs(FrontRight)) > 0.01
                 && Math.abs(motorFrontRight.getCurrentPosition() - frontRightTargetPosition) > tolerance))
                 || (((Math.abs(FrontLeft)) > 0.01
@@ -438,7 +419,7 @@ public class UtilHolonomic {
 
         // updates needed here to drive until foundRed or foundBlue;
 
-        double tolerance = INCREMENT_DRIVE_MOTOR_MOVE;
+        double tolerance = TOLERANCE_WHEEL_POS;
         while ((((Math.abs(FrontRight)) > 0.01
                 && Math.abs(motorFrontRight.getCurrentPosition() - frontRightTargetPosition) > tolerance))
                 || (((Math.abs(FrontLeft)) > 0.01
@@ -533,17 +514,17 @@ public class UtilHolonomic {
                 motorLeft.getTargetPosition(), targetPositionL);
         telemetry.update();
         while ((/* touchSensor.getState() == false && */
-        Math.abs(motorRight.getCurrentPosition() - (targetPositionR)) > INCREMENT_DRIVE_MOTOR_MOVE)
-                || Math.abs(motorLeft.getCurrentPosition() - (targetPositionL)) > INCREMENT_DRIVE_MOTOR_MOVE) {
+        Math.abs(motorRight.getCurrentPosition() - (targetPositionR)) > TOLERANCE_WHEEL_POS)
+                || Math.abs(motorLeft.getCurrentPosition() - (targetPositionL)) > TOLERANCE_WHEEL_POS) {
             motorRight.setTargetPosition(
-                    (int) (motorRight.getCurrentPosition() + (int) directionDrive * INCREMENT_DRIVE_MOTOR_MOVE));
+                    (int) (motorRight.getCurrentPosition() + (int) directionDrive * TOLERANCE_WHEEL_POS));
             if (isFast) {
                 motorRight.setPower(DRIVE_MOTOR_POWER * 2);
             } else {
                 motorRight.setPower(DRIVE_MOTOR_POWER);
             }
             motorLeft.setTargetPosition(
-                    (int) (motorRight.getCurrentPosition() + (int) directionDrive * INCREMENT_DRIVE_MOTOR_MOVE));
+                    (int) (motorRight.getCurrentPosition() + (int) directionDrive * TOLERANCE_WHEEL_POS));
             if (isFast) {
                 motorLeft.setPower(DRIVE_MOTOR_POWER * 2);
             } else {
@@ -581,17 +562,17 @@ public class UtilHolonomic {
                 motorLeft.getTargetPosition(), targetPositionL);
         telemetry.update();
         while ((/* touchSensor.getState() == false && */
-        Math.abs(motorRight.getCurrentPosition() - (targetPositionR)) > INCREMENT_DRIVE_MOTOR_MOVE)
-                || Math.abs(motorLeft.getCurrentPosition() - (targetPositionL)) > INCREMENT_DRIVE_MOTOR_MOVE) {
+        Math.abs(motorRight.getCurrentPosition() - (targetPositionR)) > TOLERANCE_WHEEL_POS)
+                || Math.abs(motorLeft.getCurrentPosition() - (targetPositionL)) > TOLERANCE_WHEEL_POS) {
             motorRight.setTargetPosition(
-                    (int) (motorRight.getCurrentPosition() + (int) directionDrive * INCREMENT_DRIVE_MOTOR_MOVE));
+                    (int) (motorRight.getCurrentPosition() + (int) directionDrive * TOLERANCE_WHEEL_POS));
             if (isFast) {
                 motorRight.setPower(WEIGHT_R * DRIVE_MOTOR_POWER * 2);
             } else {
                 motorRight.setPower(WEIGHT_R * DRIVE_MOTOR_POWER);
             }
             motorLeft.setTargetPosition(
-                    (int) (motorRight.getCurrentPosition() + (int) directionDrive * INCREMENT_DRIVE_MOTOR_MOVE));
+                    (int) (motorRight.getCurrentPosition() + (int) directionDrive * TOLERANCE_WHEEL_POS));
             if (isFast) {
                 motorLeft.setPower(DRIVE_MOTOR_POWER * 2);
             } else {
@@ -627,13 +608,13 @@ public class UtilHolonomic {
                 motorLeft.getTargetPosition(), targetPositionL);
         telemetry.update();
         while ((/* touchSensor.getState() == false && */
-        Math.abs(motorRight.getCurrentPosition() - (targetPositionR)) > INCREMENT_DRIVE_MOTOR_MOVE)
-                || Math.abs(motorLeft.getCurrentPosition() - (targetPositionL)) > INCREMENT_DRIVE_MOTOR_MOVE) {
+        Math.abs(motorRight.getCurrentPosition() - (targetPositionR)) > TOLERANCE_WHEEL_POS)
+                || Math.abs(motorLeft.getCurrentPosition() - (targetPositionL)) > TOLERANCE_WHEEL_POS) {
             motorRight.setTargetPosition(
-                    (int) (motorRight.getCurrentPosition() + (int) directionDrive * INCREMENT_DRIVE_MOTOR_MOVE));
+                    (int) (motorRight.getCurrentPosition() + (int) directionDrive * TOLERANCE_WHEEL_POS));
             motorRight.setPower(DRIVE_MOTOR_POWER);
             motorLeft.setTargetPosition(
-                    (int) (motorRight.getCurrentPosition() + (int) directionDrive * INCREMENT_DRIVE_MOTOR_MOVE));
+                    (int) (motorRight.getCurrentPosition() + (int) directionDrive * TOLERANCE_WHEEL_POS));
             motorLeft.setPower(DRIVE_MOTOR_POWER);
             telemetry.addData("Drive Position R", "= %d  %d  %d", motorRight.getCurrentPosition(),
                     motorRight.getTargetPosition(), targetPositionR);

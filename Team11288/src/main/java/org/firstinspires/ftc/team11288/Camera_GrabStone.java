@@ -88,11 +88,11 @@ public class Camera_GrabStone extends LinearOpMode {
         motorLift.setMode(STOP_AND_RESET_ENCODER);
 
         //utils class initializer
-        teamUtils = new UtilHolonomic(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
-        teamUtils.InitExtraSensors(hardwareMap);
-        teamUtils.InitVuforia(hardwareMap);
+        //teamUtils = new UtilMain(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
+        //teamUtils.InitExtraSensors(hardwareMap);
+        //teamUtils.InitVuforia(hardwareMap);
 
-
+/*
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         //Play started
@@ -130,6 +130,6 @@ public class Camera_GrabStone extends LinearOpMode {
 
 
             }
-        }
+        }*/
     }
 }

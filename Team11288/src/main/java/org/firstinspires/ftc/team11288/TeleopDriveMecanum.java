@@ -1,6 +1,7 @@
 // Team11288_Teleop
 package org.firstinspires.ftc.team11288;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -19,8 +20,8 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENC
  * Assumes claw with arm having shoulder motor, elbow servo and wrist servo - all having 180deg servos
  *
  */
-
-@TeleOp(name="TeleopDrive", group="Teleop")
+@Disabled
+@TeleOp(name="TeleopDriveMechanumTest", group="Teleop")
 public class TeleopDriveMecanum extends OpMode{
 
     /* Declare OpMode members. */
@@ -65,7 +66,7 @@ public class TeleopDriveMecanum extends OpMode{
     NormalizedColorSensor colorSensor;
 
     //TODO touch sensor
-    DigitalChannel touchSensor;  // Hardware Device Object
+    //DigitalChannel touchSensor;  // Hardware Device Object
 
 
     private int directionArm=1;
