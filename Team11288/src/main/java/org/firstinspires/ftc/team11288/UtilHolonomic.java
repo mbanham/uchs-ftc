@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -19,6 +20,7 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODE
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
 public class UtilHolonomic {
+
     private DcMotor motorRight;
     private DcMotor motorLeft;
     private Telemetry telemetry;
@@ -26,7 +28,8 @@ public class UtilHolonomic {
     private final double DRIVE_MOTOR_POWER = 0.75;
     // HD Hex Motor (REV-41-1301) 40:1
     static final double COUNTS_PER_DRIVE_MOTOR_REV = 1120; // counts per reevaluation of the motor
-     static final double TOLERANCE_WHEEL_POS = 200.0; //tolerance
+    private static final double SECONDSPERINCH = 2.0/24.0;
+     static final double TOLERANCE_WHEEL_POS = 100.0; //tolerance
     //75mm Rev Mecanum wheels = 2.95 inch diameter
     static final double INCHES_PER_ROTATION = 9.273; // inches per rotation of 75mm Mecanum wheel
     static final double DEG_PER_ROTATION = 100.0; // inches per rotation of 90mm traction wheel
@@ -37,7 +40,7 @@ public class UtilHolonomic {
     private DcMotor motorFrontLeft;
     private DcMotor motorFrontRight;
 
-    static final int COUNTS_PER_INCH = (int) ((1.4142 * (COUNTS_PER_DRIVE_MOTOR_REV)) / (4.0 * Math.PI)); // for 45deg
+    static final int COUNTS_PER_INCH = (int) (COUNTS_PER_DRIVE_MOTOR_REV/INCHES_PER_ROTATION); // for 45deg
                                                                                                           // wheels
     static final int COUNTS_PER_SQUARE = (int) (COUNTS_PER_INCH * 1); // for 45deg wheels
     static final double CENTER_TO_WHEEL_DIST = COUNTS_PER_INCH * 8;//8 inches
@@ -61,13 +64,7 @@ public class UtilHolonomic {
         motorFrontRight = frontRightMotor;
 
         telemetry = telemetryIn;
-        // motorLeft = leftMotor;
-        // motorRight = rightMotor;
-        // liftMotor = liftMotorIn;
-        // armMotor = armMotorIn;
-        // telemetry = telemetryIn;
-        // touchSensor = touchSensorIn;
-        // // liftSensor = liftSensorIn;
+
     }
 
     //not being used in 2020 config
@@ -121,6 +118,43 @@ public class UtilHolonomic {
     }
     //#endregion
 
+
+
+    //#region Driving
+    public void drivebyDistanceByTime(double x, double y, double distance, String unit) {// inches
+        setWheelsToEncoderMode();
+        double r = Math.hypot((-x), (-y));
+        double robotAngle = Math.atan2((-y), (-x)) - Math.PI / 4;
+        final double v1 = r * Math.cos(robotAngle);
+        final double v2 = -r * Math.sin(robotAngle);
+        final double v3 = r * Math.sin(robotAngle);
+        final double v4 = -r * Math.cos(robotAngle);
+
+        double FrontRight = Range.clip(v2, -1, 1);
+        double FrontLeft = Range.clip(v1, -1, 1);
+        double BackLeft = Range.clip(v3, -1, 1);
+        double BackRight = Range.clip(v4, -1, 1);
+
+        //int moveAmount = (int) (distance * COUNTS_PER_INCH);
+
+        double distance_time = distance * SECONDSPERINCH;
+
+
+
+        ElapsedTime et = new ElapsedTime();
+        et.reset();
+
+        while(et.seconds() < distance_time){
+            motorFrontRight.setPower(FrontRight);
+            motorFrontLeft.setPower(FrontLeft);
+            motorBackLeft.setPower(BackLeft);
+            motorBackRight.setPower(BackRight);
+        }
+        et.reset();
+        stopWheelsSpeedMode();
+
+    }
+
     //#region Driving
     public void drivebyDistance(double x, double y, double distance, String unit) {// inches
         setWheelsToEncoderMode();
@@ -171,26 +205,26 @@ public class UtilHolonomic {
         while ((((Math.abs(FrontRight)) > 0.01
                 && Math.abs(motorFrontRight.getCurrentPosition() - frontRightTargetPosition) > tolerance))
                 || (((Math.abs(FrontLeft)) > 0.01
-                        && Math.abs(motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition) > tolerance))
+                && Math.abs(motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition) > tolerance))
                 || (((Math.abs(BackLeft)) > 0.01
-                        && Math.abs(motorBackLeft.getCurrentPosition() - backLeftTargetPosition) > tolerance))
+                && Math.abs(motorBackLeft.getCurrentPosition() - backLeftTargetPosition) > tolerance))
                 || (((Math.abs(BackRight)) > 0.01
-                        && Math.abs(motorBackRight.getCurrentPosition() - backRightTargetPosition) > tolerance))) {
+                && Math.abs(motorBackRight.getCurrentPosition() - backRightTargetPosition) > tolerance))) {
             // wait and check again until done running
             telemetry.addData("front right", "=%.2f %d %d %d %b", FrontRight, frontRightStartPosition,
                     motorFrontRight.getCurrentPosition(), frontRightTargetPosition,
                     ((Math.ceil(Math.abs(FrontRight)) > 0.0
                             && Math.abs(motorFrontRight.getCurrentPosition() - frontRightTargetPosition) > tolerance)));// ,
-                                                                                                                        // frontRightTargetPosition);
+            // frontRightTargetPosition);
             telemetry.addData("front left", "=%.2f %d %d %d %b", FrontLeft,frontLeftStartPosition,
                     motorFrontLeft.getCurrentPosition(), frontLeftTargetPosition,
                     ((Math.ceil(Math.abs(FrontLeft)) > 0.0
                             && Math.abs(motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition) > tolerance)));// ,
-                                                                                                                      // frontLeftTargetPosition);
+            // frontLeftTargetPosition);
             telemetry.addData("back left", "=%.2f %d %d %d %b", BackLeft,backLeftStartPosition,
                     motorBackLeft.getCurrentPosition(),backLeftTargetPosition, ((Math.ceil(Math.abs(BackLeft)) > 0.0
                             && Math.abs(motorBackLeft.getCurrentPosition() - backLeftTargetPosition) > tolerance)));// ,
-                                                                                                                    // backLeftTargetPosition);
+            // backLeftTargetPosition);
             telemetry.addData("back right", "=%.2f %d %d %d %b", BackRight,backRightStartPosition,
                     motorBackRight.getCurrentPosition(),backRightTargetPosition,
                     ((Math.ceil(Math.abs(BackRight)) > 0.0
@@ -205,6 +239,10 @@ public class UtilHolonomic {
         stopWheelsSpeedMode();
 
     }
+
+
+
+
     public void drivebyDistAndRot(double x, double y, double rotation, double distance, String unit) {// inches
         setWheelsToEncoderMode();
         double r = Math.hypot((-x), (-y));

@@ -2,17 +2,19 @@ package org.firstinspires.ftc.team11288;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.configuration.annotations.DigitalIoDeviceType;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
 
 @Autonomous(name = "Red_Right_Platf_Wall_Park", group = "Linear Opmode")
-//@Disabled                            // Comment this out to add to the opmode list
+@Disabled                            // Comment this out to add to the opmode list
 public class Red_Right_Platf_Wall_Park extends LinearOpMode {
     //initialize these variables, override them in the constructor
 

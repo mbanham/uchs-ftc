@@ -106,10 +106,6 @@ public class TeleopDrive extends OpMode{
             motorLift.setMode(STOP_AND_RESET_ENCODER);
             motorLift.setDirection(DcMotorSimple.Direction.FORWARD);
 
-            initialPosition = (int) (motorArm.getCurrentPosition());
-            rotations=12;
-            directionArm = -1;
-            targetPosition = (int) (motorArm.getCurrentPosition() + (directionArm * rotations * COUNTS_PER_MOTOR_REV));
 
             //utils class initializer
             teamUtils = new UtilHolonomic(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft,telemetry);

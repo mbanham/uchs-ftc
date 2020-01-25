@@ -7,14 +7,13 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
 
-@Autonomous(name = "Blue_Left_Platf_Test_Far", group = "Linear Opmode")
-@Disabled                            // Comment this out to add to the opmode list
-public class Blue_Left_Platf_Test_Far extends LinearOpMode {
+@Autonomous(name = "Blue_Left_Platf_Center", group = "Linear Opmode")
+//@Disabled                            // Comment this out to add to the opmode list
+public class Blue_Left_Platf_Center extends LinearOpMode {
     //initialize these variables, override them in the constructor
 
     /* Declare OpMode members. */
@@ -64,7 +63,6 @@ public class Blue_Left_Platf_Test_Far extends LinearOpMode {
 
         //utils class initializer
         teamUtils = new UtilHolonomic(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
-        //teamUtils.InitExtraSensors(hardwareMap);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -76,18 +74,19 @@ public class Blue_Left_Platf_Test_Far extends LinearOpMode {
             if (!stepsCompleted) {
                 stepsCompleted = true;
                 // run this loop until the end of the match (driver presses stop)
-                teamUtils.drivebyDistance(0.85, 0.0, 3, "inch");//drive away from wall
-                teamUtils.drivebyDistance(0.0, 0.85, 40, "inch");//drive towards corner
-                teamUtils.drivebyDistance(0.85, 0, 26, "inch");//drive to base plate
+                teamUtils.drivebyDistance(0.85, 0.0, 5, "inch");//drive away from wall
+                teamUtils.drivebyDistance(0.0, 0.85, 30, "inch");//drive towards corner
+                teamUtils.drivebyDistance(0.85, 0, 25, "inch");//drive to base plate
 
                 platform.setPosition(0);//grab it
                 sleep(800);
                 //drive back to corner
-                teamUtils.drivebyDistance(-0.85, 0, 28, "inch");//drive towards corner
+                teamUtils.drivebyDistance(-0.85, 0, 40, "inch");//drive towards corner
                 platform.setPosition(1);//let go of platform
                 sleep(800);
 
-                teamUtils.drivebyDistance(0.0, -0.85, 64, "inch");//drive up to park at wall
+                teamUtils.drivebyDistance(0.0, -0.85, 52 , "inch");//drive up to park at wall
+                teamUtils.drivebyDistance(0.85, 0, 30, "inch");//drive towards corner
                 teamUtils.stopWheelsSpeedMode();
                 requestOpModeStop();
             }
