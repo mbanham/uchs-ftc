@@ -34,6 +34,20 @@ public class UtilHolonomic {
     static final double INCHES_PER_ROTATION = 9.273; // inches per rotation of 75mm Mecanum wheel
     static final double DEG_PER_ROTATION = 100.0; // inches per rotation of 90mm traction wheel
 
+    //AUTONOMOUS REFERENCES
+    public static double MARKER_A_TO_PLATFORM_CENTER = 27;//towards the center of the platform
+    public static double BRIDGE_TO_PLATFORM_CENTER = 51;//bridge to the center of the platform
+    public static double EDGE_TO_PLATFORM = 30;//distance from the edge to the platform
+    public static double WALL_ROBOT_CLEARANCE = 5;//clearance to put the robot from the edge
+    public static double WALL_ROBOT_TO_EDGE_LOAD = 46;//distance from the robot to the edge with slipping and a load
+    public static double EDGE_TO_PLATFORM_CLEARANCE = EDGE_TO_PLATFORM - WALL_ROBOT_CLEARANCE;//distance from the robot to the clearance distance
+    public static double WALL_TO_CENTER = 30;//distance from the robot to the clearance distance
+    public static double AUTONOMOUS_SPEED = 1;//speed for the autonomous programs
+
+
+
+
+
     // 2019 Code changes
     private DcMotor motorBackLeft;
     private DcMotor motorBackRight;

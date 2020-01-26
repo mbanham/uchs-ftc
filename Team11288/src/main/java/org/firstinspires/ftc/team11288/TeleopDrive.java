@@ -134,7 +134,7 @@ public class TeleopDrive extends OpMode{
     public void loop() {
         double r = Math.hypot(scaleInput(gamepad1.left_stick_x), scaleInput(gamepad1.left_stick_y));
         double robotAngle = Math.atan2(scaleInput(gamepad1.left_stick_y), scaleInput(-gamepad1.left_stick_x)) - Math.PI / 4;
-        double rightX = scaleInput(gamepad1.right_stick_x * (multiplier));
+        double rightX = scaleInput(gamepad1.right_stick_x * (multiplier) * 1.3);
         final double v1 = r * Math.cos(robotAngle) - rightX;
         final double v2 = -r * Math.sin(robotAngle) - rightX;
         final double v3 = r * Math.sin(robotAngle) - rightX;
@@ -156,12 +156,15 @@ public class TeleopDrive extends OpMode{
         //platformArm
 
 
-        if(Range.clip(gamepad1.right_trigger, 0.4, 1) > 0.41){
-            multiplier=1-Range.clip(gamepad1.right_trigger, 0, 0.4);
-        }else
-        {
-            multiplier = 1.4; //check if we are inadvertently slowing the robot by the cos() sin() scalar, range clip protects
+        if(Range.clip(gamepad1.right_trigger, 0.75, 1) > 0.76){
+            multiplier=1-Range.clip(gamepad1.right_trigger, 0, 0.25);
+        }else if(Range.clip(gamepad1.right_trigger, 0.6, 1) > 0.61) {
+            multiplier = 1 + Range.clip(gamepad1.right_trigger, 0, 0.4);
+
+        }else{
+            multiplier= 1;
         }
+
         //#region PLATFORM_GRABBER
         if (gamepad1.a) {
             //down
