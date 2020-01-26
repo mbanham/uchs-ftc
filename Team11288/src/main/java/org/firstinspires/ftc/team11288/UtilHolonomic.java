@@ -44,7 +44,11 @@ public class UtilHolonomic {
     public static double WALL_TO_CENTER = 30;//distance from the robot to the clearance distance
     public static double AUTONOMOUS_SPEED = 1;//speed for the autonomous programs
 
+    public static double LOAD_CONST = 1.53333333;
 
+    public static double Measure_ONLOAD(double value){
+        return LOAD_CONST * value;
+    }
 
 
 

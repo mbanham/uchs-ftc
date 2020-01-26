@@ -129,7 +129,6 @@ public class TeleopDrive extends OpMode{
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
      */
     double multiplier = 1;
-    double arm_multiplier = 1;
     @Override
     public void loop() {
         double r = Math.hypot(scaleInput(gamepad1.left_stick_x), scaleInput(gamepad1.left_stick_y));
@@ -156,14 +155,10 @@ public class TeleopDrive extends OpMode{
         //platformArm
 
 
-        if(Range.clip(gamepad1.right_trigger, 0.75, 1) > 0.76){
-            multiplier=1-Range.clip(gamepad1.right_trigger, 0, 0.25);
-        }else if(Range.clip(gamepad1.right_trigger, 0.6, 1) > 0.61) {
-            multiplier = 1 + Range.clip(gamepad1.right_trigger, 0, 0.4);
+        //multiplier
+        multiplier=1-Range.clip(gamepad1.right_trigger, 0, 0.25)
+                    +Range.clip(gamepad1.left_trigger, 0, 0.4);
 
-        }else{
-            multiplier= 1;
-        }
 
         //#region PLATFORM_GRABBER
         if (gamepad1.a) {
