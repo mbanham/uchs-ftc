@@ -16,6 +16,9 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
@@ -36,12 +39,13 @@ public class UtilHolonomic {
 
     //AUTONOMOUS REFERENCES
     public static double MARKER_A_TO_PLATFORM_CENTER = 27;//towards the center of the platform
-    public static double BRIDGE_TO_PLATFORM_CENTER = 51;//bridge to the center of the platform
-    public static double EDGE_TO_PLATFORM = 30;//distance from the edge to the platform
-    public static double WALL_ROBOT_CLEARANCE = 5;//clearance to put the robot from the edge
-    public static double WALL_ROBOT_TO_EDGE_LOAD = 46;//distance from the robot to the edge with slipping and a load
-    public static double EDGE_TO_PLATFORM_CLEARANCE = EDGE_TO_PLATFORM - WALL_ROBOT_CLEARANCE;//distance from the robot to the clearance distance
+    public static double BRIDGE_TO_PLATFORM_CENTER = 45;//bridge to the center of the platform
+    public static double EDGE_TO_PLATFORM = 31;//distance from the edge to the platform
+    public static double ROBOT_WALL_CLEARANCE = 5;//clearance to put the robot from the edge
+    public static double WALL_ROBOT_TO_EDGE_LOAD = 47;//distance from the robot to the edge with slipping and a load
+    public static double EDGE_TO_PLATFORM_CLEARANCE = EDGE_TO_PLATFORM - ROBOT_WALL_CLEARANCE;//distance from the robot to the clearance distance
     public static double WALL_TO_CENTER = 30;//distance from the robot to the clearance distance
+
     public static double AUTONOMOUS_SPEED = 1;//speed for the autonomous programs
 
     public static double LOAD_CONST = 1.53333333;

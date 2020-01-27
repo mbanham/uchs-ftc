@@ -83,7 +83,7 @@ public class Red_Left_Wall_Park extends LinearOpMode {
                 teamUtils.drivebyDistance(0.85, 0.0, 3, "inch");//drive away from wall
                 teamUtils.drivebyDistance(0.0, -0.8, 24, "inch");//drive towards bridge
                 //teamUtils.drivebyDistance(0.8, 0.0, 24, "inch");//drive towards center
-
+                claw.setPosition(1);
                 teamUtils.stopWheelsSpeedMode();
                 requestOpModeStop();
 

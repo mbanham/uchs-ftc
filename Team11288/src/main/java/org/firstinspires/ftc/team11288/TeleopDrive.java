@@ -133,7 +133,7 @@ public class TeleopDrive extends OpMode{
     public void loop() {
         double r = Math.hypot(scaleInput(gamepad1.left_stick_x), scaleInput(gamepad1.left_stick_y));
         double robotAngle = Math.atan2(scaleInput(gamepad1.left_stick_y), scaleInput(-gamepad1.left_stick_x)) - Math.PI / 4;
-        double rightX = scaleInput(gamepad1.right_stick_x * (multiplier) * 1.3);
+        double rightX = scaleInput(gamepad1.right_stick_x * multiplier * 1.3);
         final double v1 = r * Math.cos(robotAngle) - rightX;
         final double v2 = -r * Math.sin(robotAngle) - rightX;
         final double v3 = r * Math.sin(robotAngle) - rightX;
@@ -156,7 +156,7 @@ public class TeleopDrive extends OpMode{
 
 
         //multiplier
-        multiplier=1-Range.clip(gamepad1.right_trigger, 0, 0.25)
+        multiplier=1-Range.clip(gamepad1.right_trigger, 0, 0.5)
                     +Range.clip(gamepad1.left_trigger, 0, 0.4);
 
 
@@ -190,10 +190,10 @@ public class TeleopDrive extends OpMode{
         //lift
         motorLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         if (gamepad2.dpad_down) {
-            motorLift.setPower(-1);
+            motorLift.setPower(1);
         } else {
             if (gamepad2.dpad_up) {
-                motorLift.setPower(1);
+                motorLift.setPower(-1);
 
             } else {
                 motorLift.setPower(0);

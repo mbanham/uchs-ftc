@@ -78,7 +78,7 @@ public class Drive_30_In_Fwd_RED extends LinearOpMode {
                 // run this loop until the end of the match (driver presses stop)
                 teamUtils.drivebyDistance(0.0, 0.8, 30, "inch");
 
-
+                claw.setPosition(1);
                 requestOpModeStop();
 
             }

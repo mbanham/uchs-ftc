@@ -86,6 +86,7 @@ public class One_Blue_Left_Swerve extends LinearOpMode {
                 platform.setPosition(1);
                 sleep(800);
                 teamUtils.drivebyDistance(0.0, 0.8, 24, "inch");//push platform to corner
+                claw.setPosition(1);
                 requestOpModeStop();
             }
         }

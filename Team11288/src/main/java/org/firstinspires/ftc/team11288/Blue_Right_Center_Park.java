@@ -81,10 +81,11 @@ public class Blue_Right_Center_Park extends LinearOpMode {
                     Thread.sleep(15000);
                 } catch(Exception e) {}
 
-                teamUtils.drivebyDistance(0.85, 0.0, 3, "inch");//drive away from wall
-                teamUtils.drivebyDistance(0.0, 0.8, 24, "inch");//drive towards bridge
-                teamUtils.drivebyDistance(0.8, 0.0, 24, "inch");//drive towards center
 
+                teamUtils.drivebyDistance(0.85, 0.0, 3, "inch");//drive away from wall
+                teamUtils.drivebyDistance(0.8, 0.0, 24, "inch");//drive towards center
+                teamUtils.drivebyDistance(0.0, 0.8, 24, "inch");//drive towards bridge
+                claw.setPosition(1);
                 teamUtils.stopWheelsSpeedMode();
                 requestOpModeStop();
 

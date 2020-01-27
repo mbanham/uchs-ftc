@@ -96,6 +96,13 @@ public class Red_Right_Platf_Wall_Park extends LinearOpMode {
                 teamUtils.drivebyDistance(-0.85, 0.0, 36, "inch");//drive away from center
                 teamUtils.drivebyDistance(0.0, 0.85, 32, "inch");//drive up to park
                 teamUtils.stopWheelsSpeedMode();
+                claw.setPosition(1);
+
+                try {
+                    Thread.sleep(3000);
+                } catch(Exception e) {}
+
+
                 requestOpModeStop();
             }
         }
