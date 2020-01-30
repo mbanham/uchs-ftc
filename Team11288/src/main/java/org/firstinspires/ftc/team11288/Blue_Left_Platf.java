@@ -65,7 +65,8 @@ public class Blue_Left_Platf extends LinearOpMode {
 
         //utils class initializer
         teamUtils = new UtilHolonomic(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
-
+        teamUtils.InitExtraSensors(hardwareMap);
+        teamUtils.InitPlatform(hardwareMap);
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         //Play started
@@ -76,18 +77,18 @@ public class Blue_Left_Platf extends LinearOpMode {
             if (!stepsCompleted) {
                 stepsCompleted = true;
                 // run this loop until the end of the match (driver presses stop)
-                teamUtils.drivebyDistance(0.85, 0.0, UtilHolonomic.ROBOT_WALL_CLEARANCE, "inch");//drive away from wall
-                teamUtils.drivebyDistance(0.0, 0.85, UtilHolonomic.MARKER_A_TO_PLATFORM_CENTER, "inch");//drive towards corner
-                teamUtils.drivebyDistance(0.85, 0, UtilHolonomic.EDGE_TO_PLATFORM_CLEARANCE, "inch");//drive to base plate
+                teamUtils.drivebyDistance(0.85, 0.0, UtilHolonomic.ROBOT_WALL_CLEARANCE);//drive away from wall
+                teamUtils.drivebyDistance(0.0, 0.85, UtilHolonomic.MARKER_A_TO_PLATFORM_CENTER);//drive towards corner
+                teamUtils.drivebyDistance(0.85, 0, UtilHolonomic.EDGE_TO_PLATFORM_CLEARANCE);//drive to base plate
 
-                platform.setPosition(0);//grab it
+                teamUtils.GrabPlaform(true);
                 sleep(800);
                 //drive back to corner
-                teamUtils.drivebyDistance(-0.85, 0, UtilHolonomic.WALL_ROBOT_TO_EDGE_LOAD, "inch");//drive towards corner
-                platform.setPosition(1);//let go of platform
+                teamUtils.drivebyDistance(-0.85, 0, UtilHolonomic.WALL_ROBOT_TO_EDGE_LOAD, UtilHolonomic.ROBOT_WALL_CLEARANCE);//drive towards corner
+                teamUtils.GrabPlaform(false);
                 sleep(800);
 
-                teamUtils.drivebyDistance(0.0, -0.85, UtilHolonomic.BRIDGE_TO_PLATFORM_CENTER , "inch");//drive up to park at wall
+                teamUtils.drivebyDistance(0.0, -0.85, UtilHolonomic.BRIDGE_TO_PLATFORM_CENTER);//drive up to park at wall
                 teamUtils.stopWheelsSpeedMode();
                 claw.setPosition(1);
 

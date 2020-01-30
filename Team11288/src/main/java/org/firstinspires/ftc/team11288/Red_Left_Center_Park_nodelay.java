@@ -76,9 +76,9 @@ public class Red_Left_Center_Park_nodelay extends LinearOpMode {
                 stepsCompleted = true;
                 // run this loop until the end of the match (driver presses stop)
 
-                teamUtils.drivebyDistance(0.85, 0.0, 3, "inch");//drive away from wall
-                teamUtils.drivebyDistance(0.8, 0.0, 24, "inch");//drive towards center
-                teamUtils.drivebyDistance(0.0, -0.8, 24, "inch");//drive towards bridge
+                teamUtils.drivebyDistance(0.85, 0.0, 3);//drive away from wall
+                teamUtils.drivebyDistance(0.8, 0.0, 24);//drive towards center
+                teamUtils.drivebyDistance(0.0, -0.8, 24);//drive towards bridge
                 teamUtils.stopWheelsSpeedMode();
                 claw.setPosition(1);
 

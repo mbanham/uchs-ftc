@@ -77,16 +77,16 @@ public class One_Red_Right_Swerve extends LinearOpMode {
             if (!stepsCompleted) {
                 stepsCompleted = true;
                 // run this loop until the end of the match (driver presses stop)
-                teamUtils.drivebyDistance(-0.8, 0.0,  3, "inch");//drive away from wall
-                teamUtils.drivebyDistance(0.0, 0.8, 24, "inch");//drive to corner
-                teamUtils.drivebyDistance(-0.8, 0, 27, "inch");//drive to base plate
+                teamUtils.drivebyDistance(-0.8, 0.0,  3);//drive away from wall
+                teamUtils.drivebyDistance(0.0, 0.8, 24);//drive to corner
+                teamUtils.drivebyDistance(-0.8, 0, 27);//drive to base plate
                 platform.setPosition(0);
                 sleep(800);
                 //drive back to corner
-                teamUtils.drivebyDistAndRot(0.8, 0, 90, 20, "inch");//drive to start position
+                //teamUtils.drivebyDistAndRot(0.8, 0, 90, 20);//drive to start position
                 platform.setPosition(1);
                 sleep(800);
-                teamUtils.drivebyDistance(0.0, 0.8, 24, "inch");//push platform to corner
+                teamUtils.drivebyDistance(0.0, 0.8, 24);//push platform to corner
                 claw.setPosition(1);
                 requestOpModeStop();
             }

@@ -9,6 +9,10 @@ import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
+import java.util.Locale;
+
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
 /*
@@ -52,7 +56,7 @@ public class TestDriveByDistance extends OpMode{
             motorBackRight = hardwareMap.dcMotor.get("motor back right");
             motorLift = hardwareMap.dcMotor.get("motor lift");
             claw = hardwareMap.servo.get("claw servo");
-            platform = hardwareMap.servo.get("platform servo");
+            platform = hardwareMap.servo.get("platform_right");
             claw.setPosition(0);
             platform.setPosition(1);
             motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -67,7 +71,7 @@ public class TestDriveByDistance extends OpMode{
 
             //utils class initializer
             teamUtils = new UtilHolonomic(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
-            // teamUtils.InitExtraSensors(hardwareMap);
+            teamUtils.InitExtraSensors(hardwareMap);
             inches = 10.0;
 
     }
@@ -101,19 +105,7 @@ public class TestDriveByDistance extends OpMode{
         {
             multiplier = 1;
         }
-        //#region PLATFORM_GRABBER
-        if (gamepad1.a) {
-            //down
-            platform.setPosition(0);
-            telemetry.addData("MyActivity", "ServoPosition=0");
-            telemetry.update();
-        } else if (gamepad1.y) {
-            //up
-            platform.setPosition(1);
-            telemetry.addData("MyActivity", "ServoPosition=1");
-            telemetry.update();
-        }
-        //#endregion
+
 
 
         //set how far to drive
@@ -156,9 +148,12 @@ public class TestDriveByDistance extends OpMode{
         if(gamepad1.dpad_right)
             x_int = -0.8;
         if(x_int != 0 || y_int != 0) {
-            teamUtils.drivebyDistance(x_int, y_int, inches, "inch");
-        }
+            teamUtils.drivebyDistance(x_int, y_int, inches, UtilHolonomic.DISTANCE_FROM_WALL);
 
+        }
+           telemetry.addData("Distance (inch)",
+                 String.format(Locale.US, "%.02f", UtilHolonomic.sensorDistance.getDistance(DistanceUnit.INCH)));
+        telemetry.update();
 
         //claw
         if (gamepad2.right_bumper) {

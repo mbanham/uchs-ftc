@@ -74,17 +74,17 @@ public class Ref_Right_Platf extends LinearOpMode {
             if (!stepsCompleted) {
                 stepsCompleted = true;
                 // run this loop until the end of the match (driver presses stop)
-                teamUtils.drivebyDistance(0.85, 0.0, UtilHolonomic.ROBOT_WALL_CLEARANCE, "inch");//drive away from wall
-                teamUtils.drivebyDistance(0.0, -0.85, UtilHolonomic.MARKER_A_TO_PLATFORM_CENTER, "inch");//drive towards corner
-                teamUtils.drivebyDistance(0.85, 0, UtilHolonomic.EDGE_TO_PLATFORM_CLEARANCE, "inch");//drive to base plate
+                teamUtils.drivebyDistance(0.85, 0.0, UtilHolonomic.ROBOT_WALL_CLEARANCE);//drive away from wall
+                teamUtils.drivebyDistance(0.0, -0.85, UtilHolonomic.MARKER_A_TO_PLATFORM_CENTER);//drive towards corner
+                teamUtils.drivebyDistance(0.85, 0, UtilHolonomic.EDGE_TO_PLATFORM_CLEARANCE);//drive to base plate
 
                 platform.setPosition(0);//grab it
                 sleep(800);
                 //drive back to corner
-                teamUtils.drivebyDistance(-0.85, 0, UtilHolonomic.WALL_ROBOT_TO_EDGE_LOAD, "inch");//drive towards corner
+                teamUtils.drivebyDistance(-0.85, 0, UtilHolonomic.WALL_ROBOT_TO_EDGE_LOAD);//drive towards corner
                 platform.setPosition(1);//let go of platform
                 sleep(800);
-                teamUtils.drivebyDistance(0.0, 0.85, UtilHolonomic.BRIDGE_TO_PLATFORM_CENTER , "inch");//drive up to park at wall
+                teamUtils.drivebyDistance(0.0, 0.85, UtilHolonomic.BRIDGE_TO_PLATFORM_CENTER );//drive up to park at wall
                 claw.setPosition(1);
                 teamUtils.stopWheelsSpeedMode();
                 requestOpModeStop();

@@ -10,14 +10,18 @@ import android.view.View;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
@@ -36,6 +40,7 @@ public class UtilHolonomic {
     //75mm Rev Mecanum wheels = 2.95 inch diameter
     static final double INCHES_PER_ROTATION = 9.273; // inches per rotation of 75mm Mecanum wheel
     static final double DEG_PER_ROTATION = 100.0; // inches per rotation of 90mm traction wheel
+    static final double DISTANCE_FROM_WALL = 2.25;
 
     //AUTONOMOUS REFERENCES
     public static double MARKER_A_TO_PLATFORM_CENTER = 27;//towards the center of the platform
@@ -62,12 +67,16 @@ public class UtilHolonomic {
     private DcMotor motorFrontLeft;
     private DcMotor motorFrontRight;
 
+    private Servo platform_left;
+    private Servo platform_right;
+
     static final int COUNTS_PER_INCH = (int) (COUNTS_PER_DRIVE_MOTOR_REV/INCHES_PER_ROTATION); // for 45deg
                                                                                                           // wheels
     static final int COUNTS_PER_SQUARE = (int) (COUNTS_PER_INCH * 1); // for 45deg wheels
     static final double CENTER_TO_WHEEL_DIST = COUNTS_PER_INCH * 8;//8 inches
     // initialize these in InitExtraSensors if using
     private ColorSensor colorSensor;
+    public static DistanceSensor sensorDistance;
     float hsvValues[] = { 0F, 0F, 0F };
     float values[];
     final double SCALE_FACTOR = 255;
@@ -89,10 +98,19 @@ public class UtilHolonomic {
 
     }
 
+    public void InitPlatform(HardwareMap hardwareMap){
+        platform_left = hardwareMap.servo.get("platform_left");
+        platform_right = hardwareMap.servo.get("platform_right");
+        GrabPlaform(true);
+    }
+
     //not being used in 2020 config
     public void InitExtraSensors(HardwareMap hardwareMap) {
         // get a reference to the color sensor.
-        colorSensor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
+        //colorSensor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
+        sensorDistance =  hardwareMap.get(DistanceSensor.class, "sensor_color_distance");
+     //   telemetry.addData("Distance (cm)",
+       //         String.format(Locale.US, "%.02f", sensorDistance.getDistance(DistanceUnit.CM)));
         // hsvValues is an array that will hold the hue, saturation, and value
         // information.
         hsvValues = new float[] { 0F, 0F, 0F };
@@ -140,6 +158,15 @@ public class UtilHolonomic {
     }
     //#endregion
 
+    public void GrabPlaform(boolean open){
+        if(open){
+            platform_right.setPosition(1);
+            platform_left.setPosition(0);
+        }else{
+            platform_right.setPosition(0);
+            platform_left.setPosition(1);
+        }
+    }
 
 
     //#region Driving
@@ -176,9 +203,12 @@ public class UtilHolonomic {
         stopWheelsSpeedMode();
 
     }
+    public void drivebyDistance(double x, double y, double distance){
+        drivebyDistance(x,y, distance, -1);
+    }
 
     //#region Driving
-    public void drivebyDistance(double x, double y, double distance, String unit) {// inches
+    public void drivebyDistance(double x, double y, double distance, double sensor_distance) {// inches
         setWheelsToEncoderMode();
         double r = Math.hypot((-x), (-y));
         double robotAngle = Math.atan2((-y), (-x)) - Math.PI / 4;
@@ -224,14 +254,15 @@ public class UtilHolonomic {
         // reaching target position before returning from this function.
 
         double tolerance = TOLERANCE_WHEEL_POS;
-        while ((((Math.abs(FrontRight)) > 0.01
+        while (((((Math.abs(FrontRight)) > 0.01
                 && Math.abs(motorFrontRight.getCurrentPosition() - frontRightTargetPosition) > tolerance))
                 || (((Math.abs(FrontLeft)) > 0.01
                 && Math.abs(motorFrontLeft.getCurrentPosition() - frontLeftTargetPosition) > tolerance))
                 || (((Math.abs(BackLeft)) > 0.01
                 && Math.abs(motorBackLeft.getCurrentPosition() - backLeftTargetPosition) > tolerance))
                 || (((Math.abs(BackRight)) > 0.01
-                && Math.abs(motorBackRight.getCurrentPosition() - backRightTargetPosition) > tolerance))) {
+                && Math.abs(motorBackRight.getCurrentPosition() - backRightTargetPosition) > tolerance)))) {
+            if(sensor_distance!=-1 && sensorDistance.getDistance(DistanceUnit.INCH) < DISTANCE_FROM_WALL) break;
             // wait and check again until done running
             telemetry.addData("front right", "=%.2f %d %d %d %b", FrontRight, frontRightStartPosition,
                     motorFrontRight.getCurrentPosition(), frontRightTargetPosition,
@@ -262,6 +293,61 @@ public class UtilHolonomic {
 
     }
 
+    public void driveUntilSensor(double x, double distance) {// inches
+        double y = 0;
+        setWheelsToEncoderMode();
+        double r = Math.hypot((-x), (-y));
+        double robotAngle = Math.atan2((-y), (-x)) - Math.PI / 4;
+        final double v1 = r * Math.cos(robotAngle);
+        final double v2 = -r * Math.sin(robotAngle);
+        final double v3 = r * Math.sin(robotAngle);
+        final double v4 = -r * Math.cos(robotAngle);
+
+        double FrontRight = Range.clip(v2, -1, 1);
+        double FrontLeft = Range.clip(v1, -1, 1);
+        double BackLeft = Range.clip(v3, -1, 1);
+        double BackRight = Range.clip(v4, -1, 1);
+
+        int moveAmount = (int) (distance * COUNTS_PER_INCH);
+
+        int backLeftStartPosition = (int) (motorBackLeft.getCurrentPosition());
+        int backRightStartPosition = (int) (motorBackRight.getCurrentPosition());
+        int frontLeftStartPosition = (int) (motorFrontLeft.getCurrentPosition());
+        int frontRightStartPosition = (int) (motorFrontRight.getCurrentPosition());
+
+        int backLeftTargetPosition = (int) (motorBackLeft.getCurrentPosition() + Math.signum(BackLeft) * moveAmount);
+        int backRightTargetPosition = (int) (motorBackRight.getCurrentPosition() + Math.signum(BackRight) * moveAmount);
+        int frontLeftTargetPosition = (int) (motorFrontLeft.getCurrentPosition() + Math.signum(FrontLeft) * moveAmount);
+        int frontRightTargetPosition = (int) (motorFrontRight.getCurrentPosition() + Math.signum(FrontRight) * moveAmount);
+
+
+        motorBackLeft.setTargetPosition((int) backLeftTargetPosition);
+        motorBackRight.setTargetPosition((int) backRightTargetPosition);
+        motorFrontLeft.setTargetPosition((int) frontLeftTargetPosition);
+        motorFrontRight.setTargetPosition((int) frontRightTargetPosition);
+
+        setWheelsToSpeedMode();
+
+        motorFrontRight.setPower(FrontRight);
+        motorFrontLeft.setPower(FrontLeft);
+        motorBackLeft.setPower(BackLeft);
+        motorBackRight.setPower(BackRight);
+
+        // for those motors that should be busy (power!=0) wait until they are done
+        // reaching target position before returning from this function.
+
+        while (sensorDistance.getDistance(DistanceUnit.INCH)>distance) {
+           try{
+               Thread.sleep(500);
+
+           }catch (Exception e)
+           {
+
+           }
+        }
+        stopWheelsSpeedMode();
+
+    }
 
 
 
@@ -443,14 +529,16 @@ public class UtilHolonomic {
         motorBackLeft.setPower(BackLeft);
         motorBackRight.setPower(BackRight);
 
-        colorSensor.enableLed(true);
+        //colorSensor.enableLed(true);
+
         // for those motors that should be busy (power!=0) wait until they are done
         // reaching target position before returning from this function.
 
-        Color.RGBToHSV((int) (colorSensor.red() * SCALE_FACTOR), (int) (colorSensor.green() * SCALE_FACTOR),
-                (int) (colorSensor.blue() * SCALE_FACTOR), hsvValues);
 
-        // send the info back to driver station using telemetry function.
+          //      Color.RGBToHSV((int) (colorSensor.red() * SCALE_FACTOR), (int) (colorSensor.green() * SCALE_FACTOR),
+            //    (int) (colorSensor.blue() * SCALE_FACTOR), hsvValues);
+
+        /* send the info back to driver station using telemetry function.
         telemetry.addData("Red  ", colorSensor.red());
         telemetry.addData("Green", colorSensor.green());
         telemetry.addData("Blue ", colorSensor.blue());
@@ -489,6 +577,8 @@ public class UtilHolonomic {
                 || (((Math.abs(BackRight)) > 0.01
                         && Math.abs(motorBackRight.getCurrentPosition() - backRightTargetPosition) > tolerance))
                 || (!foundBlue || !foundRed)) {
+
+
             // wait and check again until done running
             // telemetry.addData("front right", "=%.2f %d %b", FrontRight,
             // motorFrontRight.getCurrentPosition() -
@@ -523,6 +613,7 @@ public class UtilHolonomic {
         motorBackLeft.setPower(0);
 
         colorSensor.enableLed(false);
+        */
     }
     //#endregion
 

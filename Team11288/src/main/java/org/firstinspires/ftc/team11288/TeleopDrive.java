@@ -55,7 +55,6 @@ public class TeleopDrive extends OpMode{
 //    private elbow             = null;
 //    private Servo wrist       = null;
     private Servo claw        = null;
-    private Servo platform    = null;
 
 
     //arm for knocking jewel - keep it out of the way in Driver Mode
@@ -88,11 +87,11 @@ public class TeleopDrive extends OpMode{
             motorBackRight = hardwareMap.dcMotor.get("motor back right");
 
             claw = hardwareMap.servo.get("claw servo");
-            platform = hardwareMap.servo.get("platform servo");
+
             motorLift = hardwareMap.dcMotor.get("motor lift");
 
             claw.setPosition(0);
-            platform.setPosition(1);
+
 
             motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
             motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -109,6 +108,7 @@ public class TeleopDrive extends OpMode{
 
             //utils class initializer
             teamUtils = new UtilHolonomic(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft,telemetry);
+            teamUtils.InitPlatform(hardwareMap);
     }
     /*
       * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
@@ -152,6 +152,7 @@ public class TeleopDrive extends OpMode{
         motorBackLeft.setPower(BackLeft);
         motorBackRight.setPower(BackRight);
 
+
         //platformArm
 
 
@@ -163,12 +164,12 @@ public class TeleopDrive extends OpMode{
         //#region PLATFORM_GRABBER
         if (gamepad1.a) {
             //down
-            platform.setPosition(0);
+            teamUtils.GrabPlaform(true);
             telemetry.addData("MyActivity", "ServoPosition=0");
             telemetry.update();
         } else if (gamepad1.y) {
             //up
-            platform.setPosition(1);
+            teamUtils.GrabPlaform(false);
             telemetry.addData("MyActivity", "ServoPosition=1");
             telemetry.update();
         }
