@@ -167,6 +167,9 @@ public class UtilHolonomic {
             platform_left.setPosition(1);
         }
     }
+    public void PlaformDef(){
+        GrabPlaform(false);
+    }
 
 
     //#region Driving

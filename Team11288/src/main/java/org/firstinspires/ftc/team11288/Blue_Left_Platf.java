@@ -50,9 +50,7 @@ public class Blue_Left_Platf extends LinearOpMode {
         motorBackRight = hardwareMap.dcMotor.get("motor back right");
         motorLift = hardwareMap.dcMotor.get("motor lift");
         claw = hardwareMap.servo.get("claw servo");
-        platform = hardwareMap.servo.get("platform servo");
         claw.setPosition(0);
-        platform.setPosition(1);
         motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
         motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -67,6 +65,7 @@ public class Blue_Left_Platf extends LinearOpMode {
         teamUtils = new UtilHolonomic(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
         teamUtils.InitExtraSensors(hardwareMap);
         teamUtils.InitPlatform(hardwareMap);
+        teamUtils.PlaformDef();
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         //Play started
@@ -81,11 +80,11 @@ public class Blue_Left_Platf extends LinearOpMode {
                 teamUtils.drivebyDistance(0.0, 0.85, UtilHolonomic.MARKER_A_TO_PLATFORM_CENTER);//drive towards corner
                 teamUtils.drivebyDistance(0.85, 0, UtilHolonomic.EDGE_TO_PLATFORM_CLEARANCE);//drive to base plate
 
-                teamUtils.GrabPlaform(true);
+                teamUtils.GrabPlaform(false);
                 sleep(800);
                 //drive back to corner
                 teamUtils.drivebyDistance(-0.85, 0, UtilHolonomic.WALL_ROBOT_TO_EDGE_LOAD, UtilHolonomic.ROBOT_WALL_CLEARANCE);//drive towards corner
-                teamUtils.GrabPlaform(false);
+                teamUtils.GrabPlaform(true);
                 sleep(800);
 
                 teamUtils.drivebyDistance(0.0, -0.85, UtilHolonomic.BRIDGE_TO_PLATFORM_CENTER);//drive up to park at wall

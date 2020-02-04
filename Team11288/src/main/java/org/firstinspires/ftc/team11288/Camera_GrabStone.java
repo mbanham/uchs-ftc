@@ -70,9 +70,7 @@ public class Camera_GrabStone extends LinearOpMode {
         motorBackRight = hardwareMap.dcMotor.get("motor back right");
         motorLift = hardwareMap.dcMotor.get("motor lift");
         claw = hardwareMap.servo.get("claw servo");
-        platform = hardwareMap.servo.get("platform servo");
         claw.setPosition(0);
-        platform.setPosition(1);
         motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
         motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);

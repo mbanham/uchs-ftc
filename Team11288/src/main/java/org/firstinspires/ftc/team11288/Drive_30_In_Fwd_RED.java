@@ -31,7 +31,6 @@ public class Drive_30_In_Fwd_RED extends LinearOpMode {
     //    private elbow             = null;
 //    private Servo wrist       = null;
     private Servo claw = null;
-    private Servo platform = null;
 
 
     private ElapsedTime runtime = new ElapsedTime();
@@ -49,9 +48,7 @@ public class Drive_30_In_Fwd_RED extends LinearOpMode {
         motorBackRight = hardwareMap.dcMotor.get("motor back right");
         motorLift = hardwareMap.dcMotor.get("motor lift");
         claw = hardwareMap.servo.get("claw servo");
-        platform = hardwareMap.servo.get("platform servo");
         claw.setPosition(0);
-        platform.setPosition(1);
         motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
         motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -64,7 +61,8 @@ public class Drive_30_In_Fwd_RED extends LinearOpMode {
 
         //utils class initializer
         teamUtils = new UtilHolonomic(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
-        // teamUtils.InitExtraSensors(hardwareMap);
+        teamUtils.InitPlatform(hardwareMap);
+        teamUtils.PlaformDef();
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();

@@ -32,7 +32,6 @@ public class One_Red_Right_Swerve extends LinearOpMode {
     //    private elbow             = null;
 //    private Servo wrist       = null;
     private Servo claw = null;
-    private Servo platform = null;
 
 
     private ElapsedTime runtime = new ElapsedTime();
@@ -50,9 +49,7 @@ public class One_Red_Right_Swerve extends LinearOpMode {
         motorBackRight = hardwareMap.dcMotor.get("motor back right");
         motorLift = hardwareMap.dcMotor.get("motor lift");
         claw = hardwareMap.servo.get("claw servo");
-        platform = hardwareMap.servo.get("platform servo");
         claw.setPosition(0);
-        platform.setPosition(1);
         motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
         motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -65,7 +62,8 @@ public class One_Red_Right_Swerve extends LinearOpMode {
 
         //utils class initializer
         teamUtils = new UtilHolonomic(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
-      //  teamUtils.InitExtraSensors(hardwareMap);
+        teamUtils.InitPlatform(hardwareMap);
+        teamUtils.PlaformDef();
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -80,11 +78,11 @@ public class One_Red_Right_Swerve extends LinearOpMode {
                 teamUtils.drivebyDistance(-0.8, 0.0,  3);//drive away from wall
                 teamUtils.drivebyDistance(0.0, 0.8, 24);//drive to corner
                 teamUtils.drivebyDistance(-0.8, 0, 27);//drive to base plate
-                platform.setPosition(0);
+                teamUtils.GrabPlaform(false);
                 sleep(800);
                 //drive back to corner
                 //teamUtils.drivebyDistAndRot(0.8, 0, 90, 20);//drive to start position
-                platform.setPosition(1);
+                teamUtils.GrabPlaform(true);
                 sleep(800);
                 teamUtils.drivebyDistance(0.0, 0.8, 24);//push platform to corner
                 claw.setPosition(1);
