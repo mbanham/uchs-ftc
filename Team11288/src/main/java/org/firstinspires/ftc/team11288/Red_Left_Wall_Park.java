@@ -30,7 +30,7 @@ public class Red_Left_Wall_Park extends LinearOpMode {
     //    private elbow             = null;
 //    private Servo wrist       = null;
     private Servo claw = null;
-    private Servo platform = null;
+
 
 
     private ElapsedTime runtime = new ElapsedTime();

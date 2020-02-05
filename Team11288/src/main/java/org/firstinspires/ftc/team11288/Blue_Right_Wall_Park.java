@@ -30,7 +30,7 @@ public class Blue_Right_Wall_Park extends LinearOpMode {
     //    private elbow             = null;
 //    private Servo wrist       = null;
     private Servo claw = null;
-    private Servo platform = null;
+
 
 
     private ElapsedTime runtime = new ElapsedTime();
@@ -81,7 +81,7 @@ public class Blue_Right_Wall_Park extends LinearOpMode {
 
                 teamUtils.drivebyDistance(0.85, 0.0, 3);//drive away from wall
                 teamUtils.drivebyDistance(0.0, 0.8, 24);//drive towards bridge
-                platform.setPosition(0);
+
                 //teamUtils.drivebyDistance(0.8, 0.0, 24);//drive towards center
                 claw.setPosition(1);
                 teamUtils.stopWheelsSpeedMode();
