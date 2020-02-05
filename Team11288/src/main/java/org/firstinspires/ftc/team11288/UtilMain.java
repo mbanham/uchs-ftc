@@ -53,7 +53,7 @@ public class UtilMain {
     static final int COUNTS_PER_INCH = (int) ((1.4142 * (COUNTS_PER_DRIVE_MOTOR_REV)) / (4.0 * Math.PI)); // for 45deg
                                                                                                           // wheels
     // initialize these in InitExtraSensors if using
-    private ColorSensor colorSensor;
+    private DistanceSensor colorSensor;
     float hsvValues[] = { 0F, 0F, 0F };
     float values[];
     private int relativeLayoutId;
@@ -70,7 +70,7 @@ public class UtilMain {
     //not being used in 2020 config
     public void InitExtraSensors(HardwareMap hardwareMap) {
         // get a reference to the color sensor.
-        colorSensor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
+        colorSensor = hardwareMap.get(DistanceSensor.class, "distance");
         // hsvValues is an array that will hold the hue, saturation, and value
         // information.
         hsvValues = new float[] { 0F, 0F, 0F };

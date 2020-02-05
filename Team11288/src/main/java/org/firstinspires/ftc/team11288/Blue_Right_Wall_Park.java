@@ -30,6 +30,7 @@ public class Blue_Right_Wall_Park extends LinearOpMode {
     //    private elbow             = null;
 //    private Servo wrist       = null;
     private Servo claw = null;
+    private Servo platform = null;
 
 
     private ElapsedTime runtime = new ElapsedTime();
@@ -47,7 +48,9 @@ public class Blue_Right_Wall_Park extends LinearOpMode {
         motorBackRight = hardwareMap.dcMotor.get("motor back right");
         motorLift = hardwareMap.dcMotor.get("motor lift");
         claw = hardwareMap.servo.get("claw servo");
+        platform = hardwareMap.servo.get("platform servo");
         claw.setPosition(0);
+        platform.setPosition(1);
         motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
         motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -60,8 +63,7 @@ public class Blue_Right_Wall_Park extends LinearOpMode {
 
         //utils class initializer
         teamUtils = new UtilHolonomic(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
-        teamUtils.InitPlatform(hardwareMap);
-        teamUtils.PlaformDef();
+        // teamUtils.InitExtraSensors(hardwareMap);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -80,7 +82,7 @@ public class Blue_Right_Wall_Park extends LinearOpMode {
 
                 teamUtils.drivebyDistance(0.85, 0.0, 3);//drive away from wall
                 teamUtils.drivebyDistance(0.0, 0.8, 24);//drive towards bridge
-                teamUtils.GrabPlaform(true);
+                platform.setPosition(0);
                 //teamUtils.drivebyDistance(0.8, 0.0, 24);//drive towards center
                 claw.setPosition(1);
                 teamUtils.stopWheelsSpeedMode();

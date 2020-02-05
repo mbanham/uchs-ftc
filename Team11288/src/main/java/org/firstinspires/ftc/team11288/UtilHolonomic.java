@@ -44,11 +44,11 @@ public class UtilHolonomic {
 
     //AUTONOMOUS REFERENCES
     public static double MARKER_A_TO_PLATFORM_CENTER = 27;//towards the center of the platform
-    public static double BRIDGE_TO_PLATFORM_CENTER = 45;//bridge to the center of the platform
+    public static double BRIDGE_TO_PLATFORM_CENTER = 51;//bridge to the center of the platform
     public static double EDGE_TO_PLATFORM = 31;//distance from the edge to the platform
     public static double ROBOT_WALL_CLEARANCE = 5;//clearance to put the robot from the edge
     public static double WALL_ROBOT_TO_EDGE_LOAD = 47;//distance from the robot to the edge with slipping and a load
-    public static double EDGE_TO_PLATFORM_CLEARANCE = EDGE_TO_PLATFORM - ROBOT_WALL_CLEARANCE;//distance from the robot to the clearance distance
+    public static double EDGE_TO_PLATFORM_CLEARANCE = EDGE_TO_PLATFORM+4 - ROBOT_WALL_CLEARANCE;//distance from the robot to the clearance distance
     public static double WALL_TO_CENTER = 30;//distance from the robot to the clearance distance
 
     public static double AUTONOMOUS_SPEED = 1;//speed for the autonomous programs
@@ -67,8 +67,8 @@ public class UtilHolonomic {
     private DcMotor motorFrontLeft;
     private DcMotor motorFrontRight;
 
-    private Servo platform_left;
-    private Servo platform_right;
+    private static Servo platform_left;
+    private static Servo platform_right;
 
     static final int COUNTS_PER_INCH = (int) (COUNTS_PER_DRIVE_MOTOR_REV/INCHES_PER_ROTATION); // for 45deg
                                                                                                           // wheels
@@ -166,9 +166,6 @@ public class UtilHolonomic {
             platform_right.setPosition(0);
             platform_left.setPosition(1);
         }
-    }
-    public void PlaformDef(){
-        GrabPlaform(false);
     }
 
 

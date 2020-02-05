@@ -32,8 +32,7 @@ public class Blue_Left_Platf extends LinearOpMode {
     //    private elbow             = null;
 //    private Servo wrist       = null;
     private Servo claw = null;
-    private Servo platform = null;
-
+    private Servo platform;
 
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -65,7 +64,6 @@ public class Blue_Left_Platf extends LinearOpMode {
         teamUtils = new UtilHolonomic(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
         teamUtils.InitExtraSensors(hardwareMap);
         teamUtils.InitPlatform(hardwareMap);
-        teamUtils.PlaformDef();
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         //Play started
@@ -80,9 +78,11 @@ public class Blue_Left_Platf extends LinearOpMode {
                 teamUtils.drivebyDistance(0.0, 0.85, UtilHolonomic.MARKER_A_TO_PLATFORM_CENTER);//drive towards corner
                 teamUtils.drivebyDistance(0.85, 0, UtilHolonomic.EDGE_TO_PLATFORM_CLEARANCE);//drive to base plate
 
+                teamUtils.GrabPlaform(true);
+
+                //drive back to corner
                 teamUtils.GrabPlaform(false);
                 sleep(800);
-                //drive back to corner
                 teamUtils.drivebyDistance(-0.85, 0, UtilHolonomic.WALL_ROBOT_TO_EDGE_LOAD, UtilHolonomic.ROBOT_WALL_CLEARANCE);//drive towards corner
                 teamUtils.GrabPlaform(true);
                 sleep(800);
