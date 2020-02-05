@@ -107,7 +107,8 @@ public class UtilHolonomic {
     //not being used in 2020 config
     public void InitExtraSensors(HardwareMap hardwareMap) {
         // get a reference to the color sensor.
-        //colorSensor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
+        colorSensor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
+        colorSensor.enableLed(false);
         sensorDistance =  hardwareMap.get(DistanceSensor.class, "sensor_color_distance");
      //   telemetry.addData("Distance (cm)",
        //         String.format(Locale.US, "%.02f", sensorDistance.getDistance(DistanceUnit.CM)));
@@ -262,7 +263,11 @@ public class UtilHolonomic {
                 && Math.abs(motorBackLeft.getCurrentPosition() - backLeftTargetPosition) > tolerance))
                 || (((Math.abs(BackRight)) > 0.01
                 && Math.abs(motorBackRight.getCurrentPosition() - backRightTargetPosition) > tolerance)))) {
-            if(sensor_distance!=-1 && sensorDistance.getDistance(DistanceUnit.INCH) < DISTANCE_FROM_WALL) break;
+            if(sensor_distance!=-1 && !(Double.isNaN(sensorDistance.getDistance(DistanceUnit.INCH))) && sensorDistance.getDistance(DistanceUnit.INCH) < DISTANCE_FROM_WALL) {
+                telemetry.addData("DATA","Sensor Triggered");
+                telemetry.update();
+                break;
+            }
             // wait and check again until done running
             telemetry.addData("front right", "=%.2f %d %d %d %b", FrontRight, frontRightStartPosition,
                     motorFrontRight.getCurrentPosition(), frontRightTargetPosition,

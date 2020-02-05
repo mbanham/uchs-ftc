@@ -63,6 +63,7 @@ public class Drive_30_In_Fwd_BLUE extends LinearOpMode {
 
         //utils class initializer
         teamUtils = new UtilHolonomic(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
+        teamUtils.InitPlatform(hardwareMap);
         // teamUtils.InitExtraSensors(hardwareMap);
 
         // Wait for the game to start (driver presses PLAY)

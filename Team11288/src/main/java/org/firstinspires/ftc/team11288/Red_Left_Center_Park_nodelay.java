@@ -48,9 +48,7 @@ public class Red_Left_Center_Park_nodelay extends LinearOpMode {
         motorBackRight = hardwareMap.dcMotor.get("motor back right");
         motorLift = hardwareMap.dcMotor.get("motor lift");
         claw = hardwareMap.servo.get("claw servo");
-        platform = hardwareMap.servo.get("platform servo");
         claw.setPosition(0);
-        platform.setPosition(1);
         motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
         motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -63,6 +61,7 @@ public class Red_Left_Center_Park_nodelay extends LinearOpMode {
 
         //utils class initializer
         teamUtils = new UtilHolonomic(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
+        teamUtils.InitPlatform(hardwareMap);
         // teamUtils.InitExtraSensors(hardwareMap);
 
         // Wait for the game to start (driver presses PLAY)

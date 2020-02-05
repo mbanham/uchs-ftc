@@ -64,7 +64,8 @@ public class Red_Right_Platf_Center_Park extends LinearOpMode {
 
         //utils class initializer
         teamUtils = new UtilHolonomic(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
-       // teamUtils.InitExtraSensors(hardwareMap);
+        teamUtils.InitPlatform(hardwareMap);
+        // teamUtils.InitExtraSensors(hardwareMap);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
