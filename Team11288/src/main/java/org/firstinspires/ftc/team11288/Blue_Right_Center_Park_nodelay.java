@@ -80,6 +80,11 @@ public class Blue_Right_Center_Park_nodelay extends LinearOpMode {
                 teamUtils.drivebyDistance(0.0, 0.8, 24);//drive towards bridge
                 claw.setPosition(1);
                 teamUtils.stopWheelsSpeedMode();
+
+                try {
+                    Thread.sleep(3000);
+                } catch(Exception e) {}
+
                 requestOpModeStop();
 
             }

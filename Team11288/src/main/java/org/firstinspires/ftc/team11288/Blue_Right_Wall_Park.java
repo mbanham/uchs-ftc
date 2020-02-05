@@ -85,6 +85,11 @@ public class Blue_Right_Wall_Park extends LinearOpMode {
                 //teamUtils.drivebyDistance(0.8, 0.0, 24);//drive towards center
                 claw.setPosition(1);
                 teamUtils.stopWheelsSpeedMode();
+
+                try {
+                    Thread.sleep(3000);
+                } catch(Exception e) {}
+
                 requestOpModeStop();
 
             }
