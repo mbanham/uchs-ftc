@@ -22,7 +22,7 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENC
 
 
 @Autonomous(name = "Camera_GrabStone", group = "Linear Opmode")
-@Disabled                            // Comment this out to add to the opmode list
+//@Disabled                            // Comment this out to add to the opmode list
 public class Camera_GrabStone extends LinearOpMode {
     //initialize these variables, override them in the constructor
     private int TEAM_COLOR = Color.BLUE;
@@ -57,6 +57,7 @@ public class Camera_GrabStone extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
 
+    private UtilMain utilMain;
 
     @Override
     public void runOpMode() {
@@ -92,14 +93,17 @@ public class Camera_GrabStone extends LinearOpMode {
         //teamUtils.InitExtraSensors(hardwareMap);
         //teamUtils.InitVuforia(hardwareMap);
 
-/*
+        utilMain = new UtilMain(telemetry);
+        utilMain.InitVuforia(hardwareMap);
+
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         //Play started
         runtime.reset();
-        List<Recognition> recog = teamUtils.GetObjectsInFrame();
+
+        List<Recognition> recog = utilMain.GetObjectsInFrame();
         for (Recognition r : recog){
-            if(r.getLabel().equals(UtilHolonomic.STONE)){
+            if(r.getLabel().equals(UtilMain.STONE)){
                 double width = r.getImageWidth();
                 double height = r.getImageHeight();
                 double angle = r.estimateAngleToObject(AngleUnit.DEGREES);
@@ -112,7 +116,8 @@ public class Camera_GrabStone extends LinearOpMode {
                 Point top_left = new Point((int)r.getLeft(), (int)r.getTop());
                 Point top_right = new Point((int)r.getRight(), (int)r.getTop());
                 
-                
+                telemetry.addData("debug", "x=%d;y=%d", center.x, center.y);
+                telemetry.update();
 
                 double threshold = 20;
                 while(center.x >  screen_center.x + threshold || center.x < screen_center.x - threshold){
@@ -129,7 +134,10 @@ public class Camera_GrabStone extends LinearOpMode {
 
 
 
+            }else{
+                telemetry.addData("debug", "SKYSTONE");
+                telemetry.update();
             }
-        }*/
+        }
     }
 }
