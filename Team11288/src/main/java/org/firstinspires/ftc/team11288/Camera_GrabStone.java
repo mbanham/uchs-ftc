@@ -22,7 +22,7 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENC
 
 
 @Autonomous(name = "Camera_GrabStone", group = "Linear Opmode")
-@Disabled                            // Comment this out to add to the opmode list
+//@Disabled                            // Comment this out to add to the opmode list
 public class Camera_GrabStone extends LinearOpMode {
     //initialize these variables, override them in the constructor
     private int TEAM_COLOR = Color.BLUE;
@@ -57,6 +57,7 @@ public class Camera_GrabStone extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
 
+    private UtilMain utilMain;
 
     @Override
     public void runOpMode() {
@@ -89,9 +90,8 @@ public class Camera_GrabStone extends LinearOpMode {
 
         //utils class initializer
 
-        UtilMain utilMain = new UtilMain(telemetry);
+        utilMain = new UtilMain(telemetry);
         utilMain.InitVuforia(hardwareMap);
-
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -102,6 +102,9 @@ public class Camera_GrabStone extends LinearOpMode {
             if(r.name.equals(UtilMain.STONE)){
 
 
+            }else{
+                telemetry.addData("debug", "SKYSTONE");
+                telemetry.update();
             }
         }
     }
