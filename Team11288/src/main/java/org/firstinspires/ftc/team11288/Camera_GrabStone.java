@@ -88,48 +88,21 @@ public class Camera_GrabStone extends LinearOpMode {
         motorLift.setMode(STOP_AND_RESET_ENCODER);
 
         //utils class initializer
-        //teamUtils = new UtilMain(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
-        //teamUtils.InitExtraSensors(hardwareMap);
-        //teamUtils.InitVuforia(hardwareMap);
 
-/*
+        UtilMain utilMain = new UtilMain(telemetry);
+        utilMain.InitVuforia(hardwareMap);
+
+
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         //Play started
         runtime.reset();
-        List<Recognition> recog = teamUtils.GetObjectsInFrame();
-        for (Recognition r : recog){
-            if(r.getLabel().equals(UtilHolonomic.STONE)){
-                double width = r.getImageWidth();
-                double height = r.getImageHeight();
-                double angle = r.estimateAngleToObject(AngleUnit.DEGREES);
-
-                Point screen_center = new Point((int)(width / 2), (int)(height / 2));
-                Point size = new Point((int)r.getWidth(), (int)r.getHeight());
-                Point center = new Point((int)(r.getLeft() + size.x/2), (int)(r.getBottom() + size.y/2));
-                Point bottom_left = new Point((int)r.getLeft(), (int)r.getBottom());
-                Point bottom_right = new Point((int)r.getRight(), (int)r.getBottom());
-                Point top_left = new Point((int)r.getLeft(), (int)r.getTop());
-                Point top_right = new Point((int)r.getRight(), (int)r.getTop());
-                
-                
-
-                double threshold = 20;
-                while(center.x >  screen_center.x + threshold || center.x < screen_center.x - threshold){
-                    if(center.x >  screen_center.x + threshold) {//left too muchs
-                        teamUtils.drivebySpeed(0.5, 0, 0);
-                    }else if(center.x < screen_center.x - threshold){//right too much
-                        teamUtils.drivebySpeed(-0.5, 0, 0);
-                    }else{
-                        teamUtils.stopWheelsSpeedMode();
-                        requestOpModeStop();
-                    }
-
-                }
-
+        StoneElement[] recog = utilMain.GetObjectsInFrame();
+        for (StoneElement r : recog){
+            if(r.name.equals(UtilMain.STONE)){
 
 
             }
-        }*/
+        }
     }
 }

@@ -66,6 +66,9 @@ public class UtilMain {
         this.armMotor = armMotor;
         this.telemetry = telemetry;
     }
+    public UtilMain(Telemetry telemetry) {
+        this.telemetry = telemetry;
+    }
 
     //not being used in 2020 config
     public void InitExtraSensors(HardwareMap hardwareMap) {
@@ -133,9 +136,14 @@ public class UtilMain {
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, STONE, SKYSTONE);
     }
-    public List<Recognition> GetObjectsInFrame() {
+    public StoneElement[] GetObjectsInFrame() {
         List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-        return updatedRecognitions;
+        StoneElement[] elem = new StoneElement[]{};
+        for(int i = 0;i<updatedRecognitions.size();i++){
+            elem[i] = new StoneElement(updatedRecognitions.get(i));
+
+        }
+        return elem;
     }
     //#endregion
     public void moveClaw(final DcMotor motor, double position) {
