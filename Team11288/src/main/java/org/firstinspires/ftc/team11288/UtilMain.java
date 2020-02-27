@@ -64,9 +64,6 @@ public class UtilMain {
     public UtilMain(Telemetry telemetry) {
         this.telemetry = telemetry;
     }
-    public UtilMain(Telemetry telemetry) {
-        this.telemetry = telemetry;
-    }
 
     //not being used in 2020 config
     public void InitExtraSensors(HardwareMap hardwareMap) {
@@ -143,6 +140,7 @@ public class UtilMain {
         }
         return elem;
     }
+
     //#endregion
     public void moveClaw(final DcMotor motor, double position) {
 

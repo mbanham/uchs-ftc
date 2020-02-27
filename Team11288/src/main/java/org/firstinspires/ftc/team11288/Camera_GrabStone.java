@@ -90,8 +90,11 @@ public class Camera_GrabStone extends LinearOpMode {
 
         //utils class initializer
 
+
         utilMain = new UtilMain(telemetry);
         utilMain.InitVuforia(hardwareMap);
+        teamUtils = new UtilHolonomic(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
+        teamUtils.setWheelsToEncoderMode();
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -100,8 +103,15 @@ public class Camera_GrabStone extends LinearOpMode {
         StoneElement[] recog = utilMain.GetObjectsInFrame();
         for (StoneElement r : recog){
             if(r.name.equals(UtilMain.STONE)){
-
-
+                double dist = r.center.distanceToPointX(r.screen_center);
+                while(Math.abs(dist) > 10){
+                    if(dist>0){
+                        teamUtils.drivebySpeed(0.8, 0.0, 0);
+                    }else{
+                        teamUtils.drivebySpeed(-0.8, 0.0, 0);
+                    }
+                }
+                teamUtils.stopWheelsSpeedMode();
             }else{
                 telemetry.addData("debug", "SKYSTONE");
                 telemetry.update();

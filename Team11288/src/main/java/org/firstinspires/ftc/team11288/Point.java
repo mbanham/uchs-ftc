@@ -27,4 +27,17 @@ public class Point {
         this.x_max = x_max;
         this.y_max = y_max;
     }
+    public double distanceToPoint(Point p){
+        double x = p.x - this.x;
+        double y = p.y - this.y;
+        return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+    }
+    public double distanceToPointX(Point p){
+        double x = p.x - this.x;
+        return x;
+    }
+    public double distanceToPointY(Point p){
+        double y = p.y - this.y;
+        return y;
+    }
 }
