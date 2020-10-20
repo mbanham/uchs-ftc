@@ -33,6 +33,7 @@ package org.firstinspires.ftc.robotcontroller.internal;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -46,13 +47,14 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.webkit.WebView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -60,9 +62,6 @@ import android.widget.LinearLayout.LayoutParams;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
-import com.google.blocks.ftcrobotcontroller.BlocksActivity;
-import com.google.blocks.ftcrobotcontroller.ProgrammingModeActivity;
-import com.google.blocks.ftcrobotcontroller.ProgrammingModeControllerImpl;
 import com.google.blocks.ftcrobotcontroller.ProgrammingWebHandlers;
 import com.google.blocks.ftcrobotcontroller.runtime.BlocksOpMode;
 import com.qualcomm.ftccommon.ClassManagerFactory;
@@ -74,13 +73,13 @@ import com.qualcomm.ftccommon.FtcRobotControllerService.FtcRobotControllerBinder
 import com.qualcomm.ftccommon.FtcRobotControllerSettingsActivity;
 import com.qualcomm.ftccommon.LaunchActivityConstantsList;
 import com.qualcomm.ftccommon.LaunchActivityConstantsList.RequestCode;
-import com.qualcomm.ftccommon.ProgrammingModeController;
 import com.qualcomm.ftccommon.Restarter;
 import com.qualcomm.ftccommon.UpdateUI;
 import com.qualcomm.ftccommon.configuration.EditParameters;
 import com.qualcomm.ftccommon.configuration.FtcLoadFileActivity;
 import com.qualcomm.ftccommon.configuration.RobotConfigFile;
 import com.qualcomm.ftccommon.configuration.RobotConfigFileManager;
+import com.qualcomm.ftcrobotcontroller.BuildConfig;
 import com.qualcomm.ftcrobotcontroller.R;
 import com.qualcomm.hardware.HardwareFactory;
 import com.qualcomm.robotcore.eventloop.EventLoopManager;
@@ -117,13 +116,13 @@ import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.robotcore.internal.system.Assert;
 import org.firstinspires.ftc.robotcore.internal.system.PreferencesHelper;
 import org.firstinspires.ftc.robotcore.internal.system.ServiceController;
-import org.firstinspires.ftc.robotcore.internal.ui.LocalByRefIntentExtraHolder;
 import org.firstinspires.ftc.robotcore.internal.ui.ThemedActivity;
 import org.firstinspires.ftc.robotcore.internal.ui.UILocation;
 import org.firstinspires.ftc.robotcore.internal.webserver.RobotControllerWebInfo;
 import org.firstinspires.ftc.robotserver.internal.programmingmode.ProgrammingModeManager;
 import org.firstinspires.inspection.RcInspectionActivity;
 
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -140,7 +139,6 @@ public class FtcRobotControllerActivity extends Activity
   protected RobotConfigFileManager cfgFileMgr;
 
   protected ProgrammingModeManager programmingModeManager;
-  protected ProgrammingModeController programmingModeController;
 
   protected UpdateUI.Callback callback;
   protected Context context;
@@ -279,15 +277,8 @@ public class FtcRobotControllerActivity extends Activity
     // Quick check: should we pretend we're not here, and so allow the Lynx to operate as
     // a stand-alone USB-connected module?
     if (LynxConstants.isRevControlHub()) {
-      if (LynxConstants.shouldDisableAndroidBoard()) {
-        // Double-sure check that the Lynx Module can operate over USB, etc, then get out of Dodge
-        RobotLog.vv(TAG, "disabling Dragonboard and exiting robot controller");
-        AndroidBoard.getInstance().getAndroidBoardIsPresentPin().setState(false);
-        AppUtil.getInstance().finishRootActivityAndExitApp();
-      } else {
-        // Double-sure check that we can talk to the DB over the serial TTY
-        AndroidBoard.getInstance().getAndroidBoardIsPresentPin().setState(true);
-      }
+      // Double-sure check that we can talk to the DB over the serial TTY
+      AndroidBoard.getInstance().getAndroidBoardIsPresentPin().setState(true);
     }
 
     context = this;
@@ -362,8 +353,6 @@ public class FtcRobotControllerActivity extends Activity
     programmingModeManager = new ProgrammingModeManager();
     programmingModeManager.register(new ProgrammingWebHandlers());
     programmingModeManager.register(new OnBotJavaProgrammingMode());
-    programmingModeController = new ProgrammingModeControllerImpl(
-            this, (TextView) findViewById(R.id.textRemoteProgrammingMode), programmingModeManager);
 
     updateUI = createUpdateUI();
     callback = createUICallback(updateUI);
@@ -388,6 +377,8 @@ public class FtcRobotControllerActivity extends Activity
     if (preferencesHelper.readBoolean(getString(R.string.pref_wifi_automute), false)) {
       initWifiMute(true);
     }
+
+    FtcAboutActivity.setBuildTimeFromBuildConfig(BuildConfig.BUILD_TIME);
   }
 
   protected UpdateUI createUpdateUI() {
@@ -439,9 +430,6 @@ public class FtcRobotControllerActivity extends Activity
   protected void onPause() {
     super.onPause();
     RobotLog.vv(TAG, "onPause()");
-    if (programmingModeController.isActive()) {
-      programmingModeController.stopProgrammingMode();
-    }
   }
 
   @Override
@@ -523,21 +511,14 @@ public class FtcRobotControllerActivity extends Activity
   }
 
   @Override
-  public void onWindowFocusChanged(boolean hasFocus){
+  public void onWindowFocusChanged(boolean hasFocus) {
     super.onWindowFocusChanged(hasFocus);
-    // When the window loses focus (e.g., the action overflow is shown),
-    // cancel any pending hide action. When the window gains focus,
-    // hide the system UI.
+
     if (hasFocus) {
-      if (ImmersiveMode.apiOver19()){
-        // Immersive flag only works on API 19 and above.
-        immersion.hideSystemUI();
-      }
-    } else {
-      immersion.cancelSystemUIHide();
+      immersion.hideSystemUI();
+      getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION, WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
     }
   }
-
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
@@ -569,20 +550,7 @@ public class FtcRobotControllerActivity extends Activity
   public boolean onOptionsItemSelected(MenuItem item) {
     int id = item.getItemId();
 
-    if (id == R.id.action_programming_mode) {
-      if (cfgFileMgr.getActiveConfig().isNoConfig()) {
-        // Tell the user they must configure the robot before starting programming mode.
-        // TODO: as we are no longer truly 'modal' this warning should be adapted
-        AppUtil.getInstance().showToast(UILocation.BOTH, context.getString(R.string.toastConfigureRobotBeforeProgrammingMode));
-      } else {
-        Intent programmingModeIntent = new Intent(AppUtil.getDefContext(), ProgrammingModeActivity.class);
-        programmingModeIntent.putExtra(
-            LaunchActivityConstantsList.PROGRAMMING_MODE_ACTIVITY_PROGRAMMING_WEB_HANDLERS,
-            new LocalByRefIntentExtraHolder(programmingModeManager));
-        startActivity(programmingModeIntent);
-      }
-      return true;
-    } else if (id == R.id.action_program_and_manage) {
+    if (id == R.id.action_program_and_manage) {
       if (isRobotRunning()) {
         Intent programmingModeIntent = new Intent(AppUtil.getDefContext(), ProgramAndManageActivity.class);
         RobotControllerWebInfo webInfo = programmingModeManager.getWebServer().getConnectionInformation();
@@ -595,13 +563,7 @@ public class FtcRobotControllerActivity extends Activity
       Intent inspectionModeIntent = new Intent(AppUtil.getDefContext(), RcInspectionActivity.class);
       startActivity(inspectionModeIntent);
       return true;
-    }
-    else if (id == R.id.action_blocks) {
-      Intent blocksIntent = new Intent(AppUtil.getDefContext(), BlocksActivity.class);
-      startActivity(blocksIntent);
-      return true;
-    }
-    else if (id == R.id.action_restart_robot) {
+    } else if (id == R.id.action_restart_robot) {
       dimmer.handleDimTimer();
       AppUtil.getInstance().showToast(UILocation.BOTH, context.getString(R.string.toastRestartingRobot));
       requestRobotRestart();
@@ -625,7 +587,25 @@ public class FtcRobotControllerActivity extends Activity
       return true;
     }
     else if (id == R.id.action_exit_app) {
-      finish();
+
+      //Clear backstack and everything to prevent edge case where VM might be
+      //restarted (after it was exited) if more than one activity was on the
+      //backstack for some reason.
+      finishAffinity();
+
+      //For lollipop and up, we can clear ourselves from the recents list too
+      if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        List<ActivityManager.AppTask> tasks = manager.getAppTasks();
+
+        for (ActivityManager.AppTask task : tasks) {
+          task.finishAndRemoveTask();
+        }
+      }
+
+      //Finally, nuke the VM from orbit
+      AppUtil.getInstance().exitApplication();
+
       return true;
     }
 
@@ -726,8 +706,8 @@ public class FtcRobotControllerActivity extends Activity
     }
 
     OpModeRegister userOpModeRegister = createOpModeRegister();
-    eventLoop = new FtcEventLoop(hardwareFactory, userOpModeRegister, callback, this, programmingModeController);
-    FtcEventLoopIdle idleLoop = new FtcEventLoopIdle(hardwareFactory, userOpModeRegister, callback, this, programmingModeController);
+    eventLoop = new FtcEventLoop(hardwareFactory, userOpModeRegister, callback, this);
+    FtcEventLoopIdle idleLoop = new FtcEventLoopIdle(hardwareFactory, userOpModeRegister, callback, this);
 
     controllerService.setCallback(callback);
     controllerService.setupRobot(eventLoop, idleLoop, runOnComplete);
