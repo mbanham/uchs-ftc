@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
@@ -12,16 +11,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
@@ -60,24 +54,23 @@ public class UtilHolonomic {
     }
 
 
-
     // 2019 Code changes
     private DcMotor motorBackLeft;
     private DcMotor motorBackRight;
     private DcMotor motorFrontLeft;
     private DcMotor motorFrontRight;
 
-    private static Servo platform_left;
-    private static Servo platform_right;
+    //private static Servo platform_left;
+    // private static Servo platform_right;
 
-    static final int COUNTS_PER_INCH = (int) (COUNTS_PER_DRIVE_MOTOR_REV/INCHES_PER_ROTATION); // for 45deg
-                                                                                                          // wheels
+    static final int COUNTS_PER_INCH = (int) (COUNTS_PER_DRIVE_MOTOR_REV / INCHES_PER_ROTATION); // for 45deg
+    // wheels
     static final int COUNTS_PER_SQUARE = (int) (COUNTS_PER_INCH * 1); // for 45deg wheels
     static final double CENTER_TO_WHEEL_DIST = COUNTS_PER_INCH * 8;//8 inches
     // initialize these in InitExtraSensors if using
     private ColorSensor colorSensor;
     public static DistanceSensor sensorDistance;
-    float hsvValues[] = { 0F, 0F, 0F };
+    float hsvValues[] = {0F, 0F, 0F};
     float values[];
     final double SCALE_FACTOR = 255;
     int relativeLayoutId;
@@ -98,9 +91,9 @@ public class UtilHolonomic {
 
     }
 
-    public void InitPlatform(HardwareMap hardwareMap){
-        platform_left = hardwareMap.servo.get("platform_left");
-        platform_right = hardwareMap.servo.get("platform_right");
+    public void InitPlatform(HardwareMap hardwareMap) {
+        //  platform_left = hardwareMap.servo.get("platform_left");
+        //  platform_right = hardwareMap.servo.get("platform_right");
         GrabPlaform(true);
     }
 
@@ -160,12 +153,12 @@ public class UtilHolonomic {
     //#endregion
 
     public void GrabPlaform(boolean open){
-        if(open){
-            platform_right.setPosition(1);
-            platform_left.setPosition(0);
-        }else{
-            platform_right.setPosition(0);
-            platform_left.setPosition(1);
+        if(open) {
+            // platform_right.setPosition(1);
+            //  platform_left.setPosition(0);
+        }else {
+            //  platform_right.setPosition(0);
+            //  platform_left.setPosition(1);
         }
     }
 

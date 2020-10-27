@@ -1,17 +1,13 @@
 // Team11288_Teleop
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
-
-import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
 /*
  * This file provides Teleop driving for the Team11288 TeleopDrive drive robot.
@@ -86,11 +82,11 @@ public class TeleopDrive extends OpMode{
             motorBackLeft = hardwareMap.dcMotor.get("motor back left");
             motorBackRight = hardwareMap.dcMotor.get("motor back right");
 
-            claw = hardwareMap.servo.get("claw servo");
+           // claw = hardwareMap.servo.get("claw servo");
 
-            motorLift = hardwareMap.dcMotor.get("motor lift");
+            //  motorLift = hardwareMap.dcMotor.get("motor lift");
 
-            claw.setPosition(0);
+            //  claw.setPosition(0);
 
 
             motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -99,17 +95,17 @@ public class TeleopDrive extends OpMode{
             motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);
 
 
-            motorLift.setDirection(DcMotorSimple.Direction.FORWARD);
-            motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            motorLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            motorLift.setMode(STOP_AND_RESET_ENCODER);
-            motorLift.setDirection(DcMotorSimple.Direction.FORWARD);
+            //motorLift.setDirection(DcMotorSimple.Direction.FORWARD);
+            // motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            // motorLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            // motorLift.setMode(STOP_AND_RESET_ENCODER);
+            // motorLift.setDirection(DcMotorSimple.Direction.FORWARD);
 
 
             //utils class initializer
-            teamUtils = new UtilHolonomic(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft,telemetry);
+            teamUtils = new UtilHolonomic(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
             teamUtils.InitPlatform(hardwareMap);
-    }
+        }
     /*
       * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
       */
@@ -175,31 +171,31 @@ public class TeleopDrive extends OpMode{
         }
         //#endregion
 
+//
+//        //claw
+//        if (gamepad2.right_bumper) {
+//            claw.setPosition(1);
+//            telemetry.addData("MyActivity", "ClawPosition=1");
+//            telemetry.update();
+//        }
+//        if (gamepad2.left_bumper) {
+//            claw.setPosition(0);
+//            telemetry.addData("MyActivity", "ClawPosition=0");
+//            telemetry.update();
+//        }
 
-        //claw
-        if (gamepad2.right_bumper) {
-            claw.setPosition(1);
-            telemetry.addData("MyActivity", "ClawPosition=1");
-            telemetry.update();
-        }
-        if (gamepad2.left_bumper) {
-            claw.setPosition(0);
-            telemetry.addData("MyActivity", "ClawPosition=0");
-            telemetry.update();
-        }
-
-        //lift
-        motorLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        if (gamepad2.dpad_down) {
-            motorLift.setPower(1);
-        } else {
-            if (gamepad2.dpad_up) {
-                motorLift.setPower(-1);
-
-            } else {
-                motorLift.setPower(0);
-            }
-        }
+//        //lift
+//        motorLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        if (gamepad2.dpad_down) {
+//            motorLift.setPower(1);
+//        } else {
+//            if (gamepad2.dpad_up) {
+//                motorLift.setPower(-1);
+//
+//            } else {
+//                motorLift.setPower(0);
+//            }
+//        }
 
     }
     /*
