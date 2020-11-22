@@ -9,8 +9,11 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 /*
- * This file provides Teleop tests for the Team8380 obot.
+ * This file provides Teleop tests for the Team8380 robot.
+ *
  * The code is structured as an Iterative OpMode
+ *
+ * Test for intake motor and shooting motor
  *
  *
  */
