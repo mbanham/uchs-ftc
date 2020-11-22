@@ -1,12 +1,10 @@
 // Team11288_Teleop
 package org.firstinspires.ftc.team11288;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
@@ -20,8 +18,8 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENC
  * Assumes claw with arm having shoulder motor, elbow servo and wrist servo - all having 180deg servos
  *
  */
-@Disabled
-@TeleOp(name="TeleopDriveMechanumTest", group="Teleop")
+//@Disabled
+@TeleOp(name="TeleopDriveMecanumTest", group="Teleop")
 public class TeleopDriveMecanum extends OpMode{
 
     /* Declare OpMode members. */
@@ -45,7 +43,6 @@ public class TeleopDriveMecanum extends OpMode{
     static final double     COUNTS_PER_MOTOR_REV    = 1250.0; //HD Hex Motor (REV-41-1301) 40:1
     static final double     COUNTS_PER_DRIVE_MOTOR_REV    = 300.0; // counts per reevaluation of the motor
     static final double INCREMENT_DRIVE_MOTOR_MOVE = 30.0; // move set amount at a time
-    static final double MOTOR_STRAFE_INFLUENCE = 1;
 
     private DcMotor shoulder; //bottom pivot of the new claw
     private int currentPosition; //used to track shoulder motor current position
@@ -56,7 +53,6 @@ public class TeleopDriveMecanum extends OpMode{
 //    private elbow             = null;
 //    private Servo wrist       = null;
     private Servo claw        = null;
-    private Servo platform    = null;
 
 
     //arm for knocking jewel - keep it out of the way in Driver Mode
@@ -87,24 +83,19 @@ public class TeleopDriveMecanum extends OpMode{
             motorFrontLeft = hardwareMap.dcMotor.get("motor front left");
             motorBackLeft = hardwareMap.dcMotor.get("motor back left");
             motorBackRight = hardwareMap.dcMotor.get("motor back right");
-            motorArm = hardwareMap.dcMotor.get("motor arm");
+
             claw = hardwareMap.servo.get("claw servo");
-            platform = hardwareMap.servo.get("platform servo");
+
             motorLift = hardwareMap.dcMotor.get("motor lift");
 
             claw.setPosition(0);
-            platform.setPosition(1);
+
 
             motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
             motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
             motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
             motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);
 
-            motorArm.setDirection(DcMotorSimple.Direction.FORWARD);
-            motorArm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            motorArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            motorArm.setMode(STOP_AND_RESET_ENCODER);
-            motorArm.setDirection(DcMotorSimple.Direction.FORWARD);
 
             motorLift.setDirection(DcMotorSimple.Direction.FORWARD);
             motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -112,13 +103,10 @@ public class TeleopDriveMecanum extends OpMode{
             motorLift.setMode(STOP_AND_RESET_ENCODER);
             motorLift.setDirection(DcMotorSimple.Direction.FORWARD);
 
-            initialPosition = (int) (motorArm.getCurrentPosition());
-            rotations=12;
-            directionArm = -1;
-            targetPosition = (int) (motorArm.getCurrentPosition() + (directionArm * rotations * COUNTS_PER_MOTOR_REV));
 
             //utils class initializer
             teamUtils = new UtilHolonomic(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft,telemetry);
+            teamUtils.InitPlatform(hardwareMap);
     }
     /*
       * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
@@ -138,131 +126,52 @@ public class TeleopDriveMecanum extends OpMode{
     /*
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
      */
-    double speed_multiplier = 1;
-    double arm_multiplier = 1;
+    double multiplier = 1/Math.sqrt(2);
     @Override
     public void loop() {
+        double r = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
+        double robotAngle = Math.atan2(gamepad1.left_stick_y, -gamepad1.left_stick_x) - Math.PI / 4;
+        double rightX = scaleInput(gamepad1.right_stick_x * multiplier * 1.3);
+        final double v1 = r * Math.cos(robotAngle) - rightX;
+        final double v2 = -r * Math.sin(robotAngle) - rightX;
+        final double v3 = r * Math.sin(robotAngle) - rightX;
+        final double v4 = -r * Math.cos(robotAngle) - rightX;
 
-        //car
-        double stick_l = gamepad1.left_stick_y;
-        double stick_r = gamepad1.right_stick_y;
-        double horizontal = UtilMain.MathLimit(-1, 0, gamepad1.left_stick_x) + UtilMain.MathLimit(0, 1, gamepad1.right_stick_x);
-        //horizontal - left stick left = move left; right stick right = move right
+        double FrontRight = Range.clip(v2 * multiplier, -1, 1);
+        double FrontLeft = Range.clip(v1 * multiplier, -1, 1);
+        double BackLeft = Range.clip(v3 * multiplier, -1, 1);
+        double BackRight = Range.clip(v4 * multiplier, -1, 1);
 
-        //  x * 1 in case forward direction is reversed
-        double fl = (stick_l * 1) - (MOTOR_STRAFE_INFLUENCE * horizontal);
-        double fr = (stick_r * 1) + (MOTOR_STRAFE_INFLUENCE * horizontal);
-        double bl = (stick_l * 1) + (MOTOR_STRAFE_INFLUENCE * horizontal);
-        double br = (stick_r * 1) - (MOTOR_STRAFE_INFLUENCE * horizontal);
-
-        double[] motors = UtilMain.LimitList(-1, 1, new double[]{fl, fr, bl, br});
-        //order of motors is dictated by input
 
         // write the values to the motors
         teamUtils.setWheelsToSpeedMode();
-        motorFrontLeft.setPower(motors[0] * speed_multiplier);
-        motorFrontRight.setPower(motors[1] * speed_multiplier);
-        motorBackLeft.setPower(motors[2] * speed_multiplier);
-        motorBackRight.setPower(motors[3] * speed_multiplier);
+        motorFrontRight.setPower(FrontRight);
+        motorFrontLeft.setPower(FrontLeft);
+        motorBackLeft.setPower(BackLeft);
+        motorBackRight.setPower(BackRight);
+
 
         //platformArm
 
 
-        if(Range.clip(gamepad1.right_trigger, 0.4, 1) > 0.4){//from 0.4 to 1 = 0.6
-            speed_multiplier =1-Range.clip(gamepad1.right_trigger, 0, 0.4); //speed speed_multiplier 1 - 0.6
-        }else
-        {
-            speed_multiplier = 1;
-        }
+        //multiplier
+        multiplier=1-Range.clip(gamepad1.right_trigger, 0, 0.5)
+                    +Range.clip(gamepad1.left_trigger, 0, 0.4);
+
+
         //#region PLATFORM_GRABBER
         if (gamepad1.a) {
             //down
-            platform.setPosition(0);
+            teamUtils.GrabPlaform(true);
             telemetry.addData("MyActivity", "ServoPosition=0");
             telemetry.update();
         } else if (gamepad1.y) {
             //up
-            platform.setPosition(1);
+            teamUtils.GrabPlaform(false);
             telemetry.addData("MyActivity", "ServoPosition=1");
             telemetry.update();
         }
         //#endregion
-
-        //press x
-        //while x is pressed, press dpad buttons to proper degree
-        //release x to start with parameters
-        //press x to stop the robot and debug
-
-        /*if(gamepad1.x){
-            if(gamepad1.dpad_up || gamepad1.dpad_down || gamepad1.dpad_left || gamepad1.dpad_right) {
-                teamUtils.resetEncoderOnMotors();
-                double x_int = 0.5;
-                double y_int = 0.5;
-                while(gamepad1.x) {
-                    //y int
-                    if (gamepad1.dpad_up) {
-                        y_int += 0.1;
-                        while(gamepad1.dpad_up) {
-                        }
-                        telemetry.addData("MyActivity", "val=" + y_int);
-                        telemetry.update();
-                    }
-                    else
-                    if (gamepad1.dpad_down){
-                        y_int -= 0.1;
-                        while(gamepad1.dpad_down) {
-                        }
-                        telemetry.addData("MyActivity", "val=" + y_int);
-                        telemetry.update();
-
-                    }
-                    //x int
-                    if (gamepad1.dpad_left) {
-                        x_int -= 0.1;
-                        while(gamepad1.dpad_left) {
-                        }
-                        telemetry.addData("MyActivity", "val=" + x_int);
-                        telemetry.update();
-                    }
-                    else
-                    if (gamepad1.dpad_right)
-                    {
-                        x_int += 0.1;
-                        while(gamepad1.dpad_right) {
-                        }
-                        telemetry.addData("MyActivity", "val=" + x_int);
-                        telemetry.update();
-                    }
-                }
-
-                teamUtils.drivebySpeed(x_int, y_int, 0);
-                while(!gamepad1.x){
-
-                }
-                teamUtils.stopWheelsSpeedMode();
-                double dist_y = UtilHolonomic.COUNTS_PER_INCH * (motorBackLeft.getTargetPosition() + motorFrontLeft.getTargetPosition() + motorBackRight.getTargetPosition() + motorFrontRight.getTargetPosition()) / 4;
-                double dist_x = UtilHolonomic.COUNTS_PER_INCH * (-motorBackLeft.getTargetPosition() + motorFrontLeft.getTargetPosition() + motorBackRight.getTargetPosition() + -motorFrontRight.getTargetPosition()) / 4;
-
-                String output = x_int + "-" + y_int + Math.sqrt(Math.pow(dist_x, 2) + Math.pow(dist_y, 2));
-                telemetry.addData("MyActivity", output);
-
-            }
-        }*/
-
-            //dpad control 1 inch
-//            double x_int = 0;
-//            double y_int = 0;
-//            if (gamepad1.dpad_up)
-//                y_int = 0.3;
-//            if(gamepad1.dpad_down)
-//                y_int = -0.3;
-//            if(gamepad1.dpad_left)
-//                x_int = 0.3;
-//            if(gamepad1.dpad_right)
-//                x_int = -0.3;
-//            if(x_int != 0 || y_int != 0) {
-//                teamUtils.drivebyDistance(x_int, y_int, 1, "inch");
-//            }
 
 
         //claw
@@ -276,33 +185,14 @@ public class TeleopDriveMecanum extends OpMode{
             telemetry.addData("MyActivity", "ClawPosition=0");
             telemetry.update();
         }
-        //arm
-
-        motorArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        if (Range.clip(gamepad2.left_trigger, 0,1) > 0.02) {
-            motorArm.setPower(Range.clip(gamepad2.left_trigger, 0,1 * arm_multiplier ));
-        } else {
-            if (Range.clip(gamepad2.right_trigger, 0,1) > 0.02) {
-                motorArm.setPower(-Range.clip(gamepad2.right_trigger, 0,1 * arm_multiplier  ));
-            } else {
-                motorArm.setPower(0.0);
-            }
-        }
-        if(gamepad2.x){
-            arm_multiplier = 0.3;
-        }else
-        {
-            arm_multiplier = 1;
-        }
-
 
         //lift
         motorLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         if (gamepad2.dpad_down) {
-            motorLift.setPower(-1);
+            motorLift.setPower(1);
         } else {
             if (gamepad2.dpad_up) {
-                motorLift.setPower(1);
+                motorLift.setPower(-1);
 
             } else {
                 motorLift.setPower(0);
