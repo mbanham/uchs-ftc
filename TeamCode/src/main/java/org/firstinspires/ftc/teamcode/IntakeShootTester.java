@@ -79,7 +79,7 @@ public class IntakeShootTester extends OpMode {
 
         //shooter
         motorShooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motorIntake.setPower(Range.clip(gamepad1.left_trigger, 0, 1.0));
+        motorShooter.setPower(Range.clip(gamepad1.left_trigger, 0, 1.0));
 
     }
 
