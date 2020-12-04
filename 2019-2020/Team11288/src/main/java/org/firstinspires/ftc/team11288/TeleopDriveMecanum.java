@@ -127,20 +127,25 @@ public class TeleopDriveMecanum extends OpMode{
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
      */
     double multiplier = 1/Math.sqrt(2);
+    float trigger_sensitivity = 0.5f;
+    double gear;
     @Override
     public void loop() {
+        gear = 1;
+        if(gamepad1.left_trigger > trigger_sensitivity && gamepad1.right_trigger > trigger_sensitivity) gear = 0.5;
+
         double r = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
         double robotAngle = Math.atan2(gamepad1.left_stick_y, -gamepad1.left_stick_x) - Math.PI / 4;
-        double rightX = scaleInput(gamepad1.right_stick_x * multiplier * 1.3);
+        double rightX = scaleInput(gamepad1.right_stick_x * multiplier);
         final double v1 = r * Math.cos(robotAngle) - rightX;
         final double v2 = -r * Math.sin(robotAngle) - rightX;
         final double v3 = r * Math.sin(robotAngle) - rightX;
         final double v4 = -r * Math.cos(robotAngle) - rightX;
 
-        double FrontRight = Range.clip(v2 * multiplier, -1, 1);
-        double FrontLeft = Range.clip(v1 * multiplier, -1, 1);
-        double BackLeft = Range.clip(v3 * multiplier, -1, 1);
-        double BackRight = Range.clip(v4 * multiplier, -1, 1);
+        double FrontRight = Range.clip(v2 * multiplier * gear, -1, 1);
+        double FrontLeft = Range.clip(v1 * multiplier * gear, -1, 1);
+        double BackLeft = Range.clip(v3 * multiplier * gear, -1, 1);
+        double BackRight = Range.clip(v4 * multiplier * gear, -1, 1);
 
 
         // write the values to the motors
