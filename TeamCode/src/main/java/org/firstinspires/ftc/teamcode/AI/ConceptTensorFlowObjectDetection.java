@@ -29,8 +29,12 @@ package org.firstinspires.ftc.teamcode.AI;/* Copyright (c) 2019 FIRST. All right
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
@@ -47,11 +51,12 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
  * is explained below.
  */
 @TeleOp(name = "Concept: TensorFlow Object Detection", group = "Concept")
-@Disabled
 public class ConceptTensorFlowObjectDetection extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "UltimateGoal.tflite";
     private static final String LABEL_FIRST_ELEMENT = "Quad";
     private static final String LABEL_SECOND_ELEMENT = "Single";
+
+    private static final double RING_RATIO = 0.75/5;
 
     /*
      * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
@@ -80,6 +85,17 @@ public class ConceptTensorFlowObjectDetection extends LinearOpMode {
      */
     private TFObjectDetector tfod;
 
+    public float stupid(Recognition recognition, int rings){
+        return Math.abs(((recognition.getWidth()/recognition.getHeight()) - ((float)RING_RATIO*rings))/((float)RING_RATIO*rings));
+    }
+
+    private int stupid2(Recognition recognition, int rings){
+        float ratio = recognition.getHeight()/recognition.getWidth();
+        int ring = (int)Math.round(ratio/RING_RATIO);
+        return ring;
+    }
+
+    ArrayList<Integer> previousCounts = new ArrayList<Integer>();
     @Override
     public void runOpMode() {
         // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
@@ -118,14 +134,44 @@ public class ConceptTensorFlowObjectDetection extends LinearOpMode {
                         telemetry.addData("# Object Detected", updatedRecognitions.size());
 
                         // step through the list of recognitions and display boundary info.
-                        int i = 0;
+                        int ring_count = 0;
                         for (Recognition recognition : updatedRecognitions) {
-                            telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
-                            telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
-                                    recognition.getLeft(), recognition.getTop());
-                            telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
-                                    recognition.getRight(), recognition.getBottom());
+                            float best_val = Float.MAX_VALUE;
+
+                            for(int j = 1; j < 4; j++){
+                                float val = stupid(recognition, j);
+                                if(val<best_val) {
+                                    best_val = val;
+                                    ring_count = j;
+                                }
+                            }
                         }
+                        if(updatedRecognitions.size()!=0){
+                            if(previousCounts.size()>20)
+                                previousCounts.remove(0);
+                            previousCounts.add(ring_count);
+                        }
+
+                        int mode = 0;
+                        Collections.sort(previousCounts);
+                        int max_chain = 0;
+                        int current_val = 0;
+                        int current_chain = 0;
+
+                        for(int ring : previousCounts){
+                            if(current_val==ring){
+                                current_chain++;
+                                if(current_chain>max_chain){
+                                    mode = current_val;
+                                    max_chain = current_chain;
+                                }
+                            }else {
+                                current_val = ring;
+                                current_chain = 0;
+                            }
+                        }
+                        previousCounts.clear();
+                        System.out.println("[" + ring_count +"] MODE=" + mode);
                         telemetry.update();
                     }
                 }
