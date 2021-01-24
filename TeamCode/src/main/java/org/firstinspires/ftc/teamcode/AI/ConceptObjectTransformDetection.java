@@ -51,8 +51,6 @@ import static org.firstinspires.ftc.teamcode.UtilMain.VUFORIA_KEY;
 @TeleOp(name="ObjectTransformDetection")
 public class ConceptObjectTransformDetection extends LinearOpMode {
 
-    public static final String TAG = "Vuforia VuMark Sample";
-
     OpenGLMatrix lastLocation = null;
 
     /**
@@ -84,8 +82,8 @@ public class ConceptObjectTransformDetection extends LinearOpMode {
          * Once you've obtained a license key, copy the string from the Vuforia web site
          * and paste it in to your code on the next line, between the double quotes.
          */
+        //parameters.vuforiaLicenseKey = "AcPn+4n/////AAABmbf6eIjKuEHVvq9xCRDpKpgl8NNT8lBi93TDHc1x/u6oPn1KTt61lHLN6XAkmgYhkMNAp15fFYFEqVDcCkLpZy/aj3yGAAhUiS+Z8YrYty8EVWdqDl3Jh4XlZqHFMoac1nlvJGLek2oNSHh7G0nlNfgNHjsNKR2cHJTPmMUK4O7FM3Pa/fTi7jiKOBUBsHKn+EP5294jW1Kr+Lct6fP7IXs/6OsQW122UU83bocRbsWCvB/ISfpeNAtbeGucjssi89LvV7+d2AEd2yL7Qdetf9JyRsRzIezAfCJeVFgf779yHQDQhmvYAX2Q01lMowK/eBCPt3FH1WrVfJkThlqQT5Sm8A5w2D4y+WAaRMnwfub9";
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
-
         /*
          * We also indicate which camera on the RC that we wish to use.
          * Here we chose the back (HiRes) camera (for greater range), but
@@ -105,9 +103,9 @@ public class ConceptObjectTransformDetection extends LinearOpMode {
          * but differ in their instance id information.
          * @see VuMarkInstanceId
          */
-        VuforiaTrackables relicTrackables = this.vuforia.loadTrackablesFromAsset("UltimateGoal");
+        VuforiaTrackables relicTrackables = this.vuforia.loadTrackablesFromAsset("Ring");
         VuforiaTrackable relicTemplate = relicTrackables.get(0);
-        relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
+        relicTemplate.setName("RING"); // can help in debugging; otherwise not necessary
 
         telemetry.addData(">", "Press Play to start");
         telemetry.update();

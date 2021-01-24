@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QCARConfig>
+<Tracking>
+<ModelTarget name="Ring" motionHint="adaptive" trackingMode="default"/>
+
+</Tracking>
+
+<Assembly name="Rings_assembly" assemblyId="e25ce8d328e5415e9636dd0f4508d3e0">
+<Part name="Ring" translation="0 0 0" rotation="AD: 0 0 1 0"/>
+<EntryPoint name="viewpoint_0000" translation="-8.19657e-17 1.933e-17 0.157841" rotation="AD: 0.9998605637242195 0.04425472848384328 -0.41016072669005105 191.392" trained="yes">
+
+</EntryPoint>
+
+</Assembly>
+
+</QCARConfig>
