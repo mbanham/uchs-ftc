@@ -35,10 +35,12 @@ import java.util.Collections;
 import java.util.List;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import static org.firstinspires.ftc.teamcode.UtilMain.VUFORIA_KEY;
 
 /**
  * This 2020-2021 OpMode illustrates the basics of using the TensorFlow Object Detection API to
@@ -50,8 +52,8 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@TeleOp(name = "Concept: TensorFlow Object Detection", group = "Concept")
-public class ConceptTensorFlowObjectDetection extends LinearOpMode {
+@TeleOp(name = "Concept: TensorFlow Object Detection", group = "Autonomous")
+public class TensorFlowObjectDetection extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "UltimateGoal.tflite";
     private static final String LABEL_FIRST_ELEMENT = "Quad";
     private static final String LABEL_SECOND_ELEMENT = "Single";
@@ -70,8 +72,6 @@ public class ConceptTensorFlowObjectDetection extends LinearOpMode {
      * Once you've obtained a license key, copy the string from the Vuforia web site
      * and paste it in to your code on the next line, between the double quotes.
      */
-    private static final String VUFORIA_KEY =
-            "ASVozkX/////AAAAGX+Aimqfn0YRqafZGVaD2MIhBsmxiHLTd4r2XyoV4F/VEvRMnL1mLn7NDtl1onYGhHmJADQR8nt0aX4rZLIAb/7+XxI7LLZV4X0tMBDQyBL6IWcEdgMD63hTKncdP8NsIVJxJOY971/5pVdU50XisgiiAhq3b6D9twKLfGZ9EI2M4XXM0B7BxdA7x7YMD5QcMDf96myKGsPhVlkwz8XvBdbnOvZZg2FoxmhqExRp33AKii1GZRDwvfeco0hEOKusdwOkjbJ5RTJ+9T3fAysvqSovSG8iAWZ98qrG2xop2gK73UPJaY4vj5/1yVBKFMnWt42P931ybmEW1/c5dc8LR1CyD8jCxlgqypf9oCz/q89j";
 
     /**
      * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
@@ -86,16 +86,20 @@ public class ConceptTensorFlowObjectDetection extends LinearOpMode {
     private TFObjectDetector tfod;
 
     public float stupid(Recognition recognition, int rings){
+        System.out.println("-------" + recognition.estimateAngleToObject(AngleUnit.DEGREES));
         return Math.abs(((recognition.getWidth()/recognition.getHeight()) - ((float)RING_RATIO*rings))/((float)RING_RATIO*rings));
     }
-
-    private int stupid2(Recognition recognition, int rings){
-        float ratio = recognition.getHeight()/recognition.getWidth();
-        int ring = (int)Math.round(ratio/RING_RATIO);
-        return ring;
+    public float getDeviationDirection(Recognition recognition){
+        float percentDeviation = 0.1f;
+        float dev = recognition.getImageWidth()/2 - recognition.getLeft() + recognition.getWidth()/2;
+        if(Math.abs(dev/recognition.getImageWidth())<percentDeviation){
+            return 0;
+        }else
+            return Math.copySign(1, dev);
     }
 
     ArrayList<Integer> previousCounts = new ArrayList<Integer>();
+    int ring_number = -1;
     @Override
     public void runOpMode() {
         // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
@@ -136,43 +140,56 @@ public class ConceptTensorFlowObjectDetection extends LinearOpMode {
                         // step through the list of recognitions and display boundary info.
                         int ring_count = 0;
                         for (Recognition recognition : updatedRecognitions) {
+                            
                             float best_val = Float.MAX_VALUE;
-
+                            //ring_count = stupid2(recognition);
                             for(int j = 1; j < 4; j++){
                                 float val = stupid(recognition, j);
+                                System.out.println("DIRECTION=" + getDeviationDirection(recognition));
                                 if(val<best_val) {
                                     best_val = val;
                                     ring_count = j;
                                 }
                             }
                         }
-                        if(updatedRecognitions.size()!=0){
-                            if(previousCounts.size()>20)
+                        if(updatedRecognitions.size()>0) {
+                            if (previousCounts.size() > 20) {
                                 previousCounts.remove(0);
-                            previousCounts.add(ring_count);
-                        }
-
-                        int mode = 0;
-                        Collections.sort(previousCounts);
-                        int max_chain = 0;
-                        int current_val = 0;
-                        int current_chain = 0;
-
-                        for(int ring : previousCounts){
-                            if(current_val==ring){
-                                current_chain++;
-                                if(current_chain>max_chain){
-                                    mode = current_val;
-                                    max_chain = current_chain;
-                                }
-                            }else {
-                                current_val = ring;
-                                current_chain = 0;
+                                System.out.println("removing last element");
                             }
+                            previousCounts.add(ring_count);
+                            System.out.println("added RING_COUNT=" + ring_count + " size=" + previousCounts);
                         }
-                        previousCounts.clear();
-                        System.out.println("[" + ring_count +"] MODE=" + mode);
+
+
+
+                            Collections.sort(previousCounts);
+
+                            int max_chain = 0;
+                            int current_val = 0;
+                            int current_chain = 0;
+
+
+                            for (int ring : previousCounts) {
+                                if (current_val == ring) {
+                                    current_chain++;
+                                    System.out.println("same value " + ring + " | chain=" + current_chain);
+                                    if (current_chain > max_chain) {
+                                        ring_number = current_val;
+                                        max_chain = current_chain;
+                                    }
+                                } else {
+                                    System.out.println("different value " + ring);
+                                    current_val = ring;
+                                    current_chain = 1;
+                                }
+                            }
+
+
+                        System.out.println("MODE=" + ring_number);
+
                         telemetry.update();
+
                     }
                 }
             }
