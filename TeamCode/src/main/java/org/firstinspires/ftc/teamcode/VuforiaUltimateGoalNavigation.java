@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.AI;/* Copyright (c) 2019 FIRST. All rights reserved.
+package org.firstinspires.ftc.teamcode;/* Copyright (c) 2019 FIRST. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided that
@@ -27,7 +27,6 @@ package org.firstinspires.ftc.teamcode.AI;/* Copyright (c) 2019 FIRST. All right
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 

@@ -22,13 +22,13 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENC
 
 public class UtilHolonomic {
 
-    private DcMotor motorRight;
-    private DcMotor motorLeft;
-    private Telemetry telemetry;
+    private static DcMotor motorRight;
+    private static DcMotor motorLeft;
+    private static Telemetry telemetry;
 
-    private final double DRIVE_MOTOR_POWER = 0.75;
+    private static final double DRIVE_MOTOR_POWER = 0.75;
     // HD Hex Motor (REV-41-1301) 40:1
-    static final double COUNTS_PER_DRIVE_MOTOR_REV = 1120; // counts per reevaluation of the motor
+    private static final double COUNTS_PER_DRIVE_MOTOR_REV = 1120; // counts per reevaluation of the motor
     private static final double SECONDSPERINCH = 2.0/24.0;
      static final double TOLERANCE_WHEEL_POS = 100.0; //tolerance
     //75mm Rev Mecanum wheels = 2.95 inch diameter
@@ -55,10 +55,10 @@ public class UtilHolonomic {
 
 
     // 2019 Code changes
-    private DcMotor motorBackLeft;
-    private DcMotor motorBackRight;
-    private DcMotor motorFrontLeft;
-    private DcMotor motorFrontRight;
+    private static DcMotor motorBackLeft;
+    private static DcMotor motorBackRight;
+    private static DcMotor motorFrontLeft;
+    private static DcMotor motorFrontRight;
 
     //private static Servo platform_left;
     // private static Servo platform_right;
@@ -68,12 +68,12 @@ public class UtilHolonomic {
     static final int COUNTS_PER_SQUARE = (int) (COUNTS_PER_INCH * 1); // for 45deg wheels
     static final double CENTER_TO_WHEEL_DIST = COUNTS_PER_INCH * 8;//8 inches
     // initialize these in InitExtraSensors if using
-    private ColorSensor colorSensor;
+    private static ColorSensor colorSensor;
     public static DistanceSensor sensorDistance;
-    float hsvValues[] = {0F, 0F, 0F};
-    float values[];
+    private static float hsvValues[] = {0F, 0F, 0F};
+    private static float values[];
     final double SCALE_FACTOR = 255;
-    int relativeLayoutId;
+    static int relativeLayoutId;
     static View relativeLayout;
 
     ///
@@ -91,14 +91,14 @@ public class UtilHolonomic {
 
     }
 
-    public void InitPlatform(HardwareMap hardwareMap) {
+    public static void InitPlatform(HardwareMap hardwareMap) {
         //  platform_left = hardwareMap.servo.get("platform_left");
         //  platform_right = hardwareMap.servo.get("platform_right");
         GrabPlaform(true);
     }
 
     //not being used in 2020 config
-    public void InitExtraSensors(HardwareMap hardwareMap) {
+    public static void InitExtraSensors(HardwareMap hardwareMap) {
         // get a reference to the color sensor.
         colorSensor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
         colorSensor.enableLed(false);
@@ -122,7 +122,7 @@ public class UtilHolonomic {
     //#endregion
 
     //#region MotorUnilities
-    public void setWheelsToEncoderMode() {
+    public static void setWheelsToEncoderMode() {
         motorBackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -130,21 +130,21 @@ public class UtilHolonomic {
 
         resetEncoderOnMotors();
     }
-    public void setWheelsToSpeedMode() {
+    public static void setWheelsToSpeedMode() {
 
         motorBackLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motorBackRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motorFrontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motorFrontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
-    public void stopWheelsSpeedMode() {
+    public static void stopWheelsSpeedMode() {
 
         motorBackLeft.setPower(0);
         motorBackRight.setPower(0);
         motorFrontLeft.setPower(0);
         motorFrontRight.setPower(0);
     }
-    public void resetEncoderOnMotors(){
+    public static void resetEncoderOnMotors(){
         motorFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motorFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motorBackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -152,7 +152,7 @@ public class UtilHolonomic {
     }
     //#endregion
 
-    public void GrabPlaform(boolean open){
+    public static void GrabPlaform(boolean open){
         if(open) {
             // platform_right.setPosition(1);
             //  platform_left.setPosition(0);
@@ -164,7 +164,7 @@ public class UtilHolonomic {
 
 
     //#region Driving
-    public void drivebyDistanceByTime(double x, double y, double distance, String unit) {// inches
+    public static void DriveByDistanceByTime(double x, double y, double distance, String unit) {// inches
         setWheelsToEncoderMode();
         double r = Math.hypot((-x), (-y));
         double robotAngle = Math.atan2((-y), (-x)) - Math.PI / 4;
@@ -197,12 +197,12 @@ public class UtilHolonomic {
         stopWheelsSpeedMode();
 
     }
-    public void drivebyDistance(double x, double y, double distance){
-        drivebyDistance(x,y, distance, -1);
+    public static void DriveByDistance(double x, double y, double distance){
+        DriveByDistance(x,y, distance, -1);
     }
 
     //#region Driving
-    public void drivebyDistance(double x, double y, double distance, double sensor_distance) {// inches
+    public static void DriveByDistance(double x, double y, double distance, double sensor_distance) {// inches
         setWheelsToEncoderMode();
         double r = Math.hypot((-x), (-y));
         double robotAngle = Math.atan2((-y), (-x)) - Math.PI / 4;
@@ -291,7 +291,7 @@ public class UtilHolonomic {
 
     }
 
-    public void driveUntilSensor(double x, double distance) {// inches
+    public static void driveUntilSensor(double x, double distance) {// inches
         double y = 0;
         setWheelsToEncoderMode();
         double r = Math.hypot((-x), (-y));
@@ -349,7 +349,7 @@ public class UtilHolonomic {
 
 
 
-    public void drivebyDistAndRot(double x, double y, double rotation, double distance, String unit) {// inches
+    public static void DriveByDistAndRot(double x, double y, double rotation, double distance, String unit) {// inches
         setWheelsToEncoderMode();
         double r = Math.hypot((-x), (-y));
         double robotAngle = Math.atan2((-y), (-x)) - Math.PI / 4;
@@ -458,7 +458,7 @@ public class UtilHolonomic {
         stopWheelsSpeedMode();
 
     }
-    public void drivebySpeed(double x, double y, double rotation) {// inches
+    public static void DriveBySpeed(double x, double y, double rotation) {// inches
 
         double r = Math.hypot((-x), (-y));
         double robotAngle = Math.atan2((-y), (-x)) - Math.PI / 4;
@@ -485,7 +485,7 @@ public class UtilHolonomic {
         motorBackRight.setPower(BackRight);
     }
     @SuppressLint("NewApi")
-    public void driveUntilColor(double x, double y, double rotation, double distance, String unit) {// inches
+    public static void DriveUntilColor(double x, double y, double rotation, double distance, String unit) {// inches
         setWheelsToEncoderMode();
         double r = Math.hypot((-x), (-y));
         double robotAngle = Math.atan2((-y), (-x)) - Math.PI / 4;
@@ -616,7 +616,7 @@ public class UtilHolonomic {
     //#endregion
 
     //#region Other Utilities
-    public void moveClaw(final DcMotor motor, double position) {
+    public static void MoveClaw(final DcMotor motor, double position) {
 
         Thread thr = new Thread(new Runnable() {
             @Override
@@ -634,7 +634,7 @@ public class UtilHolonomic {
         });
         thr.start();
     }
-    public void twoWheelDrive(double leftInput, double rightInput, int mode) {
+    public static void TwoWheelDrive(double leftInput, double rightInput, int mode) {
         double rightDrive = UtilMain.scaleInput(rightInput, mode);
         double leftDrive = UtilMain.scaleInput(-leftInput, mode);
 
@@ -646,7 +646,7 @@ public class UtilHolonomic {
         motorRight.setPower(finalRight);
     }
 
-    void driveFixedDistance(double directionDrive, double inches, boolean isFast) {
+    public static void DriveFixedDistance(double directionDrive, double inches, boolean isFast) {
         motorRight.setMode(STOP_AND_RESET_ENCODER);
         motorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motorRight.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -693,7 +693,7 @@ public class UtilHolonomic {
         motorLeft.setMode(RUN_WITHOUT_ENCODER);
     }
 
-    void driveAngledDistance(double directionDrive, double inches, boolean isFast) {
+    public static void DriveAngledDistance(double directionDrive, double inches, boolean isFast) {
         double WEIGHT_R = 1.2;
         motorRight.setMode(STOP_AND_RESET_ENCODER);
         motorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -741,7 +741,7 @@ public class UtilHolonomic {
         motorLeft.setMode(RUN_WITHOUT_ENCODER);
     }
 
-    void driveFixedDegrees(double directionDrive, double degrees) {
+    public static void DriveFixedDegrees(double directionDrive, double degrees) {
         motorRight.setMode(STOP_AND_RESET_ENCODER);
         motorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motorLeft.setMode(STOP_AND_RESET_ENCODER);

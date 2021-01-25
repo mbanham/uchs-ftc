@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.teamcode.Utilities.Point;
+import org.firstinspires.ftc.teamcode.Utilities.Size;
 
 ;
 

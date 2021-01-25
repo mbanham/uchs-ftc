@@ -113,7 +113,7 @@ public class UtilMain {
         } else if (value > max) {
             return max;
         }
-        return -99999;
+        return -Integer.MAX_VALUE;
     }
 
     static double[] LimitList(double min, double max, double[] list) {
