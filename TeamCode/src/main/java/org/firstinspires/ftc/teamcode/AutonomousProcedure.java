@@ -16,6 +16,7 @@ public class AutonomousProcedure extends LinearOpMode {
         telemetry.update();
 
         RingCountDetection.Initialize(hardwareMap);
+        RobotMovementIntegrated.Initialize(hardwareMap);
 
         waitForStart();
         //one time run
