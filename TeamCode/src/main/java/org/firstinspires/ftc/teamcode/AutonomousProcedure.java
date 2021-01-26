@@ -33,15 +33,15 @@ public class AutonomousProcedure extends LinearOpMode {
             switch (ringreturn.ring_count){
                 case 1:
                     //Do procedure for one ring
-                    UtilHolonomic.DriveByDistance(0.0, 0.0, 1);
+                    RobotMovementIntegrated.MoveRobotToLocationDualSensor(132, 84);//A
                     break;
                 case 2:
                     //Do procedure for two rings
-                    UtilHolonomic.DriveByDistance(0.0, 0.0, 2);
+                    RobotMovementIntegrated.MoveRobotToLocationDualSensor(108,108);//B
                     break;
                 case 3:
                     //Do procedure for three rings
-                    UtilHolonomic.DriveByDistance(0.0, 0.0, 3);
+                    RobotMovementIntegrated.MoveRobotToLocationDualSensor(132,132);//C
                     break;
             }
         }

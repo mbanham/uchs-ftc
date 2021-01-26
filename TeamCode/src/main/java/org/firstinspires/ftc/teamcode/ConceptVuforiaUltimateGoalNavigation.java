@@ -83,7 +83,7 @@ import static org.firstinspires.ftc.teamcode.UtilMain.VUFORIA_KEY;
 
 
 @TeleOp(name="ULTIMATEGOAL Vuforia Nav", group ="Autonomous")
-public class VuforiaUltimateGoalNavigation extends LinearOpMode {
+public class ConceptVuforiaUltimateGoalNavigation extends LinearOpMode {
 
     // IMPORTANT:  For Phone Camera, set 1) the camera source and 2) the orientation, based on how your phone is mounted:
     // 1) Camera Source.  Valid choices are:  BACK (behind screen) or FRONT (selfie side)

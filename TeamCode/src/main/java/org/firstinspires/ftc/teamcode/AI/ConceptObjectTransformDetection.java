@@ -117,7 +117,7 @@ public class ConceptObjectTransformDetection extends LinearOpMode {
                     double rY = rot.secondAngle;
                     double rZ = rot.thirdAngle;
                     ViewObject object = new ViewObject("RING", trans, rot);
-                    telemetry.addData("VuMark", "x=%d y=%d z=%d", object.transform.x, object.transform.y, object.transform.z);
+                    //.addData("VuMark", "x=%d y=%d z=%d", object.transform.x, object.transform.y, object.transform.z);
                 }
             }
             else {
