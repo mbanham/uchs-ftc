@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Utilities;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -19,6 +19,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
+import static org.firstinspires.ftc.teamcode.Utilities.DeviceManager.*;
 
 public class UtilHolonomic {
 
@@ -26,15 +27,15 @@ public class UtilHolonomic {
     private static DcMotor motorLeft;
     private static Telemetry telemetry;
 
-    private static final double DRIVE_MOTOR_POWER = 0.75;
+    public static final double DRIVE_MOTOR_POWER = 0.75;
     // HD Hex Motor (REV-41-1301) 40:1
-    private static final double COUNTS_PER_DRIVE_MOTOR_REV = 1120; // counts per reevaluation of the motor
-    private static final double SECONDSPERINCH = 2.0/24.0;
-     static final double TOLERANCE_WHEEL_POS = 100.0; //tolerance
+    public static final double COUNTS_PER_DRIVE_MOTOR_REV = 1120; // counts per reevaluation of the motor
+    public static final double SECONDSPERINCH = 2.0/24.0;
+    public static final double TOLERANCE_WHEEL_POS = 100.0; //tolerance
     //75mm Rev Mecanum wheels = 2.95 inch diameter
-    static final double INCHES_PER_ROTATION = 9.273; // inches per rotation of 75mm Mecanum wheel
-    static final double DEG_PER_ROTATION = 100.0; // inches per rotation of 90mm traction wheel
-    static final double DISTANCE_FROM_WALL = 2.25;
+    public static final double INCHES_PER_ROTATION = 9.273; // inches per rotation of 75mm Mecanum wheel
+    public static final double DEG_PER_ROTATION = 100.0; // inches per rotation of 90mm traction wheel
+    public static final double DISTANCE_FROM_WALL = 2.25;
 
     //AUTONOMOUS REFERENCES
     public static double MARKER_A_TO_PLATFORM_CENTER = 27;//towards the center of the platform
@@ -53,20 +54,13 @@ public class UtilHolonomic {
         return LOAD_CONST * value;
     }
 
-
-    // 2019 Code changes
-    private static DcMotor motorBackLeft;
-    private static DcMotor motorBackRight;
-    private static DcMotor motorFrontLeft;
-    private static DcMotor motorFrontRight;
-
     //private static Servo platform_left;
     // private static Servo platform_right;
 
-    static final int COUNTS_PER_INCH = (int) (COUNTS_PER_DRIVE_MOTOR_REV / INCHES_PER_ROTATION); // for 45deg
+    public static final int COUNTS_PER_INCH = (int) (COUNTS_PER_DRIVE_MOTOR_REV / INCHES_PER_ROTATION); // for 45deg
     // wheels
-    static final int COUNTS_PER_SQUARE = (int) (COUNTS_PER_INCH * 1); // for 45deg wheels
-    static final double CENTER_TO_WHEEL_DIST = COUNTS_PER_INCH * 8;//8 inches
+    public static final int COUNTS_PER_SQUARE = (int) (COUNTS_PER_INCH * 1); // for 45deg wheels
+    public static final double CENTER_TO_WHEEL_DIST = COUNTS_PER_INCH * 8;//8 inches
     // initialize these in InitExtraSensors if using
     private static ColorSensor colorSensor;
     public static DistanceSensor sensorDistance;

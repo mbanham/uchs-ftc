@@ -1,6 +1,7 @@
 // Team11288_Teleop
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.deprecated;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -9,6 +10,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.Utilities.UtilHolonomic;
 
 import java.util.Locale;
 
@@ -23,6 +25,7 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENC
  */
 //@Disabled
 @TeleOp(name="TestDriveByDistance", group="Teleop")
+@Disabled
 public class TestDriveByDistance extends OpMode{
 
     /* Declare OpMode members. */

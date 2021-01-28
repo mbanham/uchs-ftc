@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Utilities;
 
 import android.app.Activity;
 import android.graphics.Color;
@@ -61,7 +61,7 @@ public class UtilMain {
     }
 
     // Utils
-    static double scaleInput(double dVal, int mode) {
+    public static double scaleInput(double dVal, int mode) {
         double[] scaleArray = {};
 
         if (mode == 0) {

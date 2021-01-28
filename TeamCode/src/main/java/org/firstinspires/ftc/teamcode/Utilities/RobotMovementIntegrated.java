@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;/* Copyright (c) 2019 FIRST. All rights reserved.
+package org.firstinspires.ftc.teamcode.Utilities;/* Copyright (c) 2019 FIRST. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided that
@@ -27,36 +27,24 @@ package org.firstinspires.ftc.teamcode;/* Copyright (c) 2019 FIRST. All rights r
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.AI.VuforiaInitializer;
-import org.firstinspires.ftc.teamcode.Utilities.Point;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.firstinspires.ftc.teamcode.Abstracts.Point;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
-import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YZX;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
-import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
 import static org.firstinspires.ftc.teamcode.AI.VuforiaInitializer.targetsUltimateGoal;
-import static org.firstinspires.ftc.teamcode.UtilHolonomic.COUNTS_PER_INCH;
-import static org.firstinspires.ftc.teamcode.UtilHolonomic.TOLERANCE_WHEEL_POS;
-import static org.firstinspires.ftc.teamcode.UtilMain.VUFORIA_KEY;
+import static org.firstinspires.ftc.teamcode.Utilities.UtilHolonomic.COUNTS_PER_INCH;
+import static org.firstinspires.ftc.teamcode.Utilities.UtilHolonomic.TOLERANCE_WHEEL_POS;
 
 /**
  * This 2020-2021 OpMode illustrates the basics of using the Vuforia localizer to determine
@@ -129,11 +117,11 @@ public class RobotMovementIntegrated {
         }
         UtilHolonomic.stopWheelsSpeedMode();
     }
-    static void MoveRobotToLocation(float xFinal, float yFinal){
+    public static void MoveRobotToLocation(float xFinal, float yFinal){
         MoveRobotToLocation(-1, -1, xFinal, yFinal);
     }
 
-    static void MoveRobotToLocationDualSensor(float xFinal, float yFinal){
+    public static void MoveRobotToLocationDualSensor(float xFinal, float yFinal){
         int timesClose = 0;
         float distanceToMove = 0;
         Point robotEncoderLocation = null;

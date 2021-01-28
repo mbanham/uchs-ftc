@@ -1,8 +1,8 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.deprecated;
 
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-import org.firstinspires.ftc.teamcode.Utilities.Point;
-import org.firstinspires.ftc.teamcode.Utilities.Size;
+import org.firstinspires.ftc.teamcode.Abstracts.Point;
+import org.firstinspires.ftc.teamcode.Abstracts.Size;
 
 ;
 

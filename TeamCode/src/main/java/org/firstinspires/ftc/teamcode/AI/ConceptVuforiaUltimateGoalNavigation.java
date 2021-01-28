@@ -47,7 +47,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YZX;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
-import static org.firstinspires.ftc.teamcode.UtilMain.VUFORIA_KEY;
+import static org.firstinspires.ftc.teamcode.AI.VuforiaInitializer.VUFORIA_KEY;
 
 /**
  * This 2020-2021 OpMode illustrates the basics of using the Vuforia localizer to determine

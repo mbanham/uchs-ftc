@@ -4,9 +4,12 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.AI.VuforiaInitializer;
-import org.firstinspires.ftc.teamcode.Utilities.Point;
-
-import static org.firstinspires.ftc.teamcode.AI.VuforiaInitializer.EndTracking;
+import org.firstinspires.ftc.teamcode.Abstracts.Point;
+import org.firstinspires.ftc.teamcode.Abstracts.RingReturnObject;
+import org.firstinspires.ftc.teamcode.Utilities.DeviceManager;
+import org.firstinspires.ftc.teamcode.Utilities.RingCountDetection;
+import org.firstinspires.ftc.teamcode.Utilities.RobotMovementIntegrated;
+import org.firstinspires.ftc.teamcode.Utilities.UtilHolonomic;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "AutonomousProcedure", group = "Linear Opmode")
 //@Disabled                            // Comment this out to add to the opmode list
@@ -24,6 +27,7 @@ public class AutonomousDriveBlue extends LinearOpMode {
         telemetry.update();
 
         VuforiaInitializer.InitializeVuforia(hardwareMap, VuforiaInitializer.Modules.ObjectDetection, VuforiaInitializer.Modules.RobotTransformDetection);
+        DeviceManager.MapDriveMotors();
 
         waitForStart();
         VuforiaInitializer.BeginTracking();
@@ -39,15 +43,15 @@ public class AutonomousDriveBlue extends LinearOpMode {
             switch (ringreturn.ring_count){
                 case 1:
                     //Do procedure for one ring
-                    RobotMovementIntegrated.MoveRobotToLocationDualSensor(endPointA.x, endPointA.y);//A
+                    RobotMovementIntegrated.MoveRobotToLocation(endPointA.x, endPointA.y);//A
                     break;
                 case 2:
                     //Do procedure for two rings
-                    RobotMovementIntegrated.MoveRobotToLocationDualSensor(endPointB.x, endPointB.y);//B
+                    RobotMovementIntegrated.MoveRobotToLocation(endPointB.x, endPointB.y);//B
                     break;
                 case 3:
                     //Do procedure for three rings
-                    RobotMovementIntegrated.MoveRobotToLocationDualSensor(endPointC.x, endPointC.y);//C
+                    RobotMovementIntegrated.MoveRobotToLocation(endPointC.x, endPointC.y);//C
                     break;
             }
         }

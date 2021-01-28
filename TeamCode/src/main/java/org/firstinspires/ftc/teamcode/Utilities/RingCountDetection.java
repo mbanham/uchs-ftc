@@ -1,22 +1,14 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Utilities;
 
-import com.qualcomm.robotcore.hardware.HardwareMap;
-
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.teamcode.AI.VuforiaInitializer;
-import org.firstinspires.ftc.teamcode.AI.VuforiaInitializer.*;
-import org.tensorflow.lite.TensorFlowLite;
+import org.firstinspires.ftc.teamcode.Abstracts.RingReturnObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static org.firstinspires.ftc.teamcode.UtilMain.VUFORIA_KEY;
 
 public class RingCountDetection {
     private static final double RING_RATIO = 0.75/5;
@@ -109,21 +101,4 @@ public class RingCountDetection {
     /**
      * Initialize the TensorFlow Object Detection engine.
      */
-}
-class RingReturnObject{
-    int ring_count;
-    int listsize;
-    int maxlistsize;
-    private String why = "";
-
-    public RingReturnObject(int ring_count, int listsize, int maxlistsize){
-        this.ring_count = ring_count;
-        this.listsize = listsize;
-    }
-    public RingReturnObject(String message){
-        this.why = message;
-    }
-    public String why(){
-        return why;
-    }
 }

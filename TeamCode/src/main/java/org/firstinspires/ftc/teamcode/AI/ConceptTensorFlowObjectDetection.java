@@ -39,7 +39,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-import static org.firstinspires.ftc.teamcode.UtilMain.VUFORIA_KEY;
+import static org.firstinspires.ftc.teamcode.AI.VuforiaInitializer.VUFORIA_KEY;
 
 /**
  * This 2020-2021 OpMode illustrates the basics of using the TensorFlow Object Detection API to

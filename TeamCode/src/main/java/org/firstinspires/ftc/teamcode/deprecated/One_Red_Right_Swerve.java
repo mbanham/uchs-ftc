@@ -1,31 +1,25 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.deprecated;
 
-
-import android.graphics.Color;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.teamcode.Utilities.UtilHolonomic;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
 
-@Autonomous(name = "Camera_GrabStone", group = "Linear Opmode")
+@Autonomous(name = "One_Red_Right_Swerve", group = "Linear Opmode")
 @Disabled                            // Comment this out to add to the opmode list
-public class Camera_GrabStone extends LinearOpMode {
-    //claw and arm
-    static final double COUNTS_PER_MOTOR_REV = 1250.0; //HD Hex Motor (REV-41-1301) 40:1
-    private static final int teleopType1 = 0, teleopType2 = 1, teleopType3 = 2, teleopTypeLinear = 3, teleopTypeRev = 4;
-    //TODO touch sensor
-    DigitalChannel touchSensor;  // Hardware Device Object
+
+public class One_Red_Right_Swerve extends LinearOpMode {
     //initialize these variables, override them in the constructor
-    private int TEAM_COLOR = Color.BLUE;
-    private int currentScaleInputMode = teleopTypeLinear;
+
     /* Declare OpMode members. */
     //wheels
     private DcMotor motorFrontRight;
@@ -33,18 +27,18 @@ public class Camera_GrabStone extends LinearOpMode {
     private DcMotor motorBackRight;
     private DcMotor motorBackLeft;
     private DcMotor motorLift;
+
     private UtilHolonomic teamUtils;
+
+
     //    private elbow             = null;
 //    private Servo wrist       = null;
     private Servo claw = null;
     private Servo platform = null;
-    private int directionArm = 1;
-    private int rotations = 12;
 
 
     private ElapsedTime runtime = new ElapsedTime();
 
-    private UtilMain utilMain;
 
     @Override
     public void runOpMode() {
@@ -65,10 +59,6 @@ public class Camera_GrabStone extends LinearOpMode {
         motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
         motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-        motorBackLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motorBackRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motorFrontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motorFrontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         motorLift.setDirection(DcMotorSimple.Direction.FORWARD);
         motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -76,33 +66,34 @@ public class Camera_GrabStone extends LinearOpMode {
         motorLift.setMode(STOP_AND_RESET_ENCODER);
 
         //utils class initializer
-
-
-        utilMain = new UtilMain(telemetry);
-        utilMain.InitVuforia(hardwareMap);
         teamUtils = new UtilHolonomic(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
-        teamUtils.setWheelsToEncoderMode();
+        //  teamUtils.InitExtraSensors(hardwareMap);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         //Play started
-        runtime.reset();
-        StoneElement[] recog = utilMain.GetObjectsInFrame();
-        for (StoneElement r : recog) {
-            if (r.name.equals(UtilMain.STONE)) {
-                double dist = r.center.x - r.screen_center.x;
-                while (Math.abs(dist) > 10) {
-                    if (dist > 0) {
-                        teamUtils.DriveBySpeed(0.8, 0.0, 0);
-                    } else {
-                        teamUtils.DriveBySpeed(-0.8, 0.0, 0);
-                    }
-                }
-                teamUtils.stopWheelsSpeedMode();
-            } else {
-                telemetry.addData("debug", "SKYSTONE");
-                telemetry.update();
+
+        boolean stepsCompleted = false;
+
+        while (opModeIsActive()) {
+            if (!stepsCompleted) {
+                stepsCompleted = true;
+                // run this loop until the end of the match (driver presses stop)
+                teamUtils.DriveByDistance(-0.8, 0.0, 3);//drive away from wall
+                teamUtils.DriveByDistance(0.0, 0.8, 24);//drive to corner
+                teamUtils.DriveByDistance(-0.8, 0, 27);//drive to base plate
+                platform.setPosition(0);
+                sleep(800);
+                //drive back to corner
+                //teamUtils.drivebyDistAndRot(0.8, 0, 90, 20);//drive to start position
+                platform.setPosition(1);
+                sleep(800);
+                teamUtils.DriveByDistance(0.0, 0.8, 24);//push platform to corner
+                claw.setPosition(1);
+                requestOpModeStop();
             }
         }
     }
+
 }
+

@@ -10,7 +10,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
-import org.firstinspires.ftc.teamcode.Utilities.Size;
+import org.firstinspires.ftc.teamcode.Utilities.DeviceManager;
+import org.firstinspires.ftc.teamcode.Abstracts.Size;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,7 +22,6 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YZX;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
-import static org.firstinspires.ftc.teamcode.Utilities.Size.*;
 
 public class VuforiaInitializer {
     // OBJECT DETECTION
@@ -71,15 +71,20 @@ public class VuforiaInitializer {
     }
 
     static ArrayList<Modules> args;
+
     public static void InitializeVuforia(HardwareMap hardwareMap, Modules ... modules){
         EndTracking();
         args = new ArrayList<Modules>(Arrays.asList(modules));
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        DeviceManager.MapWebcam();
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
         parameters.cameraDirection = CAMERA_CHOICE;
 
         parameters.useExtendedTracking = false;
+        parameters.cameraName = DeviceManager.webcamName;
 
         //  Instantiate the Vuforia engine
         if(args.contains(Modules.ObjectDetection)){

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.deprecated;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -9,13 +9,14 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Utilities.UtilHolonomic;
+
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
 
-@Autonomous(name = "One_Red_Right_Swerve", group = "Linear Opmode")
+@Autonomous(name = "Ref_Right_Platf_Center", group = "Linear Opmode")
 @Disabled                            // Comment this out to add to the opmode list
-
-public class One_Red_Right_Swerve extends LinearOpMode {
+public class Ref_Right_Platf_Center extends LinearOpMode {
     //initialize these variables, override them in the constructor
 
     /* Declare OpMode members. */
@@ -50,9 +51,9 @@ public class One_Red_Right_Swerve extends LinearOpMode {
         motorBackRight = hardwareMap.dcMotor.get("motor back right");
         motorLift = hardwareMap.dcMotor.get("motor lift");
         claw = hardwareMap.servo.get("claw servo");
-        platform = hardwareMap.servo.get("platform servo");
+        //platform = hardwareMap.servo.get("platform servo");
         claw.setPosition(0);
-        platform.setPosition(1);
+        //platform.setPosition(1);
         motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
         motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -65,8 +66,8 @@ public class One_Red_Right_Swerve extends LinearOpMode {
 
         //utils class initializer
         teamUtils = new UtilHolonomic(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
-        //  teamUtils.InitExtraSensors(hardwareMap);
-
+        teamUtils.InitExtraSensors(hardwareMap);
+        teamUtils.InitPlatform(hardwareMap);
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         //Play started
@@ -77,21 +78,34 @@ public class One_Red_Right_Swerve extends LinearOpMode {
             if (!stepsCompleted) {
                 stepsCompleted = true;
                 // run this loop until the end of the match (driver presses stop)
-                teamUtils.DriveByDistance(-0.8, 0.0, 3);//drive away from wall
-                teamUtils.DriveByDistance(0.0, 0.8, 24);//drive to corner
-                teamUtils.DriveByDistance(-0.8, 0, 27);//drive to base plate
-                platform.setPosition(0);
-                sleep(800);
+                teamUtils.DriveByDistance(0.85, 0.0, UtilHolonomic.ROBOT_WALL_CLEARANCE);//drive away from wall
+                teamUtils.DriveByDistance(0.0, -0.85, UtilHolonomic.MARKER_A_TO_PLATFORM_CENTER);//drive towards corner
+                teamUtils.DriveByDistance(0.85, 0, UtilHolonomic.EDGE_TO_PLATFORM_CLEARANCE);//drive to base plate
+
+                teamUtils.GrabPlaform(true);
+
                 //drive back to corner
-                //teamUtils.drivebyDistAndRot(0.8, 0, 90, 20);//drive to start position
-                platform.setPosition(1);
+                teamUtils.GrabPlaform(false);
                 sleep(800);
-                teamUtils.DriveByDistance(0.0, 0.8, 24);//push platform to corner
+                teamUtils.DriveByDistance(-0.85, 0, UtilHolonomic.WALL_ROBOT_TO_EDGE_LOAD, UtilHolonomic.ROBOT_WALL_CLEARANCE);//drive towards corner
+                teamUtils.GrabPlaform(true);
+                sleep(800);
+
+                teamUtils.DriveByDistance(0.0, 0.85, 0.85 * (0.66 * UtilHolonomic.BRIDGE_TO_PLATFORM_CENTER));//drive up to park at wall
+                teamUtils.DriveByDistance(0.85, 0, UtilHolonomic.WALL_TO_CENTER);//drive towards corner
+                teamUtils.DriveByDistance(0.0, 0.85, 0.85 * (0.33 * UtilHolonomic.BRIDGE_TO_PLATFORM_CENTER));//drive up to park at wall
+                teamUtils.stopWheelsSpeedMode();
                 claw.setPosition(1);
+
+                try {
+                    Thread.sleep(3000);
+                } catch (Exception e) {
+                }
+
                 requestOpModeStop();
             }
         }
     }
-
 }
+
 

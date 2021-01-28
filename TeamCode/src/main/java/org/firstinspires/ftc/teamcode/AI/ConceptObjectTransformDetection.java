@@ -44,9 +44,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
-import org.firstinspires.ftc.teamcode.Utilities.ViewObject;
+import org.firstinspires.ftc.teamcode.Abstracts.ViewObject;
 
-import static org.firstinspires.ftc.teamcode.UtilMain.VUFORIA_KEY;
+import static org.firstinspires.ftc.teamcode.AI.VuforiaInitializer.VUFORIA_KEY;
 
 
 @TeleOp(name="ObjectTransformDetection")
