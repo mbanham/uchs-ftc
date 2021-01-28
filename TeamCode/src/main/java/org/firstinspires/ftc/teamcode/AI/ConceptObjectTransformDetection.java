@@ -28,6 +28,7 @@
  */
 package org.firstinspires.ftc.teamcode.AI;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -49,6 +50,7 @@ import static org.firstinspires.ftc.teamcode.UtilMain.VUFORIA_KEY;
 
 
 @TeleOp(name="ObjectTransformDetection")
+@Disabled
 public class ConceptObjectTransformDetection extends LinearOpMode {
 
     OpenGLMatrix lastLocation = null;

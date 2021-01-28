@@ -78,7 +78,7 @@ public class Drive_30_In_Fwd_BLUE extends LinearOpMode {
                 stepsCompleted = true;
                 // run this loop until the end of the match (driver presses stop)
 
-                teamUtils.drivebyDistance(0.0, 0.8, 30);
+                teamUtils.DriveByDistance(0.0, 0.8, 30);
                 claw.setPosition(1);
                 teamUtils.stopWheelsSpeedMode();
                 requestOpModeStop();

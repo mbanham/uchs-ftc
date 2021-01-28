@@ -147,7 +147,7 @@ public class TestDriveByDistance extends OpMode{
         if(gamepad1.dpad_right)
             x_int = -0.8;
         if(x_int != 0 || y_int != 0) {
-            teamUtils.drivebyDistance(x_int, y_int, inches, UtilHolonomic.DISTANCE_FROM_WALL);
+            teamUtils.DriveByDistance(x_int, y_int, inches, UtilHolonomic.DISTANCE_FROM_WALL);
 
         }
            telemetry.addData("Distance (inch)",

@@ -3,48 +3,54 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.teamcode.AI.VuforiaInitializer;
+import org.firstinspires.ftc.teamcode.Utilities.Point;
+
+import static org.firstinspires.ftc.teamcode.AI.VuforiaInitializer.EndTracking;
+
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "AutonomousProcedure", group = "Linear Opmode")
 //@Disabled                            // Comment this out to add to the opmode list
-public class AutonomousProcedure extends LinearOpMode {
+public class AutonomousDriveBlue extends LinearOpMode {
 
     DcMotor mfl, mfr, mbl, mbr;
     private UtilHolonomic teamUtils;
 
+    Point endPointA = new Point(12, 84);//a
+    Point endPointB = new Point(36, 108);//b
+    Point endPointC = new Point(12, 132);//c
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        RingCountDetection.Initialize(hardwareMap);
-        RobotMovementIntegrated.Initialize(hardwareMap);
+        VuforiaInitializer.InitializeVuforia(hardwareMap, VuforiaInitializer.Modules.ObjectDetection, VuforiaInitializer.Modules.RobotTransformDetection);
 
         waitForStart();
+        VuforiaInitializer.BeginTracking();
         //one time run
         RingReturnObject ringreturn = null;
-        while (opModeIsActive()) {
-            ringreturn = RingCountDetection.GetRingCount();
-            //if method does not return null and at least 10% of the maximum iterations has been performed
-            if (ringreturn.ring_count != -1 && (ringreturn.listsize / ringreturn.maxlistsize) > 0.1) {
-                break;
-            }
+        while (!RingCountDetection.GetRingCountCheck()) {
+
         }
+        ringreturn = RingCountDetection.GetRingCount();
         if(ringreturn==null){
             requestOpModeStop();
         }else{
             switch (ringreturn.ring_count){
                 case 1:
                     //Do procedure for one ring
-                    RobotMovementIntegrated.MoveRobotToLocationDualSensor(132, 84);//A
+                    RobotMovementIntegrated.MoveRobotToLocationDualSensor(endPointA.x, endPointA.y);//A
                     break;
                 case 2:
                     //Do procedure for two rings
-                    RobotMovementIntegrated.MoveRobotToLocationDualSensor(108,108);//B
+                    RobotMovementIntegrated.MoveRobotToLocationDualSensor(endPointB.x, endPointB.y);//B
                     break;
                 case 3:
                     //Do procedure for three rings
-                    RobotMovementIntegrated.MoveRobotToLocationDualSensor(132,132);//C
+                    RobotMovementIntegrated.MoveRobotToLocationDualSensor(endPointC.x, endPointC.y);//C
                     break;
             }
         }
+        VuforiaInitializer.EndTracking();
     }
 }

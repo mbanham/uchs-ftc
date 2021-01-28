@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode;
 import android.graphics.Color;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -15,7 +16,7 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENC
 
 
 @Autonomous(name = "Camera_GrabStone", group = "Linear Opmode")
-//@Disabled                            // Comment this out to add to the opmode list
+@Disabled                            // Comment this out to add to the opmode list
 public class Camera_GrabStone extends LinearOpMode {
     //claw and arm
     static final double COUNTS_PER_MOTOR_REV = 1250.0; //HD Hex Motor (REV-41-1301) 40:1
@@ -89,12 +90,12 @@ public class Camera_GrabStone extends LinearOpMode {
         StoneElement[] recog = utilMain.GetObjectsInFrame();
         for (StoneElement r : recog) {
             if (r.name.equals(UtilMain.STONE)) {
-                double dist = r.center.distanceToPointX(r.screen_center);
+                double dist = r.center.x - r.screen_center.x;
                 while (Math.abs(dist) > 10) {
                     if (dist > 0) {
-                        teamUtils.drivebySpeed(0.8, 0.0, 0);
+                        teamUtils.DriveBySpeed(0.8, 0.0, 0);
                     } else {
-                        teamUtils.drivebySpeed(-0.8, 0.0, 0);
+                        teamUtils.DriveBySpeed(-0.8, 0.0, 0);
                     }
                 }
                 teamUtils.stopWheelsSpeedMode();

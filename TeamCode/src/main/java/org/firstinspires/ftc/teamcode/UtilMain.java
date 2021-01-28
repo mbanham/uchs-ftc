@@ -37,7 +37,6 @@ public class UtilMain {
     static final int COUNTS_PER_INCH = (int) ((1.4142 * (COUNTS_PER_DRIVE_MOTOR_REV)) / (4.0 * Math.PI)); // for 45deg
     // vuforia
     private static final String TFOD_MODEL_ASSET = "Skystone.tflite";
-    public static final String VUFORIA_KEY = "ASVozkX/////AAAAGX+Aimqfn0YRqafZGVaD2MIhBsmxiHLTd4r2XyoV4F/VEvRMnL1mLn7NDtl1onYGhHmJADQR8nt0aX4rZLIAb/7+XxI7LLZV4X0tMBDQyBL6IWcEdgMD63hTKncdP8NsIVJxJOY971/5pVdU50XisgiiAhq3b6D9twKLfGZ9EI2M4XXM0B7BxdA7x7YMD5QcMDf96myKGsPhVlkwz8XvBdbnOvZZg2FoxmhqExRp33AKii1GZRDwvfeco0hEOKusdwOkjbJ5RTJ+9T3fAysvqSovSG8iAWZ98qrG2xop2gK73UPJaY4vj5/1yVBKFMnWt42P931ybmEW1/c5dc8LR1CyD8jCxlgqypf9oCz/q89j";
     private final double LIFT_MOTOR_POWER = 0.65;
     private final double ARM_MOTOR_POWER = 0.15;
     float hsvValues[] = {0F, 0F, 0F};
@@ -156,67 +155,6 @@ public class UtilMain {
         relativeLayoutId = hardwareMap.appContext.getResources().getIdentifier("RelativeLayout", "id",
                 hardwareMap.appContext.getPackageName());
         View relativeLayout = ((Activity) hardwareMap.appContext).findViewById(relativeLayoutId);
-    }
-
-    //#region Vuforia PatternRecog
-    public void InitVuforia(HardwareMap hwm) {
-        initVuforiaRaw();
-
-        // if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
-        //      initTfod(hwm);
-        //   } else {
-        //       telemetry.addData("Sorry!", "This device is not compatible with TFOD");
-        //   }
-
-        /**
-         * Activate TensorFlow Object Detection before we wait for the start command. Do
-         * it here so that the Camera Stream window will have the TensorFlow annotations
-         * visible.
-         **/
-        if (tfod != null) {
-            tfod.activate();
-        }
-
-        /** Wait for the game to begin */
-        telemetry.addData(">", "Press Play to start op mode");
-        telemetry.update();
-
-    }
-
-    private void initVuforiaRaw() {
-        /*
-         * Configure Vuforia by creating a Parameter object, and passing it to the
-         * Vuforia engine.
-         */
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
-
-        parameters.vuforiaLicenseKey = VUFORIA_KEY;
-        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
-
-        // Instantiate the Vuforia engine
-        vuforia = ClassFactory.getInstance().createVuforia(parameters);
-
-        // Loading trackables is not necessary for the TensorFlow Object Detection
-        // engine.
-    }
-
-    private void initTfod(HardwareMap hwm) {
-        int tfodMonitorViewId = hwm.appContext.getResources().getIdentifier("tfodMonitorViewId", "id",
-                hwm.appContext.getPackageName());
-        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minimumConfidence = 0.8;
-        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
-        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, STONE, SKYSTONE);
-    }
-
-    public StoneElement[] GetObjectsInFrame() {
-        List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-        StoneElement[] elem = new StoneElement[]{};
-        for (int i = 0; i < updatedRecognitions.size(); i++) {
-            elem[i] = new StoneElement(updatedRecognitions.get(i));
-
-        }
-        return elem;
     }
 
     //#endregion
