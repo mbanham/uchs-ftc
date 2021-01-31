@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.Utilities.RingCountDetection;
 import org.firstinspires.ftc.teamcode.Utilities.RobotMovementIntegrated;
 import org.firstinspires.ftc.teamcode.Utilities.UtilHolonomic;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "AutonomousProcedure", group = "Linear Opmode")
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "AutonomousProcedureRed", group = "Linear Opmode")
 //@Disabled                            // Comment this out to add to the opmode list
 public class AutonomousDriveRed extends LinearOpMode {
 

@@ -22,7 +22,6 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENC
  * Assumes claw with arm having shoulder motor, elbow servo and wrist servo - all having 180deg servos
  *
  */
-@Disabled
 @TeleOp(name = "TeleopDriveMechanumTest", group = "Teleop")
 public class TeleopDriveMecanum extends OpMode {
 
@@ -50,10 +49,13 @@ public class TeleopDriveMecanum extends OpMode {
     private DcMotor motorFrontLeft;
     private DcMotor motorBackRight;
     private DcMotor motorBackLeft;
-    private DcMotor motorArm;
-    private DcMotor motorLift;
+//    private DcMotor motorArm;
+//    private DcMotor motorLift;
     private UtilHolonomic teamUtils;
-    private DcMotor shoulder; //bottom pivot of the new claw
+//    private DcMotor shoulder; //bottom pivot of the new claw
+    private DcMotor motorLauncher;
+    private DcMotor motorLoader;
+    private Servo loader = null;
     private int currentPosition; //used to track shoulder motor current position
     private int targetPosition; //used to track target shoulder position
     private double minPosition; //minimum allowed position of shoulder motor
@@ -63,8 +65,8 @@ public class TeleopDriveMecanum extends OpMode {
     //DigitalChannel touchSensor;  // Hardware Device Object
 //    private elbow             = null;
 //    private Servo wrist       = null;
-    private Servo claw = null;
-    private Servo platform = null;
+//    private Servo claw = null;
+//    private Servo platform = null;
     //arm for knocking jewel - keep it out of the way in Driver Mode
     private Servo knockingArm = null;
     private int directionArm = 1;
@@ -84,35 +86,40 @@ public class TeleopDriveMecanum extends OpMode {
         motorFrontLeft = hardwareMap.dcMotor.get("motor front left");
         motorBackLeft = hardwareMap.dcMotor.get("motor back left");
         motorBackRight = hardwareMap.dcMotor.get("motor back right");
-        motorArm = hardwareMap.dcMotor.get("motor arm");
-        claw = hardwareMap.servo.get("claw servo");
-        platform = hardwareMap.servo.get("platform servo");
-        motorLift = hardwareMap.dcMotor.get("motor lift");
+//        motorArm = hardwareMap.dcMotor.get("motor arm");
+//        claw = hardwareMap.servo.get("claw servo");
+//        platform = hardwareMap.servo.get("platform servo");
+//        motorLift = hardwareMap.dcMotor.get("motor lift");
+        motorLauncher = hardwareMap.dcMotor.get("motor launcher");
+        motorLoader = hardwareMap.dcMotor.get("motor loader");
+        loader = hardwareMap.servo.get("launch servo");
 
-        claw.setPosition(0);
-        platform.setPosition(1);
+        loader.setPosition(0);
 
         motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
         motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
         motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        motorArm.setDirection(DcMotorSimple.Direction.FORWARD);
-        motorArm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motorArm.setMode(STOP_AND_RESET_ENCODER);
-        motorArm.setDirection(DcMotorSimple.Direction.FORWARD);
+        motorLauncher.setDirection(DcMotorSimple.Direction.FORWARD);
+        motorLoader.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        motorLift.setDirection(DcMotorSimple.Direction.FORWARD);
-        motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motorLift.setMode(STOP_AND_RESET_ENCODER);
-        motorLift.setDirection(DcMotorSimple.Direction.FORWARD);
+//        motorArm.setDirection(DcMotorSimple.Direction.FORWARD);
+//        motorArm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        motorArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        motorArm.setMode(STOP_AND_RESET_ENCODER);
+//        motorArm.setDirection(DcMotorSimple.Direction.FORWARD);
+//
+//        motorLift.setDirection(DcMotorSimple.Direction.FORWARD);
+//        motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        motorLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        motorLift.setMode(STOP_AND_RESET_ENCODER);
+//        motorLift.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        initialPosition = (int) (motorArm.getCurrentPosition());
+       // initialPosition = (int) (motorArm.getCurrentPosition());
         rotations = 12;
         directionArm = -1;
-        targetPosition = (int) (motorArm.getCurrentPosition() + (directionArm * rotations * COUNTS_PER_MOTOR_REV));
+        //targetPosition = (int) (motorArm.getCurrentPosition() + (directionArm * rotations * COUNTS_PER_MOTOR_REV));
 
         //utils class initializer
         teamUtils = new UtilHolonomic(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
@@ -166,19 +173,24 @@ public class TeleopDriveMecanum extends OpMode {
         } else {
             speed_multiplier = 1;
         }
-        //#region PLATFORM_GRABBER
-        if (gamepad1.a) {
-            //down
-            platform.setPosition(0);
-            telemetry.addData("MyActivity", "ServoPosition=0");
-            telemetry.update();
-        } else if (gamepad1.y) {
-            //up
-            platform.setPosition(1);
-            telemetry.addData("MyActivity", "ServoPosition=1");
-            telemetry.update();
+
+        if(gamepad2.a) {
+            loader.setPosition(1);
+        } else if(gamepad2.b) {
+            loader.setPosition(0);
         }
-        //#endregion
+
+        if(gamepad2.right_trigger > 0.1) {
+            motorLauncher.setPower(gamepad2.right_trigger);
+        } else {
+            motorLauncher.setPower(0);
+        }
+
+        if(gamepad2.left_trigger > 0.1) {
+            motorLoader.setPower(gamepad2.left_trigger);
+        } else {
+            motorLoader.setPower(0);
+        }
 
         //press x
         //while x is pressed, press dpad buttons to proper degree
@@ -255,50 +267,6 @@ public class TeleopDriveMecanum extends OpMode {
 //            if(x_int != 0 || y_int != 0) {
 //                teamUtils.drivebyDistance(x_int, y_int, 1, "inch");
 //            }
-
-
-        //claw
-        if (gamepad2.right_bumper) {
-            claw.setPosition(1);
-            telemetry.addData("MyActivity", "ClawPosition=1");
-            telemetry.update();
-        }
-        if (gamepad2.left_bumper) {
-            claw.setPosition(0);
-            telemetry.addData("MyActivity", "ClawPosition=0");
-            telemetry.update();
-        }
-        //arm
-
-        motorArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        if (Range.clip(gamepad2.left_trigger, 0, 1) > 0.02) {
-            motorArm.setPower(Range.clip(gamepad2.left_trigger, 0, 1 * arm_multiplier));
-        } else {
-            if (Range.clip(gamepad2.right_trigger, 0, 1) > 0.02) {
-                motorArm.setPower(-Range.clip(gamepad2.right_trigger, 0, 1 * arm_multiplier));
-            } else {
-                motorArm.setPower(0.0);
-            }
-        }
-        if (gamepad2.x) {
-            arm_multiplier = 0.3;
-        } else {
-            arm_multiplier = 1;
-        }
-
-
-        //lift
-        motorLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        if (gamepad2.dpad_down) {
-            motorLift.setPower(-1);
-        } else {
-            if (gamepad2.dpad_up) {
-                motorLift.setPower(1);
-
-            } else {
-                motorLift.setPower(0);
-            }
-        }
 
     }
 

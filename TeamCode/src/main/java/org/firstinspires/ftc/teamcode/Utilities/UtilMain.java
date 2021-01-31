@@ -104,7 +104,7 @@ public class UtilMain {
     }
     //#endregion
 
-    static double MathLimit(double min, double max, double value) {
+    public static double MathLimit(double min, double max, double value) {
         if (value >= min && value <= max) {
             return value;
         } else if (value < min) {
@@ -115,7 +115,7 @@ public class UtilMain {
         return -Integer.MAX_VALUE;
     }
 
-    static double[] LimitList(double min, double max, double[] list) {
+    public static double[] LimitList(double min, double max, double[] list) {
         //declaring variables
         double list_max = 0;// Ex. 8
         double list_min = 0;// Ex. -2
@@ -129,7 +129,7 @@ public class UtilMain {
                 list_min = d;
         }
         list_max -= list_min;
-        double[] new_list = new double[]{};
+        double[] new_list = new double[list.length];
         for (int i = 0; i < list.length; i++) {
             double d = list[i];//get value Ex. 3 in range -2 8
             d -= list_min; // Ex. 3-(-2) = 5 of 10
