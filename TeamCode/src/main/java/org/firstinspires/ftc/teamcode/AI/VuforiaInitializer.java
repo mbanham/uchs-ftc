@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.AI;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraManager;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
@@ -11,12 +13,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 import org.firstinspires.ftc.teamcode.Utilities.DeviceManager;
 import org.firstinspires.ftc.teamcode.Abstracts.Size;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
@@ -60,6 +64,8 @@ public class VuforiaInitializer {
     private static final float TRACKING_BIAS = 0.5f;
     private static final float MIN_RESULT_CONFIDENCE = 0.75f;
 
+    public static CameraManager cameraManager;
+    public static Camera camera;
     public static VuforiaLocalizer vuforia;
     public static TFObjectDetector tfod;
 
@@ -78,14 +84,18 @@ public class VuforiaInitializer {
         args = new ArrayList<Modules>(Arrays.asList(modules));
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        DeviceManager.MapWebcam();
+        DeviceManager.MapWebcam(hardwareMap);
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
         parameters.cameraDirection = CAMERA_CHOICE;
 
         parameters.useExtendedTracking = false;
+        cameraManager = ClassFactory.getInstance().getCameraManager();
         parameters.cameraName = DeviceManager.webcamName;
+
+        Deadline deadline = new Deadline(2, TimeUnit.SECONDS);
+        camera = cameraManager.requestPermissionAndOpenCamera(deadline, parameters.cameraName, null);
 
         //  Instantiate the Vuforia engine
         if(args.contains(Modules.ObjectDetection)){

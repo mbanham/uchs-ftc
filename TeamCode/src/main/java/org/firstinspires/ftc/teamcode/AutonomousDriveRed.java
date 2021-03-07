@@ -29,7 +29,7 @@ public class AutonomousDriveRed extends LinearOpMode {
         telemetry.update();
 
         VuforiaInitializer.InitializeVuforia(hardwareMap, VuforiaInitializer.Modules.ObjectDetection, VuforiaInitializer.Modules.RobotTransformDetection);
-        DeviceManager.MapDriveMotors();
+        DeviceManager.MapDriveMotors(hardwareMap);
 
         waitForStart();
         VuforiaInitializer.BeginTracking();

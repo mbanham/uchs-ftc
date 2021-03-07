@@ -33,8 +33,10 @@ public class AutonomousDriveBlue extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
+        System.out.println(hardwareMap.toString());
+
         VuforiaInitializer.InitializeVuforia(hardwareMap, VuforiaInitializer.Modules.ObjectDetection, VuforiaInitializer.Modules.RobotTransformDetection);
-        DeviceManager.MapDriveMotors();
+        DeviceManager.MapDriveMotors(hardwareMap);
 
         waitForStart();
         VuforiaInitializer.BeginTracking();
