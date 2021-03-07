@@ -2,7 +2,9 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.vuforia.Vuforia;
 
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.teamcode.AI.VuforiaInitializer;
 import org.firstinspires.ftc.teamcode.Abstracts.Point;
 import org.firstinspires.ftc.teamcode.Abstracts.RingReturnObject;

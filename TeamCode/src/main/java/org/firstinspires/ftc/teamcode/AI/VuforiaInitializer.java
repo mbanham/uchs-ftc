@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.AI;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
@@ -28,7 +29,7 @@ public class VuforiaInitializer {
     private static final String TFOD_MODEL_ASSET = "UltimateGoal.tflite";
     private static final String LABEL_FIRST_ELEMENT = "Quad";
     private static final String LABEL_SECOND_ELEMENT = "Single";
-    public static final String VUFORIA_KEY = "ASVozkX/////AAAAGX+Aimqfn0YRqafZGVaD2MIhBsmxiHLTd4r2XyoV4F/VEvRMnL1mLn7NDtl1onYGhHmJADQR8nt0aX4rZLIAb/7+XxI7LLZV4X0tMBDQyBL6IWcEdgMD63hTKncdP8NsIVJxJOY971/5pVdU50XisgiiAhq3b6D9twKLfGZ9EI2M4XXM0B7BxdA7x7YMD5QcMDf96myKGsPhVlkwz8XvBdbnOvZZg2FoxmhqExRp33AKii1GZRDwvfeco0hEOKusdwOkjbJ5RTJ+9T3fAysvqSovSG8iAWZ98qrG2xop2gK73UPJaY4vj5/1yVBKFMnWt42P931ybmEW1/c5dc8LR1CyD8jCxlgqypf9oCz/q89j";
+    public static final String VUFORIA_KEY = "AaxEeJj/////AAABmdLSaHu3GEP4oER0Z4wPyoYCDrpQOx7X1WZ792YNzZwWGHsLEoTDlfqsXqFSF65DRwdrvXt8RCy1oOpTCReV8Mb7NJETFJupTeuqAt9KHsxxSszvgNq6nY4yzLCMWHPWmmh+iKRyJGSKXv4rZ3Z9t1wcPkSZ1p0jBlFX9v4wqGQSumKTKmgpV+133yONI/3EX8UvIJJQMMW65V1SiNaq8xw2NRZMXYU2b8BemEUQTYDmdD1mOoOw5gBSYuNhaWR3JpZ0tGJ2n4CrSQiD+UeGLC1NkA+lFp3XgoYIbHb6p08rdRsvbytOTQ/13fCfiVtpgibzARDbRQQ9PcdTBMphdHjf2ZZmsDG4iDYV2hmUGbMQ";
 
     // NOTE: If you are running on a CONTROL HUB, with only one USB WebCam, you must select CAMERA_CHOICE = BACK; and PHONE_IS_PORTRAIT = false;
     private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
