@@ -1,7 +1,6 @@
 // Team11288_Teleop
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Utilities;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -10,11 +9,6 @@ import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.teamcode.Utilities.UtilHolonomic;
-import org.firstinspires.ftc.teamcode.Utilities.UtilMain;
-
-import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
-
 /*
  * This file provides Teleop driving for the Team11288 TeleopDrive drive robot.
  * The code is structured as an Iterative OpMode
@@ -22,8 +16,8 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENC
  * Assumes claw with arm having shoulder motor, elbow servo and wrist servo - all having 180deg servos
  *
  */
-@TeleOp(name = "TeleopDriveMechanumTest", group = "Teleop")
-public class TeleopDriveMecanum extends OpMode {
+@TeleOp(name = "TeleopDriveMecanumWorking", group = "Teleop")
+public class TeleopDriveMecanumWorking extends OpMode {
 
     //claw and arm
     //  static final double     COUNTS_PER_MOTOR_REV    = 1120 ;    // NeveRest Classic 40 Gearmotor (am-2964a)
@@ -55,7 +49,7 @@ public class TeleopDriveMecanum extends OpMode {
 //    private DcMotor shoulder; //bottom pivot of the new claw
     private DcMotor motorLauncher;
     private DcMotor motorLoader;
-    private Servo loader = null;
+    private Servo loader = null, wobbler = null;
     private int currentPosition; //used to track shoulder motor current position
     private int targetPosition; //used to track target shoulder position
     private double minPosition; //minimum allowed position of shoulder motor
@@ -80,7 +74,6 @@ public class TeleopDriveMecanum extends OpMode {
         // Send telemetry message to signify robot waiting
         telemetry.addData("Say", "Hello Driver");
 
-
         //initialize wheels
         motorFrontRight = hardwareMap.dcMotor.get("motor front right");
         motorFrontLeft = hardwareMap.dcMotor.get("motor front left");
@@ -93,8 +86,10 @@ public class TeleopDriveMecanum extends OpMode {
         motorLauncher = hardwareMap.dcMotor.get("motor launcher");
         motorLoader = hardwareMap.dcMotor.get("motor loader");
         loader = hardwareMap.servo.get("launch servo");
+        wobbler = hardwareMap.servo.get("wobble servo");
 
-        loader.setPosition(0);
+        loader.setPosition(0.3);
+        wobbler.setPosition(0.7);
 
         motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
         motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -142,6 +137,8 @@ public class TeleopDriveMecanum extends OpMode {
 
     float gear, trigger_sensitivity = 0.1f, multiplier = 1;
 
+    double lastLoadTime;
+
     @Override
     public void loop() {
         gear = 1;
@@ -178,9 +175,16 @@ public class TeleopDriveMecanum extends OpMode {
         }
 
         if(gamepad2.a) {
-            loader.setPosition(1);
-        } else if(gamepad2.b) {
-            loader.setPosition(0);
+            loader.setPosition(0.43);
+            lastLoadTime = getRuntime();
+        } else if(getRuntime() > lastLoadTime + 0.15) {
+            loader.setPosition(0.35);
+        }
+
+        if(gamepad2.x) {
+            wobbler.setPosition(0.7);
+        } else if(gamepad2.y) {
+            wobbler.setPosition(0.3);
         }
 
         if(gamepad2.right_trigger > 0.1) {
