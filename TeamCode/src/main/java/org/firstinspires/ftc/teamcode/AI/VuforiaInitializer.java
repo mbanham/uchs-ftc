@@ -83,8 +83,10 @@ public class VuforiaInitializer {
         EndTracking();
         args = new ArrayList<Modules>(Arrays.asList(modules));
 
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+
         DeviceManager.MapWebcam(hardwareMap);
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
@@ -93,12 +95,14 @@ public class VuforiaInitializer {
         parameters.useExtendedTracking = false;
         cameraManager = ClassFactory.getInstance().getCameraManager();
         parameters.cameraName = DeviceManager.webcamName;
+        vuforia = ClassFactory.getInstance().createVuforia(parameters);
 
-        Deadline deadline = new Deadline(2, TimeUnit.SECONDS);
-        camera = cameraManager.requestPermissionAndOpenCamera(deadline, parameters.cameraName, null);
+        //Deadline deadline = new Deadline(2, TimeUnit.SECONDS);
+        //camera = cameraManager.requestPermissionAndOpenCamera(deadline, parameters.cameraName, null);
 
         //  Instantiate the Vuforia engine
         if(args.contains(Modules.ObjectDetection)){
+            System.out.println("OBJECT_DETECTION");
             int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                     "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
             TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
@@ -107,6 +111,7 @@ public class VuforiaInitializer {
             tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
         }
         if(args.contains(Modules.RobotTransformDetection)){
+            System.out.println("TRANSFORM_DETECTION");
             VuforiaTrackables targetsUltimateGoal = vuforia.loadTrackablesFromAsset("UltimateGoal");
             VuforiaTrackable blueTowerGoalTarget = targetsUltimateGoal.get(0);
             blueTowerGoalTarget.setName("Blue Tower Goal Target");
@@ -165,10 +170,11 @@ public class VuforiaInitializer {
 
         }
 
-        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+
     }
     public static void BeginTracking(){
         if(args.contains(Modules.ObjectDetection)) {
+            System.out.println("OBJECT_DETECTION");
                 tfod.activate();
 
                 // The TensorFlow software will scale the input images from the camera to a lower resolution.
@@ -180,6 +186,7 @@ public class VuforiaInitializer {
                 tfod.setZoom(2.5, 16.0/9.0);
         }
         if(args.contains(Modules.RobotTransformDetection)) {
+            System.out.println("TRANSFORM_DETECTION");
             targetsUltimateGoal.activate();
         }
     }
