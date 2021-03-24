@@ -90,7 +90,7 @@ public class TeleopDriveMecanumWorking extends OpMode {
         loader = hardwareMap.servo.get("launch servo");
         wobbler = hardwareMap.servo.get("wobble servo");
 
-        loader.setPosition(0.3);
+        loader.setPosition(0.35);
         wobbler.setPosition(0.7);
 
         motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
