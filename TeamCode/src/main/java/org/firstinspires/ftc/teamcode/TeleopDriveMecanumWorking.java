@@ -90,7 +90,7 @@ public class TeleopDriveMecanumWorking extends OpMode {
         loader = hardwareMap.servo.get("launch servo");
         wobbler = hardwareMap.servo.get("wobble servo");
 
-        loader.setPosition(0.35);
+        loader.setPosition(0.25);
         wobbler.setPosition(0.7);
 
         motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -170,29 +170,29 @@ public class TeleopDriveMecanumWorking extends OpMode {
         //platformArm
 
 
-        if (Range.clip(gamepad1.right_trigger, 0.4, 1) > 0.4) {//from 0.4 to 1 = 0.6
-            speed_multiplier = 1 - Range.clip(gamepad1.right_trigger, 0, 0.4); //speed speed_multiplier 1 - 0.6
-        } else {
-            speed_multiplier = 1;
-        }
+//        if (Range.clip(gamepad1.right_trigger, 0.4, 1) > 0.4) {//from 0.4 to 1 = 0.6
+//            speed_multiplier = 1 - Range.clip(gamepad1.right_trigger, 0, 0.4); //speed speed_multiplier 1 - 0.6
+//        } else {
+//            speed_multiplier = 1;
+//        }
 
-        if(gamepad2.a) {
-            loader.setPosition(0.43);
-            lastLoadTime = getRuntime();
-        } else if(getRuntime() > lastLoadTime + 0.15) {
-            loader.setPosition(0.35);
-        }
-
-        if(gamepad2.x) {
+        if(gamepad1.x) {
             wobbler.setPosition(0.7);
-        } else if(gamepad2.y) {
+        } else if(gamepad1.y) {
             wobbler.setPosition(0.3);
         }
 
-        if(gamepad2.right_trigger > 0.1) {
-            motorLauncher.setPower(gamepad2.right_trigger);
-        } else if(gamepad2.left_trigger > 0.1) {
-            motorLauncher.setPower(-gamepad2.left_trigger);
+        if(gamepad1.a) {
+            loader.setPosition(0.43);
+            lastLoadTime = getRuntime();
+        } else if(getRuntime() > lastLoadTime + 0.15) {
+            loader.setPosition(0.25);
+        }
+
+        if(gamepad1.right_trigger > 0.1) {
+            motorLauncher.setPower(gamepad1.right_trigger * 0.5);
+        } else if(gamepad1.left_trigger > 0.1) {
+            motorLauncher.setPower(-gamepad1.left_trigger * 0.5);
         } else {
             motorLauncher.setPower(0);
         }

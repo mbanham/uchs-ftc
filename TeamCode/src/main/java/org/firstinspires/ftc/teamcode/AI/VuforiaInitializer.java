@@ -30,9 +30,9 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
 
 public class VuforiaInitializer {
     // OBJECT DETECTION
-    private static final String TFOD_MODEL_ASSET = "UltimateGoal.tflite";
-    private static final String LABEL_FIRST_ELEMENT = "Quad";
-    private static final String LABEL_SECOND_ELEMENT = "Single";
+    public static final String TFOD_MODEL_ASSET = "UltimateGoal.tflite";
+    public static final String LABEL_FIRST_ELEMENT = "Quad";
+    public static final String LABEL_SECOND_ELEMENT = "Single";
     public static final String VUFORIA_KEY = "AaxEeJj/////AAABmdLSaHu3GEP4oER0Z4wPyoYCDrpQOx7X1WZ792YNzZwWGHsLEoTDlfqsXqFSF65DRwdrvXt8RCy1oOpTCReV8Mb7NJETFJupTeuqAt9KHsxxSszvgNq6nY4yzLCMWHPWmmh+iKRyJGSKXv4rZ3Z9t1wcPkSZ1p0jBlFX9v4wqGQSumKTKmgpV+133yONI/3EX8UvIJJQMMW65V1SiNaq8xw2NRZMXYU2b8BemEUQTYDmdD1mOoOw5gBSYuNhaWR3JpZ0tGJ2n4CrSQiD+UeGLC1NkA+lFp3XgoYIbHb6p08rdRsvbytOTQ/13fCfiVtpgibzARDbRQQ9PcdTBMphdHjf2ZZmsDG4iDYV2hmUGbMQ";
 
     // NOTE: If you are running on a CONTROL HUB, with only one USB WebCam, you must select CAMERA_CHOICE = BACK; and PHONE_IS_PORTRAIT = false;

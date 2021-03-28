@@ -90,6 +90,7 @@ public class RingCountDetection {
                 return new RingReturnObject(ring_number, previousCounts.size(), LIST_SIZE);
 
             }
+            else telemetry.addData("do recognitions exist",VuforiaInitializer.tfod.getUpdatedRecognitions() != null);
         }
         return new RingReturnObject("Skipped routine. TFOD possibly failed to initialize");
     }
