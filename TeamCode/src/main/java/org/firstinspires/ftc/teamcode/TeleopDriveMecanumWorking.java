@@ -190,9 +190,9 @@ public class TeleopDriveMecanumWorking extends OpMode {
         }
 
         if(gamepad1.right_trigger > 0.1) {
-            motorLauncher.setPower(gamepad1.right_trigger * 0.5);
+            motorLauncher.setPower(gamepad1.right_trigger);
         } else if(gamepad1.left_trigger > 0.1) {
-            motorLauncher.setPower(-gamepad1.left_trigger * 0.5);
+            motorLauncher.setPower(-gamepad1.left_trigger);
         } else {
             motorLauncher.setPower(0);
         }
