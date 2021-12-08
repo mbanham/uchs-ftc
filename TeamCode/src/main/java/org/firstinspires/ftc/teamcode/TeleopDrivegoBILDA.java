@@ -21,15 +21,13 @@ import org.firstinspires.ftc.teamcode.Utilities.UtilHolonomic;
 @TeleOp(name = "TeleopDrivegoBILDA", group = "Teleop")
 public class TeleopDrivegoBILDA extends OpMode {
 
-    float gear, trigger_sensitivity = 0.1f, multiplier = 1;
+    float gear = 1f, trigger_sensitivity = 0.1f, multiplier = 0.6f;
     double lastLoadTime;
 
     private DcMotor motorFrontRight;
     private DcMotor motorFrontLeft;
     private DcMotor motorBackRight;
     private DcMotor motorBackLeft;
-    private UtilHolonomic teamUtils;
-
 
     @Override
     public void init() {
@@ -42,10 +40,6 @@ public class TeleopDrivegoBILDA extends OpMode {
         motorFrontLeft = hardwareMap.dcMotor.get("motor front left");
         motorBackLeft = hardwareMap.dcMotor.get("motor back left");
         motorBackRight = hardwareMap.dcMotor.get("motor back right");
-
-
-        //utils class initializer
-        teamUtils = new UtilHolonomic(motorFrontRight, motorFrontLeft, motorBackRight, motorBackLeft, telemetry);
     }
 
     /*
@@ -65,9 +59,7 @@ public class TeleopDrivegoBILDA extends OpMode {
 
     @Override
     public void loop() {
-        gear = 1;
-        if (gamepad1.left_trigger > trigger_sensitivity && gamepad1.right_trigger > trigger_sensitivity)
-            gear = 0.5f;
+        gear = gamepad1.left_bumper ? 0.5f : 1f;
 
         double r = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
         double robotAngle = Math.atan2(gamepad1.left_stick_y, -gamepad1.left_stick_x) - Math.PI / 4;
@@ -84,7 +76,6 @@ public class TeleopDrivegoBILDA extends OpMode {
         double BackRight = Range.clip(v4 * multiplier * gear, -1, 1);
 
         // write the values to the motors
-        teamUtils.setWheelsToSpeedMode();
         motorFrontRight.setPower(FrontRight);
         motorFrontLeft.setPower(FrontLeft);
         motorBackLeft.setPower(BackLeft);
