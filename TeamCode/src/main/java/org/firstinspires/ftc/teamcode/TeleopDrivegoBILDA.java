@@ -29,6 +29,8 @@ public class TeleopDrivegoBILDA extends OpMode {
     private DcMotor motorBackRight;
     private DcMotor motorBackLeft;
 
+    private DcMotor carouselSpinner;
+
     @Override
     public void init() {
         // Initialize the hardware variables.
@@ -40,6 +42,8 @@ public class TeleopDrivegoBILDA extends OpMode {
         motorFrontLeft = hardwareMap.dcMotor.get("motor front left");
         motorBackLeft = hardwareMap.dcMotor.get("motor back left");
         motorBackRight = hardwareMap.dcMotor.get("motor back right");
+
+        carouselSpinner = hardwareMap.dcMotor.get("carousel spinner");
     }
 
     /*
@@ -59,6 +63,7 @@ public class TeleopDrivegoBILDA extends OpMode {
 
     @Override
     public void loop() {
+        // halve speed when left bumper held down
         gear = gamepad1.left_bumper ? 0.5f : 1f;
 
         double r = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
@@ -80,6 +85,9 @@ public class TeleopDrivegoBILDA extends OpMode {
         motorFrontLeft.setPower(FrontLeft);
         motorBackLeft.setPower(BackLeft);
         motorBackRight.setPower(BackRight);
+
+        // spin carousel motor when B pressed
+        carouselSpinner.setPower(gamepad1.b ? 0.4 : 0.0);
     }
 
     /*
