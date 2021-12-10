@@ -26,13 +26,13 @@ import static org.firstinspires.ftc.teamcode.Utilities.DeviceManager.motorFrontR
 
 public class UtilHolonomic {
 
-    public static final double DRIVE_MOTOR_POWER = 0.75;
-    // HD Hex Motor (REV-41-1301) 40:1
-    public static final double COUNTS_PER_DRIVE_MOTOR_REV = 1120; // counts per reevaluation of the motor
+    public static final double DRIVE_MOTOR_POWER = 0.6;
+    // goBILDA Yellow Jacket Planetary 13.7:1 (5202-0002-0014)
+    public static final double COUNTS_PER_DRIVE_MOTOR_REV = 384.5; // counts per reevaluation of the motor
     public static final double SECONDSPERINCH = 2.0 / 24.0;
     public static final double TOLERANCE_WHEEL_POS = 100.0; //tolerance
-    //75mm Rev Mecanum wheels = 2.95 inch diameter
-    public static final double INCHES_PER_ROTATION = 9.273; // inches per rotation of 75mm Mecanum wheel
+    public static final double WHEEL_DIAMETER_INCHES = 3.937; // 100mm goBILDA mecanum
+    public static final double INCHES_PER_ROTATION = WHEEL_DIAMETER_INCHES * Math.PI;
     public static final double DEG_PER_ROTATION = 100.0; // inches per rotation of 90mm traction wheel
     public static final double DISTANCE_FROM_WALL = 2.25;
     public static final int COUNTS_PER_INCH = (int) (COUNTS_PER_DRIVE_MOTOR_REV / INCHES_PER_ROTATION); // for 45deg
