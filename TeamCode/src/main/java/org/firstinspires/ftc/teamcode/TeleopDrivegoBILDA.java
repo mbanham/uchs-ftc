@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
@@ -30,6 +31,9 @@ public class TeleopDrivegoBILDA extends OpMode {
     private DcMotor motorBackLeft;
 
     private DcMotor carouselSpinner;
+    private DcMotor motorLift;
+
+    private CRServo intake;
 
     @Override
     public void init() {
@@ -44,6 +48,9 @@ public class TeleopDrivegoBILDA extends OpMode {
         motorBackRight = hardwareMap.dcMotor.get("motor back right");
 
         carouselSpinner = hardwareMap.dcMotor.get("carousel spinner");
+        motorLift = hardwareMap.dcMotor.get("motor lift");
+
+        intake = hardwareMap.crservo.get("servo intake");
     }
 
     /*
@@ -88,7 +95,29 @@ public class TeleopDrivegoBILDA extends OpMode {
 
         // spin carousel motor when B pressed
         carouselSpinner.setPower(gamepad1.b ? 0.4 : 0.0);
+
+        // bind lift to dpad
+        if (gamepad1.dpad_up) {
+            motorLift.setPower(-0.5);
+
+        } else {
+            motorLift.setPower(0.0);
+        }
+
+        // bind intake to triggers
+        if(gamepad1.right_trigger > 0.5) {
+            intake.setPower(1.0);
+
+        } else if(gamepad1.left_trigger > 0.5) {
+            intake.setPower(-1.0);
+
+        } else {
+            intake.setPower(0.0);
+        }
+
     }
+
+
 
     /*
      * Code to run ONCE after the driver hits STOP

@@ -14,8 +14,7 @@ import org.firstinspires.ftc.teamcode.Utilities.UtilHolonomic;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
 
-@Autonomous(name = "Freight Frenzy Auto: Blue", group = "Linear Opmode")
-@Disabled                            // Comment this out to add to the opmode list
+@Autonomous(name = "FFAutoBlue", group = "Linear Opmode")
 public class FFAutoBlue extends LinearOpMode {
     //initialize these variables, override them in the constructor
 
@@ -30,15 +29,11 @@ public class FFAutoBlue extends LinearOpMode {
 
     private UtilHolonomic teamUtils;
 
-    private ElapsedTime runtime;
-
 
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-
-        runtime = new ElapsedTime();
 
         //initialize wheels
         motorFrontRight = hardwareMap.dcMotor.get("motor front right");
@@ -58,20 +53,20 @@ public class FFAutoBlue extends LinearOpMode {
         waitForStart();
         //Play started
 
-        int startTime = (int) runtime.seconds();
-
+        resetStartTime();
         while (opModeIsActive()) {
                 // run this loop until the end of the match (driver presses stop)
-            int currentTime = (int) runtime.seconds();
+            int currentTime = (int) getRuntime();
 
             // spin motor every other second
-            carouselSpinner.setPower(currentTime % 2 == 0 ? 0.4 : 0.0);
+            carouselSpinner.setPower(currentTime    % 2 == 0 ? 0.4 : 0.0);
 
             // start after 12s
-            if(currentTime <= startTime + 12) {
+            if(currentTime <= 12) {
                 continue;
             }
             teamUtils.DriveByDistance(1, 1, 12);
+            requestOpModeStop();
 
             }
         }
