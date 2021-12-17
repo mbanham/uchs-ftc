@@ -87,11 +87,11 @@ public class ConceptWebcam extends LinearOpMode {
      */
     private static final int secondsPermissionTimeout = Integer.MAX_VALUE;
 
-	/**
-	 * Sample size of the bitmap image, used to reduce computation time.
-	 * Large numbers decrease image quality.
-	*/
-	private int sampleSize = 4;
+    /**
+     * Sample size of the bitmap image, used to reduce computation time.
+     * Large numbers decrease image quality.
+    */
+    private int sampleSize = 4;
 
     /**
      * State regarding our interaction with the camera
@@ -180,21 +180,21 @@ public class ConceptWebcam extends LinearOpMode {
      */
     private void onNewFrame(Bitmap frame) {
 
-		// Get amount of green pixels in each section
-		int[] sections = get_majority_green(3, frame);
+        // Get amount of green pixels in each section
+        int[] sections = get_majority_green(3, frame);
 
-		int section = 0;
-		int section_size = 0;
+        int section = 0;
+        int section_size = 0;
 
-		// Get section with most green
-		for (int i = 0; i < sections.length; ++i) {
-			if (sections[i] > section_size) {
-				section = i;
-				section_size = sections[i];
-			} 
-		}
+        // Get section with most green
+        for (int i = 0; i < sections.length; ++i) {
+            if (sections[i] > section_size) {
+                section = i;
+                section_size = sections[i];
+            } 
+        }
 
-		System.out.println("Segment with the most green: " + section);
+        System.out.println("Segment with the most green: " + section);
 
         saveBitmap(frame);
         frame.recycle(); // not strictly necessary, but helpful
@@ -203,45 +203,46 @@ public class ConceptWebcam extends LinearOpMode {
 	/**
      * Get the segment of camera containing the most green
      */
-	private int[] get_majority_green(int segments, Bitmap frame) {
-		final BitmapFactory.Options options = new BitmapFactory.Options();
+    private int[] get_majority_green(int segments, Bitmap frame) {
+        final BitmapFactory.Options options = new BitmapFactory.Options();
 
-		// Reduce the resolution of the bitmap image
-		options.inSampleSize = this.sampleSize;
+        // Reduce the resolution of the bitmap image
+        options.inSampleSize = this.sampleSize;
 
-		// Get the image as a bitmap
-		Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.image, options);
+        // Get the image as a bitmap
+        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.image, options);
 
-		// Get the image dimensions
-		int imageHeight = bmp.getHeight();
-		int imageWidth = bmp.getWidth();
+        // Get the image dimensions
+        int imageHeight = bmp.getHeight();
+        int imageWidth = bmp.getWidth();
 
-		// Divide the image into segments
-		int segment_length = imageWidth / segments;
+        // Divide the image into segments
+        int segment_length = imageWidth / segments;
 
-		// Array containing the total number of green pixels in a segment
-		int[] averages = new int[segments];
+        // Array containing the total number of green pixels in a segment
+        int[] averages = new int[segments];
 
-		for (int x = 0; x < imageWidth; x++) {
-			for (int y = 0; y < imageHeight; y++) {
+        for (int x = 0; x < imageWidth; x++) {
+            for (int y = 0; y < imageHeight; y++) {
 
-				// Get pixel at x, y coordinate
-				int pixel = bmp.getPixel(x, y);
+                // Get pixel at x, y coordinate
+                int pixel = bmp.getPixel(x, y);
 
-				// Get RGB values from hex
-				int r = pixel & 0xff;
-				int g = (pixel >> 8) & 0xff;
-				int b = (pixel >> 16) & 0xff;
+                // Get RGB values from hex
+                int r = pixel & 0xff;
+                int g = (pixel >> 8) & 0xff;
+                int b = (pixel >> 16) & 0xff;
 
-				// Get index in array
-				int index = x / segment_length;
+                // Get index in array
+                int index = x / segment_length;
 
-				// If pixel is green, add to array
-				if (g >= r && g >= b && index < segments) averages[index] += 1;
-			}
-		}
+                // If pixel is green, add to array
+                if (g >= r && g >= b && index < segments)
+                    averages[index] += 1;
+            }
+        }
 
-		return averages;
+        return averages;
     }
 
     //----------------------------------------------------------------------------------------------
