@@ -87,7 +87,7 @@ public class ConceptWebcam extends LinearOpMode {
      */
     private static final int secondsPermissionTimeout = Integer.MAX_VALUE;
 
-    /**
+    /** TODO
      * Sample size of the bitmap image, used to reduce computation time.
      * Large numbers decrease image quality.
     */
@@ -203,14 +203,7 @@ public class ConceptWebcam extends LinearOpMode {
 	/**
      * Get the segment of camera containing the most green
      */
-    private int[] get_majority_green(int segments, Bitmap frame) {
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-
-        // Reduce the resolution of the bitmap image
-        options.inSampleSize = this.sampleSize;
-
-        // Get the image as a bitmap
-        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.image, options);
+    private int[] get_majority_green(int segments, Bitmap bmp) {
 
         // Get the image dimensions
         int imageHeight = bmp.getHeight();
