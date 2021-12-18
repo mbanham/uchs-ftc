@@ -194,7 +194,7 @@ public class ConceptWebcam extends LinearOpMode {
             } 
         }
 
-        System.out.println("Segment with the most green: " + section);
+        telemetry.addData("Segment with the most green", section);
 
         saveBitmap(frame);
         frame.recycle(); // not strictly necessary, but helpful
