@@ -41,11 +41,11 @@ public class FFAutoRed extends LinearOpMode {
         drive.setPoseEstimate(startPose);
 
         Trajectory trajectory1 = drive.trajectoryBuilder(startPose)
-                .strafeLeft(15)
+                .strafeLeft(22.5)
                 .build();
 
         Trajectory trajectory2 = drive.trajectoryBuilder(trajectory1.end())
-                .lineTo(new Vector2d(-60, -35))
+                .lineTo(new Vector2d(-66, -35))
                 .build();
 
         // For waiting
@@ -74,9 +74,13 @@ public class FFAutoRed extends LinearOpMode {
                 case SPIN_CAROUSEL:
 
                     // spin carousel for 7 seconds
-                    carouselSpinner.setPower(0.2);
-                    if (waitTimer.seconds() >= 7) {
+                    carouselSpinner.setPower(0.4);
+                    drive.setMotorPowers(-0.1, 0.1, -0.1, 0.1);
+
+
+                    if (waitTimer.seconds() >= 4) {
                         carouselSpinner.setPower(0.0);
+                        drive.setMotorPowers(0.0, 0.0, 0.0, 0.0);
                         currentState = State.GO_TO_STORAGE;
                         drive.followTrajectoryAsync(trajectory2);
                     }
