@@ -214,9 +214,8 @@ public class ConceptWebcam extends LinearOpMode {
         int imageHeight = bmp.getHeight();
         int imageWidth = bmp.getWidth();
 	    
-
-        int[] pixels = new int[imageWidth * imageHeight];
-        bmp.getPixels(pixels, 0, bm.getWidth(), 0, 0, width, height);
+        //int[] pixels = new int[imageWidth * imageHeight];
+        //bmp.getPixels(pixels, 0, bm.getWidth(), 0, 0, width, height);
 
         // Divide the image into segments
         int segment_length = imageWidth / segments;
