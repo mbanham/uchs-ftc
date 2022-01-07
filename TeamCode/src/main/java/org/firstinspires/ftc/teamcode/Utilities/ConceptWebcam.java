@@ -180,6 +180,9 @@ public class ConceptWebcam extends LinearOpMode {
      */
     private void onNewFrame(Bitmap frame) {
 
+	telemetry.addData(">", "Frame has been taken, parsing image...");
+        telemetry.update();
+
         // Get amount of green pixels in each section
         int[] sections = get_majority_green(3, frame);
 
@@ -193,8 +196,10 @@ public class ConceptWebcam extends LinearOpMode {
                 section_size = sections[i];
             } 
         }
-
-        telemetry.addData("Segment with the most green", section);
+	    
+	telemetry.clear();
+	telemetry.addData("Segment with most green: ", section);
+        telemetry.update();
 
         saveBitmap(frame);
         frame.recycle(); // not strictly necessary, but helpful
@@ -208,6 +213,10 @@ public class ConceptWebcam extends LinearOpMode {
         // Get the image dimensions
         int imageHeight = bmp.getHeight();
         int imageWidth = bmp.getWidth();
+	    
+
+        int[] pixels = new int[imageWidth * imageHeight];
+        bmp.getPixels(pixels, 0, bm.getWidth(), 0, 0, width, height);
 
         // Divide the image into segments
         int segment_length = imageWidth / segments;
@@ -222,16 +231,21 @@ public class ConceptWebcam extends LinearOpMode {
                 int pixel = bmp.getPixel(x, y);
 
                 // Get RGB values from hex
-                int r = pixel & 0xff;
-                int g = (pixel >> 8) & 0xff;
-                int b = (pixel >> 16) & 0xff;
+                int r = (color >> 16) & 0xff;
+                int g = (color >>  8) & 0xff;
+                int b = (color      ) & 0xff;
 
                 // Get index in array
                 int index = x / segment_length;
 
                 // If pixel is green, add to array
-                if (g >= r && g >= b && index < segments)
+                if (g >= r && g >= b && index < segments) {
                     averages[index] += 1;
+                    bmp.setPixel(x, y, FFFFFFFF);   
+                } else {
+                    bmp.setPixe(x, y, FF000000);   
+                }
+                
             }
         }
 
