@@ -33,7 +33,7 @@ public class TeleopDrivegoBILDA extends OpMode {
     private DcMotor carouselSpinner;
     private DcMotor motorLift;
 
-    private CRServo intake;
+    private Servo intake;
 
     @Override
     public void init() {
@@ -49,8 +49,10 @@ public class TeleopDrivegoBILDA extends OpMode {
 
         carouselSpinner = hardwareMap.dcMotor.get("carousel spinner");
         motorLift = hardwareMap.dcMotor.get("motor lift");
+        motorLift.setTargetPosition(15);
+        motorLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        intake = hardwareMap.crservo.get("servo intake");
+        intake = hardwareMap.servo.get("servo intake");
     }
 
     /*
@@ -97,23 +99,43 @@ public class TeleopDrivegoBILDA extends OpMode {
         carouselSpinner.setPower(gamepad1.b ? 0.4 : 0.0);
 
         // bind lift to dpad
-        if (gamepad1.dpad_up) {
-            motorLift.setPower(-0.5);
+        motorLift.setPower(0.17);
+        if (gamepad2.dpad_up) {
+            telemetry.addData("Dpad", "up");
+            motorLift.setTargetPosition(585);
+
+        } else if (gamepad2.dpad_down) {
+            telemetry.addData("Dpad", "down");
+            motorLift.setTargetPosition(17);
+
+        } else if (gamepad2.dpad_left) {
+            telemetry.addData("Dpad", "left");
+            motorLift.setTargetPosition(230);
+
+        } else if(gamepad2.dpad_right) {
+            telemetry.addData("Dpad", "right");
+            motorLift.setTargetPosition(74);
 
         } else {
-            motorLift.setPower(0.0);
+            telemetry.addData("Dpad", "nothing");
         }
 
         // bind intake to triggers
-        if(gamepad1.right_trigger > 0.5) {
-            intake.setPower(1.0);
+        if(gamepad2.right_trigger > 0.5) {
+            telemetry.addData("Trigger", "right");
+            intake.setPosition(0);
 
-        } else if(gamepad1.left_trigger > 0.5) {
-            intake.setPower(-1.0);
+        } else if(gamepad2.left_trigger > 0.5) {
+            telemetry.addData("Trigger", "left");
+            intake.setPosition(1);
 
         } else {
-            intake.setPower(0.0);
+            telemetry.addData("Trigger", "nothing");
+            intake.setPosition(0.5);
         }
+
+        telemetry.addData("Arm pos", motorLift.getCurrentPosition());
+        telemetry.addData("Arm status", motorLift.isBusy());
 
     }
 
