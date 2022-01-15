@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode.Utilities;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.os.Handler;
 
@@ -230,9 +231,9 @@ public class ConceptWebcam extends LinearOpMode {
                 int pixel = bmp.getPixel(x, y);
 
                 // Get RGB values from hex
-                int r = (color >> 16) & 0xff;
-                int g = (color >>  8) & 0xff;
-                int b = (color      ) & 0xff;
+                int r = Color.red(pixel);
+                int g = Color.green(pixel);
+                int b = Color.blue(pixel);
 
                 // Get index in array
                 int index = x / segment_length;
@@ -240,9 +241,9 @@ public class ConceptWebcam extends LinearOpMode {
                 // If pixel is green, add to array
                 if (g >= r && g >= b && index < segments) {
                     averages[index] += 1;
-                    bmp.setPixel(x, y, FFFFFFFF);   
+                    bmp.setPixel(x, y, 0xFFFFFFFF);
                 } else {
-                    bmp.setPixe(x, y, FF000000);   
+                    bmp.setPixel(x, y, 0xFF000000);
                 }
                 
             }

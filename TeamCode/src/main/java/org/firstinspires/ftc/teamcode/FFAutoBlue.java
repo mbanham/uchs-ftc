@@ -46,11 +46,11 @@ public class FFAutoBlue extends LinearOpMode {
                 .build();
 
         Trajectory trajectory2 = drive.trajectoryBuilder(trajectory1.end())
-                .lineToLinearHeading(new Pose2d(-56, 60, 0))
+                .lineToLinearHeading(new Pose2d(-60, 60, 0))
                 .build();
 
         Trajectory trajectory3 = drive.trajectoryBuilder(trajectory2.end())
-                .lineTo(new Vector2d(-62, 36))
+                .lineTo(new Vector2d(-70, 29))
                 .build();
 
         // For waiting
