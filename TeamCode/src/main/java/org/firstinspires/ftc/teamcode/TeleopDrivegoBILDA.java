@@ -96,7 +96,13 @@ public class TeleopDrivegoBILDA extends OpMode {
         motorBackRight.setPower(BackRight);
 
         // spin carousel motor when B pressed
-        carouselSpinner.setPower(gamepad1.b ? 0.4 : 0.0);
+        if (gamepad1.b) {
+            carouselSpinner.setPower(0.4);
+        } else if (gamepad1.a) {
+            carouselSpinner.setPower(-0.4);
+        } else {
+            carouselSpinner.setPower(0);
+        }
 
         // bind lift to dpad
         motorLift.setPower(0.17);
