@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.Utilities.UtilHolonomic;
@@ -34,6 +35,7 @@ public class TeleopDrivegoBILDA extends OpMode {
     private DcMotor motorLift;
 
     private Servo intake;
+    ElapsedTime waitTimer;
 
     @Override
     public void init() {
@@ -49,10 +51,13 @@ public class TeleopDrivegoBILDA extends OpMode {
 
         carouselSpinner = hardwareMap.dcMotor.get("carousel spinner");
         motorLift = hardwareMap.dcMotor.get("motor lift");
+        motorLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motorLift.setTargetPosition(15);
         motorLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         intake = hardwareMap.servo.get("servo intake");
+
+        waitTimer = new ElapsedTime();
     }
 
     /*
@@ -105,35 +110,43 @@ public class TeleopDrivegoBILDA extends OpMode {
         }
 
         // bind lift to dpad
-        motorLift.setPower(0.17);
         if (gamepad2.dpad_up) {
             telemetry.addData("Dpad", "up");
             motorLift.setTargetPosition(585);
+            motorLift.setPower(0.12);
 
         } else if (gamepad2.dpad_down) {
             telemetry.addData("Dpad", "down");
-            motorLift.setTargetPosition(17);
+            waitTimer.reset();
+            motorLift.setTargetPosition(0);
+            motorLift.setPower(0.12);
 
         } else if (gamepad2.dpad_left) {
             telemetry.addData("Dpad", "left");
             motorLift.setTargetPosition(230);
+            motorLift.setPower(0.12);
 
         } else if(gamepad2.dpad_right) {
             telemetry.addData("Dpad", "right");
-            motorLift.setTargetPosition(74);
+            motorLift.setTargetPosition(700);
+            motorLift.setPower(0.12);
 
         } else {
             telemetry.addData("Dpad", "nothing");
         }
 
+        if(motorLift.getTargetPosition() == 0 && !motorLift.isBusy()) {
+            motorLift.setPower(0);
+        }
+
         // bind intake to triggers
         if(gamepad2.right_trigger > 0.5) {
             telemetry.addData("Trigger", "right");
-            intake.setPosition(0);
+            intake.setPosition(0.1);
 
         } else if(gamepad2.left_trigger > 0.5) {
             telemetry.addData("Trigger", "left");
-            intake.setPosition(1);
+            intake.setPosition(0.9);
 
         } else {
             telemetry.addData("Trigger", "nothing");

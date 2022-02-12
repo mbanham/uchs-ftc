@@ -6,6 +6,7 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
@@ -39,9 +40,11 @@ public class FFAutoBlueExtended extends LinearOpMode {
         // Initialize carousel spinner
         DcMotor carouselSpinner = hardwareMap.dcMotor.get("carousel spinner");
 
+        Servo intake = hardwareMap.servo.get("servo intake");
+
         DcMotor motorLift = hardwareMap.dcMotor.get("motor lift");
         motorLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorLift.setTargetPosition(10);
+        motorLift.setTargetPosition(0);
         motorLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         // Initialize SampleMecanumDrive & set initial pose
@@ -49,7 +52,7 @@ public class FFAutoBlueExtended extends LinearOpMode {
         drive.setPoseEstimate(startPose);
 
         Trajectory trajectory0 = drive.trajectoryBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(-12, 45, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(-12, 36, Math.toRadians(90)))
                 .build();
 
         Trajectory trajectory1 = drive.trajectoryBuilder(startPose)
@@ -57,11 +60,11 @@ public class FFAutoBlueExtended extends LinearOpMode {
                 .build();
 
         Trajectory trajectory2 = drive.trajectoryBuilder(trajectory1.end())
-                .lineToLinearHeading(new Pose2d(-60, 60, 0))
+                .lineToLinearHeading(new Pose2d(-68, 58, 0))
                 .build();
 
         Trajectory trajectory3 = drive.trajectoryBuilder(trajectory2.end())
-                .lineTo(new Vector2d(-70, 29))
+                .lineTo(new Vector2d(-80, 29))
                 .build();
 
         // For waiting
@@ -70,8 +73,6 @@ public class FFAutoBlueExtended extends LinearOpMode {
 
         waitForStart();
         if (isStopRequested()) return;
-
-        motorLift.setPower(0.17);
 
         // trajectory1: Move forward to allow turning
         currentState = State.GO_TO_HUB;
@@ -91,11 +92,20 @@ public class FFAutoBlueExtended extends LinearOpMode {
                     break;
                 case DEPOSIT_PRELOAD:
 
+                    motorLift.setPower(0.12);
                     motorLift.setTargetPosition(585);
-                    if(waitTimer.seconds() >= 5)
-                        motorLift.setTargetPosition(10);
+
+                    if(waitTimer.seconds() >= 2)
+                        intake.setPosition(0.1);
+
+                    if(waitTimer.milliseconds() >= 2300) {
+                        intake.setPosition(0.5);
+                        motorLift.setTargetPosition(0);
+                    }
+
 
                     if(waitTimer.seconds() >= 7) {
+                        motorLift.setPower(0);
                         currentState = State.SPACE_FORWARD;
                         drive.followTrajectoryAsync(trajectory1);
                     }
