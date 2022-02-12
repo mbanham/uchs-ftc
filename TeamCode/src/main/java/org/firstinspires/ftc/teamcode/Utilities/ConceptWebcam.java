@@ -158,6 +158,8 @@ public class ConceptWebcam extends LinearOpMode {
                 boolean buttonIsPressed = gamepad1.a;
                 if (buttonIsPressed && !buttonPressSeen) {
                     captureWhenAvailable = true;
+                    telemetry.addData(">", "A Pressed");
+                    telemetry.update();
                 }
                 buttonPressSeen = buttonIsPressed;
 
@@ -181,7 +183,7 @@ public class ConceptWebcam extends LinearOpMode {
      */
     private void onNewFrame(Bitmap frame) {
 
-	telemetry.addData(">", "Frame has been taken, parsing image...");
+	    telemetry.addData(">", "Frame has been taken, parsing image...");
         telemetry.update();
 
         // Get amount of green pixels in each section
@@ -239,11 +241,13 @@ public class ConceptWebcam extends LinearOpMode {
                 int index = x / segment_length;
 
                 // If pixel is green, add to array
-                if (g >= r && g >= b && index < segments) {
+                if (index > segments) {
+
+                } else if (g >= r && g >= b) {
                     averages[index] += 1;
-                    bmp.setPixel(x, y, 0xFFFFFFFF);
+                    //bmp.setPixel(x, y, 0xFFFFFFFF);
                 } else {
-                    bmp.setPixel(x, y, 0xFF000000);
+                    //bmp.setPixel(x, y, 0xFF000000);
                 }
                 
             }
