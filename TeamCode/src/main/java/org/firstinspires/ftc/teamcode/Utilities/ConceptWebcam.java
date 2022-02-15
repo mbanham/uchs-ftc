@@ -30,7 +30,6 @@
 package org.firstinspires.ftc.teamcode.Utilities;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.os.Handler;
@@ -80,7 +79,26 @@ public class ConceptWebcam extends LinearOpMode {
     // State
     //----------------------------------------------------------------------------------------------
 
-    private static final String TAG = "Webcam Sample";
+    /**
+     * Webcam device name
+     */
+    private static final String deviceName = "Webcam 1";
+
+    /**
+     * Amount of compression to apply to image
+     * The image will by scaled by this amount
+     */
+    private final double imageCompression = 0.3;
+
+    /**
+     * Color threshold for detection
+     */
+    private final int colorThreshold = 10;
+
+    /**
+     * Amount of segments to divide the image into
+     */
+    private final int imageSegments = 3;
 
     /**
      * How long we are to wait to be granted permission to use the camera before giving up. Here,
@@ -88,11 +106,7 @@ public class ConceptWebcam extends LinearOpMode {
      */
     private static final int secondsPermissionTimeout = Integer.MAX_VALUE;
 
-    /** TODO
-     * Sample size of the bitmap image, used to reduce computation time.
-     * Large numbers decrease image quality.
-    */
-    private int sampleSize = 4;
+    private static final String TAG = "Webcam Sample";
 
     /**
      * State regarding our interaction with the camera
@@ -131,7 +145,7 @@ public class ConceptWebcam extends LinearOpMode {
         callbackHandler = CallbackLooper.getDefault().getHandler();
 
         cameraManager = ClassFactory.getInstance().getCameraManager();
-        cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
+        cameraName = hardwareMap.get(WebcamName.class, deviceName);
 
         initializeFrameQueue(2);
         AppUtil.getInstance().ensureDirectoryExists(captureDirectory);
@@ -158,6 +172,7 @@ public class ConceptWebcam extends LinearOpMode {
                 boolean buttonIsPressed = gamepad1.a;
                 if (buttonIsPressed && !buttonPressSeen) {
                     captureWhenAvailable = true;
+
                     telemetry.addData(">", "A Pressed");
                     telemetry.update();
                 }
@@ -183,11 +198,17 @@ public class ConceptWebcam extends LinearOpMode {
      */
     private void onNewFrame(Bitmap frame) {
 
+        // Scale down the bitmap to save computational time
+        frame = Bitmap.createScaledBitmap(frame, (int) (frame.getWidth() * imageCompression), (int) (frame.getHeight() * imageCompression), false);
+
 	    telemetry.addData(">", "Frame has been taken, parsing image...");
         telemetry.update();
 
+        // Save a "clean" image to disk
+        saveBitmap(frame);
+
         // Get amount of green pixels in each section
-        int[] sections = get_majority_green(3, frame);
+        int[] sections = get_majority_green(imageSegments, frame);
 
         int section = 0;
         int section_size = 0;
@@ -200,12 +221,20 @@ public class ConceptWebcam extends LinearOpMode {
             } 
         }
 	    
-	telemetry.clear();
-	telemetry.addData("Segment with most green: ", section);
+        telemetry.clear();
+        telemetry.addData(">", "Results");
+        telemetry.addData("Image segments", imageSegments);
+        telemetry.addData("Image width", frame.getWidth());
+        telemetry.addData("Image height", frame.getHeight());
+        telemetry.addData("Amount of green", section_size);
+        telemetry.addData("Segment with most green", section);
         telemetry.update();
 
+        // Save a debug image to disk
         saveBitmap(frame);
-        frame.recycle(); // not strictly necessary, but helpful
+
+        // Recycle frame to save memory
+        frame.recycle();
     }
 
 	/**
@@ -233,23 +262,24 @@ public class ConceptWebcam extends LinearOpMode {
                 int pixel = bmp.getPixel(x, y);
 
                 // Get RGB values from hex
-                int r = Color.red(pixel);
+                int r = Color.red(pixel) + colorThreshold;
                 int g = Color.green(pixel);
-                int b = Color.blue(pixel);
+                int b = Color.blue(pixel) + colorThreshold;
 
                 // Get index in array
                 int index = x / segment_length;
 
                 // If pixel is green, add to array
-                if (index > segments) {
-
-                } else if (g >= r && g >= b) {
+                if (index >= segments) {
+                    // Fix to ignore pixels which are somehow outside the segment
+                } else if (g > r && g > b) {
                     averages[index] += 1;
-                    //bmp.setPixel(x, y, 0xFFFFFFFF);
-                } else {
-                    //bmp.setPixel(x, y, 0xFF000000);
+                    bmp.setPixel(x, y, Color.GREEN);
+                } else if (r > g && r > b) {
+                    bmp.setPixel(x, y, Color.RED);
+                } else if (b > g && b > r) {
+                    bmp.setPixel(x, y, Color.BLUE);
                 }
-                
             }
         }
 
