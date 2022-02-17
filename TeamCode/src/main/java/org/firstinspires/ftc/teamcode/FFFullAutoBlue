@@ -27,6 +27,9 @@ public class FFAutoBlueExtended extends LinearOpMode {
         IDLE            // Our bot will enter the IDLE state when done
     }
 
+    // Heights of the different levels of the team hub
+    int[] targetHeights = { 84, 160, 230 };
+
     // We define the current state we're on
     // Default to IDLE
     State currentState = State.IDLE;
@@ -71,8 +74,11 @@ public class FFAutoBlueExtended extends LinearOpMode {
 
 
 
-        WebcamName hardwareName = hardwareMap.get(WebcamName.class, deviceName);
-        WebcamHelper webcam = new WebcamHelper("Webcam 1", hardwareName);
+        String cameraName = "Webcam 1";
+
+        // Setup webcam helper
+        WebcamName hardwareName = hardwareMap.get(WebcamName.class, cameraName);
+        WebcamHelper webcam = new WebcamHelper(cameraName, hardwareName);
 
         // Turn on the webcam
         webcam.initiate();
@@ -123,8 +129,11 @@ public class FFAutoBlueExtended extends LinearOpMode {
                     break;
                 case DEPOSIT_PRELOAD:
 
+                    
+
+
                     motorLift.setPower(0.12);
-                    motorLift.setTargetPosition(585);
+                    motorLift.setTargetPosition(targetHeights[targetPosition]);
 
                     if(waitTimer.seconds() >= 2)
                         intake.setPosition(0.1);
