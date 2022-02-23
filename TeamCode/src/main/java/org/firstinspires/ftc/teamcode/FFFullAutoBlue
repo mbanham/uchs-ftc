@@ -95,8 +95,8 @@ public class FFAutoBlueExtended extends LinearOpMode {
         // Get all green pixels with a threshold of 30
         int[] segments = webcam.getMajorityGreen(frame, 30);
 
-        // The position the team element is in
-        int targetPosition = webcam.getGreenSegment(segments);
+        // Get the section with the most green
+        int targetPosition = webcam.highestInArray(segments);
 
         // Save the image as a JPG
         //webcam.saveBitmap(frame);
@@ -128,9 +128,6 @@ public class FFAutoBlueExtended extends LinearOpMode {
                     }
                     break;
                 case DEPOSIT_PRELOAD:
-
-                    
-
 
                     motorLift.setPower(0.12);
                     motorLift.setTargetPosition(targetHeights[targetPosition]);
