@@ -59,9 +59,16 @@ class WebcamHelper {
         cameraManager = ClassFactory.getInstance().getCameraManager();
     }
 
+    /**
+     * Initialize the camera
+     */
     public void initiate () {
 
-        frameQueue = new EvictingBlockingQueue<Bitmap>(new ArrayBlockingQueue<Bitmap>(2));
+        // How many frames to store in memory before discarding
+        int capacity = 2;
+
+        // Discard excess frames from memory
+        frameQueue = new EvictingBlockingQueue<Bitmap>(new ArrayBlockingQueue<Bitmap>(capacity));
         frameQueue.setEvictAction(new Consumer<Bitmap>() {
             @Override
             public void accept(Bitmap frame) {
@@ -81,6 +88,7 @@ class WebcamHelper {
 
     /**
      * Get a single bitmap frame from the webcam
+     * @return returns a bitmap containing the taken image
      */
     public Bitmap getFrame () {
 
@@ -121,7 +129,9 @@ class WebcamHelper {
     public void openCamera () {
         if (camera != null) return;
 
+        // Timeout camera if it takes longer than 10 seconds
         Deadline deadline = new Deadline(10, TimeUnit.SECONDS);
+
         camera = cameraManager.requestPermissionAndOpenCamera(deadline, cameraName, null);
     }
 
@@ -170,43 +180,42 @@ class WebcamHelper {
             synchronizer.finish(null);
         }
 
-        /** Wait for all the asynchrony to complete */
+        // Wait for all the asynchrony to complete
         try {
             synchronizer.await();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
 
-        /** Retrieve the created session. This will be null on error. */
         cameraCaptureSession = synchronizer.getValue();
     }
 
     /**
      * Get the index of the highest number in an array
+     * @param  sections  array of integers
+     * @return           index of the highest number in the array
      */
-    public int getGreenSegment (int[] sections) {
+    public int highestInArray (int[] sections) {
 
-        int section = 0;
-        int section_size = 0;
+        int index = 0;
 
-        for (int i = 0; i < sections.length; ++i) {
-            if (sections[i] > section_size) {
-                section = i;
-                section_size = sections[i];
-            } 
+        for (int i = 0; i < sections.length; i++) {
+            index = sections[i] > sections[index] ? i : index;
         }
 
-        return section;
+        return index;
     }
 
     /**
      * Save the bitmap as a JPG image
+     * @param  bmp  bitmap to save
+     * @return      boolean value to determine if the file was successfully saved
      */
-    public boolean saveBitmap (Bitmap bitmap) {
+    public boolean saveBitmap (Bitmap bmp) {
         File file = new File(captureDirectory, String.format(Locale.getDefault(), "webcam-frame-%d.jpg", captureCounter++));
         
         try (FileOutputStream outputStream = new FileOutputStream(file)) {
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            bmp.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
             return true;
         }
         return false;
