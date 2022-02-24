@@ -1,12 +1,12 @@
 // region Java Imports
+package org.firstinspires.ftc.teamcode;
+
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.os.Handler;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.RobotLog;
+import androidx.annotation.NonNull;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.android.util.Size;
@@ -29,7 +29,6 @@ import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Locale;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -37,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 
 class WebcamHelper {
 
-    public String deviceName = "Webcam 1";
+    public String deviceName;
     public int segments = 3;
 
     private CameraManager cameraManager;
@@ -52,9 +51,10 @@ class WebcamHelper {
     private Handler callbackHandler;
 
     public WebcamHelper (String cameraName, WebcamName hardwareName) {
-        deviceName = cameraName;
-        cameraName = hardwareName;
-        
+
+        this.deviceName = cameraName;
+        this.cameraName = hardwareName;
+
         callbackHandler = CallbackLooper.getDefault().getHandler();
         cameraManager = ClassFactory.getInstance().getCameraManager();
     }
@@ -68,13 +68,8 @@ class WebcamHelper {
         int capacity = 2;
 
         // Discard excess frames from memory
-        frameQueue = new EvictingBlockingQueue<Bitmap>(new ArrayBlockingQueue<Bitmap>(capacity));
-        frameQueue.setEvictAction(new Consumer<Bitmap>() {
-            @Override
-            public void accept(Bitmap frame) {
-                frame.recycle();
-            }
-        });
+        frameQueue = new EvictingBlockingQueue<>(new ArrayBlockingQueue<>(capacity));
+        frameQueue.setEvictAction(Bitmap::recycle);
 
         AppUtil.getInstance().ensureDirectoryExists(captureDirectory);
 
@@ -83,7 +78,7 @@ class WebcamHelper {
 
         startCamera();
         if (cameraCaptureSession == null) return;
-        
+
     }
 
     /**
@@ -92,22 +87,21 @@ class WebcamHelper {
      */
     public Bitmap getFrame () {
 
-        boolean attemptingCapture = true;
         Bitmap bmp;
 
-        while (attemptingCapture) {
+        while (true) {
 
             bmp = frameQueue.poll();
 
             if (bmp != null) {
-                attemptingCapture = false;
+                break;
             }
         }
 
         return bmp;
     }
 
-    /** 
+    /**
      * Stop and turn off the camera
      */
     public void stopCamera () {
@@ -144,7 +138,7 @@ class WebcamHelper {
         final int imageFormat = ImageFormat.YUY2;
 
         CameraCharacteristics cameraCharacteristics = cameraName.getCameraCharacteristics();
-        
+
         final Size size = cameraCharacteristics.getDefaultSize(imageFormat);
         final int fps = cameraCharacteristics.getMaxFramesPerSecond(imageFormat, size);
 
@@ -152,22 +146,16 @@ class WebcamHelper {
         try {
             camera.createCaptureSession(Continuation.create(callbackHandler, new CameraCaptureSession.StateCallbackDefault() {
                 @Override
-                public void onConfigured(CameraCaptureSession session) {
+                public void onConfigured(@NonNull CameraCaptureSession session) {
                     try {
                         final CameraCaptureRequest captureRequest = camera.createCaptureRequest(imageFormat, size, fps);
                         session.startCapture(captureRequest,
-                                new CameraCaptureSession.CaptureCallback() {
-                                    @Override
-                                    public void onNewFrame(CameraCaptureSession session, CameraCaptureRequest request, CameraFrame cameraFrame) {
-                                        Bitmap bmp = captureRequest.createEmptyBitmap();
-                                        cameraFrame.copyToBitmap(bmp);
-                                        frameQueue.offer(bmp);
-                                    }
+                                (session1, request, cameraFrame) -> {
+                                    Bitmap bmp = captureRequest.createEmptyBitmap();
+                                    cameraFrame.copyToBitmap(bmp);
+                                    frameQueue.offer(bmp);
                                 },
-                                Continuation.create(callbackHandler, new CameraCaptureSession.StatusCallback() {
-                                    @Override
-                                    public void onCaptureSequenceCompleted(CameraCaptureSession session, CameraCaptureSequenceId cameraCaptureSequenceId, long lastFrameNumber) {}
-                                })
+                                Continuation.create(callbackHandler, (session12, cameraCaptureSequenceId, lastFrameNumber) -> {})
                         );
                         synchronizer.finish(session);
                     } catch (CameraException | RuntimeException e) {
@@ -213,11 +201,13 @@ class WebcamHelper {
      */
     public boolean saveBitmap (Bitmap bmp) {
         File file = new File(captureDirectory, String.format(Locale.getDefault(), "webcam-frame-%d.jpg", captureCounter++));
-        
-        try (FileOutputStream outputStream = new FileOutputStream(file)) {
+
+        try {
+            FileOutputStream outputStream = new FileOutputStream(file);
             bmp.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
             return true;
-        }
+        } catch(Exception ignored) {}
+
         return false;
     }
 
@@ -225,10 +215,10 @@ class WebcamHelper {
      * Scale down a bitmap by a percent
      */
     public Bitmap scaleBitmap (Bitmap bmp, double imageCompression) {
-        int newWidth = frame.getWidth() * imageCompression;
-        int newHeight = frame.getHeight() * imageCompression;
+        int newWidth = (int) (bmp.getWidth() * imageCompression);
+        int newHeight = (int) (bmp.getHeight() * imageCompression);
 
-        return Bitmap.createScaledBitmap(frame, newWidth, newHeight, false);
+        return Bitmap.createScaledBitmap(bmp, newWidth, newHeight, false);
     }
 
     /**
@@ -236,7 +226,7 @@ class WebcamHelper {
      * Use getPixels once to load entire bitmap
      * rather than getPixel on each pixel
      */
-    private int[] getMajorityGreen (Bitmap bmp, int colorThreshold) {
+    public int[] getMajorityGreen (Bitmap bmp, int colorThreshold) {
 
         // Get the image dimensions
         int imageHeight = bmp.getHeight();

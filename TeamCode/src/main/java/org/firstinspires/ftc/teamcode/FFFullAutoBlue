@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Bitmap;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
@@ -9,11 +11,12 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
 // Asynchronous state machine for auto (see https://gm0.org/en/latest/docs/software/finite-state-machines.html)
 @Autonomous(group = "advanced")
-public class FFAutoBlueExtended extends LinearOpMode {
+public class FFFullAutoBlue extends LinearOpMode {
 
     // This enum defines our "state"
     // This is essentially just defines the possible steps our program will take
@@ -36,7 +39,7 @@ public class FFAutoBlueExtended extends LinearOpMode {
 
     // Define our start pose
     // This assumes we start at x: 15, y: 10, heading: 180 degrees
-    Pose2d startPose = new Pose2d(-36, 61, Math.toRadians(270));
+    Pose2d startPose = new Pose2d(-36, 61, 0);
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -55,7 +58,7 @@ public class FFAutoBlueExtended extends LinearOpMode {
         drive.setPoseEstimate(startPose);
 
         Trajectory trajectory0 = drive.trajectoryBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(-12, 36, Math.toRadians(90)))
+                .strafeLeft(20)
                 .build();
 
         Trajectory trajectory1 = drive.trajectoryBuilder(startPose)
@@ -63,7 +66,7 @@ public class FFAutoBlueExtended extends LinearOpMode {
                 .build();
 
         Trajectory trajectory2 = drive.trajectoryBuilder(trajectory1.end())
-                .lineToLinearHeading(new Pose2d(-68, 58, 0))
+                .lineToLinearHeading(new Pose2d(-68, 58, Math.toRadians(-90)))
                 .build();
 
         Trajectory trajectory3 = drive.trajectoryBuilder(trajectory2.end())
@@ -100,7 +103,7 @@ public class FFAutoBlueExtended extends LinearOpMode {
 
         // Save the image as a JPG
         //webcam.saveBitmap(frame);
-        
+
         // Recycle the frame to save memory
         frame.recycle();
 
